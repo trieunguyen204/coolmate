@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COOLMATE - [Tên Sản phẩm]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Tông màu Coolmate: Xanh Navy/Đen (#1E2C3D) và Xám/Trắng */
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding-top: 60px;
+        }
+
+        .navbar {
+            background-color: #1E2C3D;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            z-index: 1030;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+        }
+
+        .product-image-main {
+            width: 100%;
+            border-radius: 12px;
+            object-fit: contain;
+            background: #f8f9fa;
+            max-height: 500px;
+        }
+
+        .thumbnail-image {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .thumbnail-image.active {
+            border-color: #1E2C3D;
+        }
+
+        .product-title {
+            color: #1E2C3D;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .price-new {
+            font-size: 2.2rem;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .price-old {
+            font-size: 1.2rem;
+            color: #6c757d;
+            text-decoration: line-through;
+            margin-left: 15px;
+        }
+
+        .selection-label {
+            font-weight: 600;
+            color: #1E2C3D;
+            margin-bottom: 8px;
+        }
+
+        .btn-size, .btn-color {
+            border: 1px solid #ccc;
+            background: white;
+            color: #333;
+            padding: 5px 12px;
+            margin-right: 8px;
+            border-radius: 5px;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-size.selected, .btn-color.selected {
+            background-color: #1E2C3D;
+            color: white;
+            border-color: #1E2C3D;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .quantity-control button {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            background: #eee;
+            border: 1px solid #ccc;
+            font-weight: bold;
+            color: #1E2C3D;
+        }
+
+        .quantity-control input {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ccc;
+            margin: 0 10px;
+            height: 40px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+
+        .btn-add-cart {
+            background-color: #1E2C3D;
+            border-color: #1E2C3D;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-add-cart:hover {
+            background-color: #0d1a25;
+            border-color: #0d1a25;
+        }
+
+        .btn-buy-now {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+        .btn-buy-now:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+
+        .tab-pane {
+            padding-top: 20px;
+        }
+
+        .nav-tabs .nav-link {
+            color: #333 !important;
+            border: none;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            padding: 10px 15px;
+            margin: 0 5px;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #1E2C3D !important;
+            border-bottom-color: #1E2C3D;
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}" href="home.html">COOLMATE</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}" href="home.html">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/products}" href="#">Sản phẩm</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/about}" href="about.html">Giới thiệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/contact}" href="contact.html">Liên hệ</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center">
+                <a th:href="@{/cart}" href="cart.html" class="nav-link position-relative me-2" title="Giỏ hàng">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
+                            0
+                            <span class="visually-hidden">sản phẩm trong giỏ</span>
+                        </span>
+                </a>
+                <a th:href="@{/login}" href="login.html" class="nav-link" title="Đăng nhập">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <div class="product-card">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="text-center mb-3">
+                    <img id="mainProductImage" th:src="${product.mainImageUrl}" src="placeholder_product_main.jpg" class="product-image-main" alt="Áo Polo Dry-Ex Coolmate">
+                </div>
+                <div class="row g-2 justify-content-center" id="thumbnailContainer">
+                    <div class="col-3">
+                        <img src="placeholder_product_thumb1.jpg" class="thumbnail-image active" alt="Ảnh 1" onclick="changeMainImage(this)">
+                    </div>
+                    <div class="col-3">
+                        <img src="placeholder_product_thumb2.jpg" class="thumbnail-image" alt="Ảnh 2" onclick="changeMainImage(this)">
+                    </div>
+                    <div class="col-3">
+                        <img src="placeholder_product_thumb3.jpg" class="thumbnail-image" alt="Ảnh 3" onclick="changeMainImage(this)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <h1 class="product-title" th:text="${product.name}">Áo Polo Thể Thao Dry-Ex Tối Giản</h1>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="text-warning me-3">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i>
+                    </div>
+                    <span class="text-muted">(4.3/5 - 245 đánh giá)</span>
+                </div>
+
+                <p class="mb-4 text-muted" th:text="${product.shortDescription}">
+                    Sản phẩm Áo Polo với chất liệu Dry-Ex siêu thoáng mát, thấm hút mồ hôi hiệu quả, giúp bạn thoải mái tối đa trong mọi hoạt động. Thiết kế tối giản, dễ dàng phối đồ.
+                </p>
+
+                <div class="mb-4">
+                    <span class="price-new" th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'POINT')} + ' đ'">299.000 đ</span>
+                    <span class="price-old" th:if="${product.oldPrice}" th:text="${#numbers.formatDecimal(product.oldPrice, 0, 'POINT', 0, 'POINT')} + ' đ'">349.000 đ</span>
+                </div>
+
+                <div class="mb-4">
+                    <p class="selection-label">Màu sắc: <span class="fw-normal text-muted" id="selectedColorDisplay">Đen</span></p>
+                    <div id="colorSelection">
+                        <button class="btn-color selected" data-color="Đen" style="background-color: #1a1a1a; border-color: #1a1a1a; color: white;">Đen</button>
+                        <button class="btn-color" data-color="Trắng" style="background-color: #f8f8f8; border-color: #e0e0e0;">Trắng</button>
+                        <button class="btn-color" data-color="Xanh Navy" style="background-color: #1E2C3D; border-color: #1E2C3D; color: white;">Navy</button>
+                        <button class="btn-color" data-color="Xám" style="background-color: #ccc; border-color: #bbb;">Xám</button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <p class="selection-label">Kích cỡ: <span class="fw-normal text-muted" id="selectedSizeDisplay">M</span></p>
+                    <div id="sizeSelection">
+                        <button class="btn-size" data-size="S">S</button>
+                        <button class="btn-size selected" data-size="M">M</button>
+                        <button class="btn-size" data-size="L">L</button>
+                        <button class="btn-size" data-size="XL">XL</button>
+                        <button class="btn-size" data-size="XXL">XXL</button>
+                    </div>
+                    <p class="text-muted small mt-2"><a href="#" data-bs-toggle="modal" data-bs-target="#sizeGuideModal">Xem Bảng size chi tiết</a></p>
+                </div>
+
+                <div class="mb-4">
+                    <p class="selection-label">Số lượng:</p>
+                    <div class="quantity-control">
+                        <button onclick="updateQuantity(-1)">-</button>
+                        <input type="number" id="quantityInput" value="1" min="1" max="100" class="form-control text-center">
+                        <button onclick="updateQuantity(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-3 d-md-flex justify-content-start">
+                    <button class="btn btn-add-cart flex-grow-1" id="addToCartBtn">
+                        <i class="fas fa-shopping-cart me-2"></i> Thêm vào giỏ hàng
+                    </button>
+                    <button class="btn btn-add-cart btn-buy-now flex-grow-1">
+                        <i class="fas fa-bolt me-2"></i> Mua ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Mô tả chi tiết</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="spec-tab" data-bs-toggle="tab" data-bs-target="#spec" type="button" role="tab" aria-controls="spec" aria-selected="false">Thông số Kỹ thuật</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab" aria-controls="review" aria-selected="false">Đánh giá (<span th:text="${product.reviewCount}">245</span>)</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="productTabsContent">
+                    <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                        <h5 class="fw-bold" style="color: #1E2C3D;">Giới thiệu về Áo Polo Dry-Ex</h5>
+                        <p>Áo Polo Dry-Ex là một trong những sản phẩm bán chạy nhất của Coolmate, nổi bật với công nghệ Dry-Ex giúp vải khô cực nhanh và thoáng khí tối đa. Thiết kế cổ điển kết hợp với phom dáng hiện đại, mang lại sự lịch lãm nhưng vẫn thoải mái cho người mặc trong mọi hoàn cảnh, từ đi làm đến chơi thể thao.</p>
+                        <h5 class="fw-bold mt-4" style="color: #1E2C3D;">Đặc điểm nổi bật</h5>
+                        <ul>
+                            <li>**Chất liệu:** 95% Polyester Dry-Ex, 5% Spandex.</li>
+                            <li>**Ưu điểm:** Khô nhanh, chống nhăn, co giãn 4 chiều.</li>
+                            <li>**Phù hợp:** Mặc hàng ngày, chơi golf, dạo phố.</li>
+                            <li>**Bảo hành:** Đổi trả miễn phí 60 ngày.</li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="spec" role="tabpanel" aria-labelledby="spec-tab">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><strong>Chất liệu chính:</strong> <span th:text="${product.material}">Dry-Ex 95/5</span></li>
+                                    <li class="mb-2"><strong>Thương hiệu:</strong> <span th:text="${product.brand}">Coolmate</span></li>
+                                    <li class="mb-2"><strong>Kiểu dáng:</strong> <span th:text="${product.style}">Slim-Fit/Polo</span></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><strong>Xuất xứ:</strong> <span th:text="${product.origin}">Việt Nam</span></li>
+                                    <li class="mb-2"><strong>Công nghệ:</strong> <span th:text="${product.technology}">Quick-Dry, Anti-Odor</span></li>
+                                    <li class="mb-2"><strong>Mùa sử dụng:</strong> <span th:text="${product.season}">Tất cả các mùa</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
+                        <div class="d-flex align-items-center mb-4">
+                            <h4 class="mb-0 me-3 fw-bold" style="color: #1E2C3D;">4.3</h4>
+                            <div>
+                                <div class="text-warning">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i>
+                                </div>
+                                <small class="text-muted">Dựa trên 245 đánh giá</small>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mb-3">Một số đánh giá gần đây:</h5>
+                        <div class="card mb-3 border-light shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 fw-bold">Nguyễn Thanh Tùng</h6>
+                                    <small class="text-muted">Đã mua 2 tuần trước</small>
+                                </div>
+                                <div class="text-warning my-1">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                                <p class="card-text mb-0">Chất liệu Dry-Ex rất thoải mái, mặc đi làm cả ngày không bị bí. Màu Navy rất đẹp và sang. Sẽ mua thêm!</p>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3 border-light shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 fw-bold">Trần Thị Mai</h6>
+                                    <small class="text-muted">Đã mua 1 tháng trước</small>
+                                </div>
+                                <div class="text-warning my-1">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                                </div>
+                                <p class="card-text mb-0">Áo chất lượng tốt so với giá, nhưng size M hơi ôm so với mình. Nên cân nhắc lên 1 size nếu thích mặc thoải mái.</p>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-outline-secondary mt-3">Xem tất cả đánh giá</button>
+
+                        <h5 class="fw-bold mt-5 mb-3" style="color: #1E2C3D;">Viết đánh giá của bạn</h5>
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label">Chất lượng sản phẩm:</label>
+                                <div class="text-warning">
+                                    <i class="far fa-star fa-lg" style="cursor: pointer;"></i>
+                                    <i class="far fa-star fa-lg" style="cursor: pointer;"></i>
+                                    <i class="far fa-star fa-lg" style="cursor: pointer;"></i>
+                                    <i class="far fa-star fa-lg" style="cursor: pointer;"></i>
+                                    <i class="far fa-star fa-lg" style="cursor: pointer;"></i>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewText" class="form-label">Bình luận</label>
+                                <textarea class="form-control" id="reviewText" rows="3" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-add-cart">Gửi đánh giá</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="text-center fw-bold mt-5 mb-4" style="color: #1E2C3D;">SẢN PHẨM LIÊN QUAN</h2>
+    <div class="row g-4">
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0">
+                <img src="placeholder_related_1.jpg" class="card-img-top" alt="Quần Short Thể Thao" style="height: 200px; object-fit: cover;">
+                <div class="card-body text-center">
+                    <h5 class="card-title fw-bold" style="color: #1E2C3D;">Quần Short Thể Thao 5-Inch</h5>
+                    <p class="text-danger fw-bold fs-5 mb-0">219.000 đ</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0">
+                <img src="placeholder_related_2.jpg" class="card-img-top" alt="Áo Khoác Nỉ" style="height: 200px; object-fit: cover;">
+                <div class="card-body text-center">
+                    <h5 class="card-title fw-bold" style="color: #1E2C3D;">Áo Khoác Nỉ Basic</h5>
+                    <p class="text-danger fw-bold fs-5 mb-0">399.000 đ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="sizeGuideModal" tabindex="-1" aria-labelledby="sizeGuideModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sizeGuideModalLabel" style="color: #1E2C3D;">Bảng Hướng Dẫn Chọn Kích Cỡ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bảng size chuẩn cho các loại áo thun/polo của Coolmate:</p>
+                <table class="table table-bordered text-center">
+                    <thead class="bg-light">
+                    <tr>
+                        <th>Size</th>
+                        <th>Cân nặng (kg)</th>
+                        <th>Chiều cao (cm)</th>
+                        <th>Vòng ngực (cm)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td>S</td><td>45 - 55</td><td>155 - 165</td><td>86 - 92</td></tr>
+                    <tr><td>M</td><td>55 - 65</td><td>165 - 172</td><td>92 - 98</td></tr>
+                    <tr><td>L</td><td>65 - 75</td><td>170 - 178</td><td>98 - 104</td></tr>
+                    <tr><td>XL</td><td>75 - 85</td><td>175 - 185</td><td>104 - 110</td></tr>
+                    <tr><td>XXL</td><td>85 - 95</td><td>180 - 190</td><td>110 - 116</td></tr>
+                    </tbody>
+                </table>
+                <p class="text-muted small mt-3">Lưu ý: Bảng chỉ mang tính chất tham khảo. Nếu ở giữa hai size, hãy chọn size lớn hơn nếu bạn thích mặc thoải mái.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // === GLOBAL VARIABLES & UTILS ===
+    const CART_STORAGE_KEY = 'coolmateCart'; // Đổi key
+
+    let selectedSize = 'M';
+    let selectedColor = 'Đen';
+    let currentQuantity = 1;
+
+    function formatPrice(price) {
+        return price.toLocaleString('vi-VN') + ' đ';
+    }
+
+    // === PRODUCT SELECTION LOGIC ===
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCartBadge();
+        setupSelectionListeners();
+        setupAddToCartButton();
+        // Đặt lại giá trị ban đầu cho input số lượng
+        document.getElementById('quantityInput').value = currentQuantity;
+    });
+
+    function setupSelectionListeners() {
+        // Lắng nghe chọn SIZE
+        document.querySelectorAll('.btn-size').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-size').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedSize = this.getAttribute('data-size');
+                document.getElementById('selectedSizeDisplay').textContent = selectedSize;
+            });
+        });
+
+        // Lắng nghe chọn COLOR
+        document.querySelectorAll('.btn-color').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-color').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedColor = this.getAttribute('data-color');
+                document.getElementById('selectedColorDisplay').textContent = selectedColor;
+            });
+        });
+
+        // Lắng nghe input số lượng
+        document.getElementById('quantityInput').addEventListener('change', function() {
+            let val = parseInt(this.value);
+            if (isNaN(val) || val < 1) {
+                val = 1;
+            }
+            currentQuantity = val;
+            this.value = val;
+        });
+    }
+
+    function updateQuantity(change) {
+        let input = document.getElementById('quantityInput');
+        let newQuantity = currentQuantity + change;
+        if (newQuantity < 1) newQuantity = 1;
+
+        currentQuantity = newQuantity;
+        input.value = newQuantity;
+    }
+
+    function changeMainImage(element) {
+        const mainImage = document.getElementById('mainProductImage');
+        mainImage.src = element.src;
+
+        // Cập nhật trạng thái active
+        document.querySelectorAll('.thumbnail-image').forEach(img => img.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    // === CART LOGIC ===
+    function setupAddToCartButton() {
+        document.getElementById('addToCartBtn').addEventListener('click', function() {
+            const productId = '1001'; // Giả lập Product ID
+            const productName = document.querySelector('.product-title').textContent;
+            const productPrice = 299000; // Giả lập giá
+
+            // Tạo đối tượng sản phẩm để thêm vào giỏ
+            const newItem = {
+                id: productId,
+                name: productName + ' (' + selectedColor + ' / ' + selectedSize + ')',
+                price: productPrice,
+                quantity: currentQuantity,
+                size: selectedSize,
+                color: selectedColor,
+                imageUrl: document.getElementById('mainProductImage').src // Hoặc URL ảnh thu nhỏ
+            };
+
+            // Lấy giỏ hàng hiện tại
+            let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+
+            // Kiểm tra nếu sản phẩm đã tồn tại (dựa trên id, size, color)
+            const existingItem = cart.find(item =>
+                item.id === newItem.id &&
+                item.size === newItem.size &&
+                item.color === newItem.color
+            );
+
+            if (existingItem) {
+                existingItem.quantity += newItem.quantity;
+            } else {
+                cart.push(newItem);
+            }
+
+            // Lưu lại giỏ hàng
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+            updateCartBadge();
+            alert(`Đã thêm ${currentQuantity} sản phẩm "${newItem.name}" vào giỏ hàng!`);
+
+            // Reset số lượng về 1 sau khi thêm
+            currentQuantity = 1;
+            document.getElementById('quantityInput').value = 1;
+        });
+    }
+
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+        const cartCount = document.getElementById('cartCount');
+        if (cartCount) {
+            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            cartCount.textContent = totalItems;
+            cartCount.style.display = totalItems > 0 ? 'inline' : 'none';
+        }
+    }
+</script>
+</body>
+</html>

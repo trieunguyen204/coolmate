@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|COOLSTYLE - Áo Polo Proze Air Max|" >COOLSTYLE - Chi tiết Sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* CSS MÔ PHỎNG PHONG CÁCH COOLMATE */
+        :root {
+            --color-primary: #007bff; /* Thay bằng màu Coolmate Blue nếu cần: #1c2a41 */
+            --color-coolmate-blue: #1c2a41;
+            --color-coolmate-green: #38b67f;
+            --color-text: #2c3e50;
+        }
+
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f4f4; /* Nền xám nhạt */
+            min-height: 100vh;
+            color: var(--color-text);
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+            border-bottom: 2px solid var(--color-coolmate-blue);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--color-coolmate-blue) !important;
+        }
+
+        .product-detail-container {
+            margin-top: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .product-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--color-coolmate-blue);
+        }
+
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #dc3545; /* Màu đỏ nổi bật cho giá */
+            margin-bottom: 20px;
+        }
+
+        .badge-stock {
+            background-color: var(--color-coolmate-green);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .color-option, .size-option {
+            border: 2px solid #ddd;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .color-option:hover, .size-option:hover {
+            border-color: var(--color-coolmate-blue);
+        }
+        .color-option.selected, .size-option.selected {
+            border-color: var(--color-coolmate-blue);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .btn-add-to-cart {
+            background-color: var(--color-coolmate-blue);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .btn-add-to-cart:hover {
+            background-color: #0d47a1;
+            color: white;
+        }
+
+        .product-description h5, .review-section h4 {
+            border-left: 4px solid var(--color-coolmate-green);
+            padding-left: 10px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="#">COOLSTYLE</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Áo</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Quần</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Đồ Lót</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Bộ Sưu Tập</a></li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Giỏ hàng <span class="badge bg-danger">0</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container my-5">
+    <div class="row product-detail-container">
+        <div class="col-md-6">
+            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="https://via.placeholder.com/600x600/1c2a41/ffffff?text=Product+Image+1" class="d-block w-100 rounded" alt="Áo Polo 1">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://via.placeholder.com/600x600/38b67f/ffffff?text=Product+Image+2" class="d-block w-100 rounded" alt="Áo Polo 2">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            <div class="d-flex mt-3 justify-content-center">
+                <img src="https://via.placeholder.com/100x100/1c2a41/ffffff?text=Thumb+1" class="img-thumbnail me-2" style="width: 80px; height: 80px; cursor: pointer;">
+                <img src="https://via.placeholder.com/100x100/38b67f/ffffff?text=Thumb+2" class="img-thumbnail me-2" style="width: 80px; height: 80px; cursor: pointer;">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <span class="badge-stock mb-3">CÒN HÀNG</span>
+            <h1 class="product-title">Áo Polo Thể Thao Proze Air Max M-23</h1>
+            <p class="text-muted">Chất liệu: 50% Cotton, 50% Polyester | Công nghệ: Quick Dry & Anti-UV</p>
+
+            <div class="d-flex align-items-center mb-3">
+                <div class="text-warning me-2">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                </div>
+                <span class="text-muted">(250 đánh giá)</span>
+            </div>
+
+            <p class="product-price">499.000 đ <del class="text-muted fs-5 ms-2">550.000 đ</del></p>
+
+            <h6 class="fw-bold mt-4 mb-2">Màu sắc: <span class="text-primary" id="selectedColor">Xanh Navy</span></h6>
+            <div class="d-flex mb-3">
+                <div class="color-option selected" style="background-color: #1c2a41;"></div>
+                <div class="color-option" style="background-color: #dc3545;"></div>
+                <div class="color-option" style="background-color: #38b67f;"></div>
+                <div class="color-option" style="background-color: #e9ecef;"></div>
+            </div>
+
+            <h6 class="fw-bold mb-2">Kích cỡ: <span class="text-primary" id="selectedSize">L</span></h6>
+            <div class="d-flex mb-4">
+                <div class="size-option selected">S</div>
+                <div class="size-option">M</div>
+                <div class="size-option">L</div>
+                <div class="size-option">XL</div>
+                <div class="size-option">XXL</div>
+            </div>
+
+            <div class="d-flex align-items-center mb-4">
+                <input type="number" id="quantity" value="1" min="1" class="form-control text-center me-3" style="width: 80px;">
+                <button class="btn btn-add-to-cart flex-grow-1"><i class="fas fa-cart-plus"></i> THÊM VÀO GIỎ</button>
+            </div>
+
+            <div class="product-description mt-5">
+                <h5>Đặc điểm nổi bật</h5>
+                <ul>
+                    <li>Thoáng khí vượt trội, khô nhanh gấp 3 lần cotton thường.</li>
+                    <li>Chống tia UV (UPF 50+) bảo vệ da dưới nắng hè.</li>
+                    <li>Co giãn 4 chiều, thoải mái vận động.</li>
+                    <li>Sản xuất tại Việt Nam.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5 review-section p-4 bg-white rounded shadow-sm">
+        <div class="col-12">
+            <h4 class="mt-0">Đánh giá Sản phẩm (250)</h4>
+            <div class="card p-3 mb-3 border-light">
+                <div class="d-flex justify-content-between">
+                    <h6 class="mb-1 fw-bold">Trần Văn A</h6>
+                    <small class="text-muted">20/10/2023</small>
+                </div>
+                <div class="text-warning mb-2">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="mb-0">Áo rất mát, mặc thoải mái, form chuẩn. Màu xanh navy rất đẹp và không bị ra màu khi giặt. Sẽ ủng hộ CoolStyle tiếp!</p>
+            </div>
+            <div class="text-center mt-4">
+                <a href="#" class="btn btn-outline-secondary">Xem tất cả đánh giá</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Thêm logic chọn màu và size
+    document.querySelectorAll('.color-option').forEach(el => {
+        el.addEventListener('click', () => {
+            document.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('selectedColor').textContent = el.style.backgroundColor.includes('navy') ? 'Xanh Navy' : 'Đỏ';
+        });
+    });
+
+    document.querySelectorAll('.size-option').forEach(el => {
+        el.addEventListener('click', () => {
+            document.querySelectorAll('.size-option').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('selectedSize').textContent = el.textContent;
+        });
+    });
+</script>
+</body>
+</html>

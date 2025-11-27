@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoolFashion - Thời trang tối giản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa; /* Nền sáng */
+            min-height: 100vh;
+            padding-top: 60px; /* Cho Navbar cố định */
+        }
+
+        /* Thay đổi màu Navbar sang Xanh Navy */
+        .navbar {
+            background-color: #1E2C3D; /* Xanh Navy đậm */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            z-index: 1030;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            margin: 0 5px;
+            padding: 10px 15px !important;
+            border-radius: 5px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-form {
+            position: relative;
+        }
+
+        .search-input {
+            border-radius: 20px;
+            padding-right: 40px;
+            padding-left: 15px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-input:focus {
+            background: white;
+            color: #1E2C3D;
+            box-shadow: none;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            padding-right: 15px;
+            transition: color 0.3s;
+        }
+
+        .search-input:focus ~ .search-button {
+            color: #1E2C3D;
+        }
+
+        .action-icon {
+            color: white;
+            font-size: 1.2rem;
+            margin-left: 15px;
+            transition: color 0.3s;
+        }
+
+        .action-icon:hover {
+            color: #ffc107; /* Vàng nổi bật */
+        }
+
+        /* Carousel và Banner */
+        .voucher-carousel-item {
+            height: 400px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Sản phẩm (Product Card) */
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image-wrapper {
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1E2C3D;
+            margin-bottom: 5px;
+            height: 44px; /* Giữ chiều cao cố định 2 dòng */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            color: #dc3545; /* Màu đỏ cho giá mới */
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .product-old-price {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-decoration: line-through;
+            margin-left: 10px;
+            display: inline-block;
+        }
+
+        .product-rating {
+            color: #ffc107;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .product-actions {
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .btn-add-cart, .btn-order {
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .btn-add-cart {
+            background-color: #1E2C3D;
+            border-color: #1E2C3D;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .btn-add-cart:hover {
+            background-color: #0d1a25;
+            border-color: #0d1a25;
+            color: white;
+        }
+
+        /* Chatbot Style */
+        .chatbox-wrapper {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .chatbox-toggler {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #1E2C3D;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .chatbox-toggler:hover {
+            transform: scale(1.05);
+            background-color: #0d1a25;
+        }
+
+        .chatbox-container {
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chatbox-header {
+            background-color: #1E2C3D;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .chatbox-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chatbox-input {
+            border-top: 1px solid #eee;
+            padding: 10px;
+            display: flex;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid container">
+        <a class="navbar-brand" th:href="@{/}" href="#">COOLMATE</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/}" href="#">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/products}" href="#">Sản phẩm</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Danh mục
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#">Áo Thun</a></li>
+                        <li><a class="dropdown-item" href="#">Quần Short</a></li>
+                        <li><a class="dropdown-item" href="#">Phụ kiện</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/about}" href="#">Giới thiệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/contact}" href="#">Liên hệ</a>
+                </li>
+            </ul>
+
+            <form class="d-flex search-form me-3" role="search" th:action="@{/search}">
+                <input class="form-control search-input" type="search" placeholder="Tìm kiếm sản phẩm..." aria-label="Search" name="query">
+                <button class="search-button" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <div class="d-flex align-items-center">
+                <th:block th:if="${#authorization.expression('!isAuthenticated()')}">
+                    <a th:href="@{/login}" class="action-icon" title="Đăng nhập/Đăng ký">
+                        <i class="fas fa-user"></i>
+                    </a>
+                </th:block>
+                <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                    <div class="dropdown">
+                        <a href="#" class="action-icon dropdown-toggle" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+                            <li><a class="dropdown-item" th:href="@{/profile}"><i class="fas fa-user me-2"></i>Tài khoản của tôi</a></li>
+                            <li><a class="dropdown-item" th:href="@{/orders}"><i class="fas fa-box me-2"></i>Đơn hàng</a></li>
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li>
+                                <form th:action="@{/logout}" method="post" style="display: block;">
+                                    <input type="hidden"
+                                           th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}" />
+                                    <button type="submit" class="dropdown-item"
+                                            style="width: 100%; text-align: left;">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </th:block>
+
+                <a th:href="@{/cart}" class="action-icon position-relative ms-3" title="Giỏ hàng">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${cartItemCount}">
+                            3
+                            <span class="visually-hidden">sản phẩm trong giỏ</span>
+                        </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div id="voucherCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#voucherCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#voucherCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#voucherCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active voucher-carousel-item" style="background-image: url('placeholder_banner1.jpg'); background-color: #3b5998;">
+                <div class="carousel-caption d-none d-md-block text-start">
+                    <h1 class="display-4 fw-bold">SIÊU SALE MÙA ĐÔNG</h1>
+                    <p class="fs-5">Giảm đến 50% các sản phẩm Áo Khoác và Nỉ.</p>
+                    <a href="#" class="btn btn-warning btn-lg fw-bold mt-2">MUA NGAY</a>
+                </div>
+            </div>
+            <div class="carousel-item voucher-carousel-item" style="background-image: url('placeholder_banner2.jpg'); background-color: #2c3e50;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h1 class="display-4 fw-bold">FREESHIP TOÀN QUỐC</h1>
+                    <p class="fs-5">Áp dụng cho đơn hàng từ 499K. Sắm Tết thả ga!</p>
+                </div>
+            </div>
+            <div class="carousel-item voucher-carousel-item" style="background-image: url('placeholder_banner3.jpg'); background-color: #f39c12;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h1 class="display-4 fw-bold text-dark">ÁO THUN COTTON TỰ NHIÊN</h1>
+                    <p class="fs-5 text-dark">Thoải mái, bền bỉ, giá chỉ từ 149K.</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#voucherCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#voucherCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <div class="voucher-banner bg-primary text-white text-center p-3 rounded-3 mb-5 shadow-sm" style="background-color: #1E2C3D !important;">
+        <p class="mb-0 fs-5 fw-bold">GIẢM 20% ĐƠN HÀNG ĐẦU TIÊN! Dùng Mã: <span class="badge bg-warning text-dark fs-5">COOL20</span></p>
+    </div>
+
+    <h2 class="text-center mb-4" style="color: #1E2C3D;"><i class="fas fa-star me-2"></i>SẢN PHẨM NỔI BẬT</h2>
+    <div class="row g-4">
+        <th:block th:each="product : ${featuredProducts}">
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="product-card">
+                    <a th:href="@{/products/{id}(id=${product.id})}" href="#">
+                        <div class="product-image-wrapper">
+                            <img th:src="${product.imageUrl}" src="placeholder_product.jpg" class="product-image" alt="Tên sản phẩm">
+                        </div>
+                    </a>
+                    <div class="product-info">
+                        <a th:href="@{/products/{id}(id=${product.id})}" class="text-decoration-none">
+                            <h3 class="product-title" th:text="${product.name}">Áo Polo Dry-Ex Coolmate</h3>
+                        </a>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span>(4.0)</span>
+                        </div>
+                        <div>
+                            <span class="product-price" th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'POINT')} + ' đ'">249.000 đ</span>
+                            <span class="product-old-price" th:if="${product.oldPrice}" th:text="${#numbers.formatDecimal(product.oldPrice, 0, 'POINT', 0, 'POINT')} + ' đ'">299.000 đ</span>
+                        </div>
+
+                        <div class="product-actions">
+                            <a th:href="@{/cart/add(productId=${product.id})}" class="btn btn-sm btn-add-cart w-100 mb-2">
+                                <i class="fas fa-shopping-cart me-1"></i> Thêm vào giỏ
+                            </a>
+                            <a th:href="@{/checkout(productId=${product.id})}" class="btn btn-sm btn-outline-secondary w-100">
+                                <i class="fas fa-bolt me-1"></i> Mua ngay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="product-card">
+                <a href="#">
+                    <div class="product-image-wrapper">
+                        <img src="https://i.ibb.co/L8Gj1H5/ao-polo-example.png" class="product-image" alt="Áo Polo">
+                    </div>
+                </a>
+                <div class="product-info">
+                    <a href="#" class="text-decoration-none">
+                        <h3 class="product-title">Áo Polo Thể Thao Kẻ Sọc</h3>
+                    </a>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>(5.0)</span>
+                    </div>
+                    <div>
+                        <span class="product-price">299.000 đ</span>
+                    </div>
+
+                    <div class="product-actions">
+                        <a href="#" class="btn btn-sm btn-add-cart w-100 mb-2">
+                            <i class="fas fa-shopping-cart me-1"></i> Thêm vào giỏ
+                        </a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary w-100">
+                            <i class="fas fa-bolt me-1"></i> Mua ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="chatbox-wrapper">
+    <button class="chatbox-toggler" id="chatboxToggler" onclick="toggleChatbox()">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    <div class="chatbox-container position-absolute bottom-0 end-0 mb-5 d-none" id="chatboxContainer">
+        <div class="chatbox-header">
+            <span>Coolmate AI Assistant</span>
+            <button class="btn-close btn-close-white" onclick="toggleChatbox()"></button>
+        </div>
+        <div class="chatbox-messages" id="chatboxMessages">
+            <div class="message-bubble" style="align-self: flex-start; background-color: #dcfce7; color: #14532d; border-radius: 12px 12px 12px 2px;">
+                <strong>Bot:</strong> Xin chào, tôi là trợ lý AI của Coolmate. Tôi có thể giúp gì cho bạn?
+            </div>
+        </div>
+        <div class="chatbox-input">
+            <input type="text" class="form-control me-2" placeholder="Nhập tin nhắn..." id="chatboxInput">
+            <button class="btn btn-primary" style="background-color: #1E2C3D; border-color: #1E2C3D;" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // --- Chatbot Logic ---
+    function toggleChatbox() {
+        const chatbox = document.getElementById('chatboxContainer');
+        chatbox.classList.toggle('d-none');
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('chatboxInput');
+        const messageText = input.value.trim();
+        if (messageText === "") return;
+
+        // 1. Hiển thị tin nhắn của người dùng
+        appendMessage(messageText, 'user');
+        input.value = '';
+
+        // 2. Hiển thị trạng thái bot đang gõ
+        const typingIndicator = appendMessage(null, 'typing');
+
+        // 3. Giả lập phản hồi của bot sau 1.5 giây
+        setTimeout(() => {
+            typingIndicator.remove(); // Xóa trạng thái đang gõ
+
+            let botResponse;
+            const lowerCaseMessage = messageText.toLowerCase();
+
+            if (lowerCaseMessage.includes('áo polo')) {
+                botResponse = "Áo Polo Dry-Ex của Coolmate có khả năng thấm hút mồ hôi tốt và khô nhanh. Bạn có muốn xem các màu sắc hiện có không?";
+            } else if (lowerCaseMessage.includes('voucher') || lowerCaseMessage.includes('khuyến mãi')) {
+                botResponse = "Hiện Coolmate đang có chương trình **GIẢM 20%** cho đơn hàng đầu tiên với mã **COOL20**. Đừng bỏ lỡ nhé!";
+            } else if (lowerCaseMessage.includes('giá') || lowerCaseMessage.includes('bao nhiêu')) {
+                botResponse = "Vui lòng cho tôi biết tên sản phẩm bạn quan tâm để tôi có thể kiểm tra giá chính xác.";
+            } else {
+                botResponse = "Tôi xin lỗi, hiện tại tôi chỉ có thể trả lời các câu hỏi về sản phẩm và khuyến mãi của Coolmate. Bạn có thể hỏi lại chi tiết hơn không?";
+            }
+
+            appendMessage(botResponse, 'bot');
+        }, 1500);
+    }
+
+    function appendMessage(text, type) {
+        const container = document.getElementById('chatboxMessages');
+        const div = document.createElement('div');
+        div.className = 'message-bubble';
+        div.style.maxWidth = "80%";
+        div.style.padding = "8px 12px";
+        div.style.borderRadius = "12px";
+        div.style.fontSize = "0.9rem";
+        div.style.whiteSpace = "pre-wrap";
+        div.style.wordBreak = "break-word";
+        div.style.marginBottom = "5px";
+
+        if (type === 'user') {
+            div.style.alignSelf = "flex-end";
+            div.style.backgroundColor = "#1E2C3D";
+            div.style.color = "white";
+            div.style.borderBottomRightRadius = "2px";
+            div.innerHTML = `<strong>Bạn:</strong> ${text}`;
+        }
+        else if (type === 'bot') {
+            div.style.alignSelf = "flex-start";
+            div.style.backgroundColor = "#e8f5e9";
+            div.style.color = "#1E2C3D";
+            div.style.border = "1px solid #c8e6c9";
+            div.style.borderBottomLeftRadius = "2px";
+            div.innerHTML = `<strong>Bot:</strong> ${text}`;
+        }
+         else if (type === 'typing') {
+            div.style.alignSelf = "flex-start";
+            div.style.fontStyle = "italic";
+            div.style.color = "#888";
+            div.style.fontSize = "12px";
+            div.innerHTML = "⏳ <i>Đang trả lời...</i>";
+        }
+
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight; // Cuộn xuống dưới cùng
+        return div; // Trả về element để có thể xóa (nếu là typing indicator)
+    }
+    // --- End Chatbot Logic ---
+</script>
+</body>
+</html>

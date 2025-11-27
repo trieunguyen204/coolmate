@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Quản lý Size - Coolmate</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* CSS CỦA COOLMATE ADMIN THEME */
+  body {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
+  }
+
+  /* Sidebar Styles - Màu Coolmate: Navy/Blue Grey */
+  .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 280px;
+      background: linear-gradient(135deg, #1c3144 0%, #3e5a77 100%);
+      color: white;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+  }
+
+  .sidebar.collapsed { width: 80px; }
+
+  .sidebar-header {
+      padding: 25px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+  }
+
+  .sidebar-logo {
+      font-size: 2rem;
+      margin-right: 10px;
+  }
+
+  .sidebar.collapsed .sidebar-logo { margin: 0; }
+
+  .sidebar-title {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+  }
+
+  .sidebar.collapsed .sidebar-title { display: none; }
+
+  .sidebar-menu { padding: 10px 0; }
+
+  .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      color: white;
+      text-decoration: none;
+      transition: background 0.2s, border-left 0.2s;
+      border-left: 4px solid transparent;
+      font-weight: 500;
+  }
+
+  .menu-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+  }
+
+  .menu-item i {
+      font-size: 1.1rem;
+      width: 30px;
+      text-align: center;
+  }
+
+  .sidebar.collapsed .menu-item span { display: none; }
+
+  .sidebar.collapsed .menu-item { justify-content: center; }
+
+  .menu-item.active {
+      background: #3e5a77;
+      border-left: 4px solid #f9fafb;
+  }
+
+  .toggle-btn {
+      position: absolute;
+      top: 20px;
+      right: -40px;
+      z-index: 1010;
+      color: #1c3144;
+      font-size: 1.2rem;
+  }
+
+  .sidebar.collapsed .toggle-btn { right: -50px; }
+
+  /* Media Queries for Mobile (Chỉ phần liên quan đến sidebar) */
+  @media (max-width: 768px) {
+      .sidebar {
+          left: -280px;
+          width: 280px;
+      }
+      .sidebar.show { left: 0; }
+      /*... các quy tắc khác được loại bỏ để chỉ giữ lại sidebar*/
+      .sidebar.collapsed { width: 280px; }
+      .sidebar.collapsed .sidebar-title, .sidebar.collapsed .menu-item span { display: block; }
+      .sidebar.collapsed .menu-item { justify-content: flex-start; }
+  }
+          .main-content { margin-left: 280px; padding: 0; }
+          .header { background: white; padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+          .dashboard-content { padding: 0 30px 30px 30px; }
+          .card { border: none; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); padding: 20px; background: white; margin-bottom: 20px; }
+          .btn-coolmate { background-color: #1c3144; color: white; }
+          .btn-coolmate:hover { background-color: #162636; color: white; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar" class="sidebar">
+    <button class="btn btn-link text-white toggle-btn d-none d-md-block" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <i class="fas fa-shirt"></i>
+        </div>
+        <h2 class="sidebar-title">Coolmate</h2>
+    </div>
+
+    <nav class="sidebar-menu">
+        <a th:href="@{/admin/home}" class="menu-item">
+            <i class="fas fa-home"></i> <span>Trang chủ</span>
+        </a>
+        <a th:href="@{/admin/products}" class="menu-item">
+            <i class="fas fa-box"></i> <span>Quản lý sản phẩm</span>
+        </a>
+        <a th:href="@{/admin/categories}" class="menu-item">
+            <i class="fas fa-list-alt"></i> <span>Quản lý danh mục</span>
+        </a>
+        <a th:href="@{/admin/sizes}" class="menu-item active">
+            <i class="fas fa-ruler-horizontal"></i> <span>Quản lý size</span>
+        </a>
+        <a th:href="@{/admin/orders}" class="menu-item">
+            <i class="fas fa-shopping-cart"></i> <span>Quản lý đơn hàng</span>
+        </a>
+        <a th:href="@{/admin/users}" class="menu-item">
+            <i class="fas fa-users"></i> <span>Quản lý khách hàng</span>
+        </a>
+        <a th:href="@{/admin/vouchers}" class="menu-item">
+            <i class="fas fa-tag"></i> <span>Quản lý Voucher</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post" class="mt-3"
+              style="width: 100%; padding: 0;">
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}" />
+
+            <button type="submit" class="menu-item"
+                    style="width: 100%; border: none; background: transparent;
+                           padding: 15px 20px; color: white; cursor: pointer;
+                           transition: background 0.2s, border-left 0.2s;
+                           font-weight: 500; display: flex; align-items: center;">
+                <i class="fas fa-sign-out-alt" style="font-size: 1.1rem; width: 30px; text-align: center;"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </form>
+    </nav>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <h1 style="margin: 0; font-size: 1.75rem; color: #1c3144;">Quản lý Kích thước</h1>
+    </div>
+
+    <div class="dashboard-content">
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-triangle me-2"></i><span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <h5 class="mb-4" th:text="${size.id == null ? 'Thêm mới Size' : 'Cập nhật Size'}">Form Size</h5>
+
+                    <form th:action="@{/admin/sizes/save}" th:object="${size}" method="post">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên Size <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{sizeName}"
+                                   placeholder="VD: S, M, L, XL..."
+                                   th:classappend="${#fields.hasErrors('sizeName')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('sizeName')}" th:errors="*{sizeName}">
+                                Lỗi tên size.
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-coolmate"><i class="fas fa-save me-2"></i>Lưu thông tin</button>
+                            <a th:if="${size.id != null}" th:href="@{/admin/sizes}" class="btn btn-secondary">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <h5 class="mb-3">Danh sách Kích thước</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên Size</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${sizes.empty}"><td colspan="3" class="text-center text-muted">Trống</td></tr>
+                            <tr th:each="s : ${sizes}">
+                                <td th:text="${s.id}"></td>
+                                <td><span class="badge bg-secondary fs-6" th:text="${s.sizeName}"></span></td>
+                                <td class="text-center">
+                                    <a th:href="@{/admin/sizes/edit/{id}(id=${s.id})}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                    <a th:href="@{/admin/sizes/delete/{id}(id=${s.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa size này?')"><i class="fas fa-trash-alt"></i></a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

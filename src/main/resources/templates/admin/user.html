@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Khách hàng - Coolmate Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* CSS CỦA COOLMATE ADMIN THEME */
+body {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Sidebar Styles - Màu Coolmate: Navy/Blue Grey */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 280px;
+    background: linear-gradient(135deg, #1c3144 0%, #3e5a77 100%);
+    color: white;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar.collapsed { width: 80px; }
+
+.sidebar-header {
+    padding: 25px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.sidebar-logo {
+    font-size: 2rem;
+    margin-right: 10px;
+}
+
+.sidebar.collapsed .sidebar-logo { margin: 0; }
+
+.sidebar-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.sidebar.collapsed .sidebar-title { display: none; }
+
+.sidebar-menu { padding: 10px 0; }
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background 0.2s, border-left 0.2s;
+    border-left: 4px solid transparent;
+    font-weight: 500;
+}
+
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.menu-item i {
+    font-size: 1.1rem;
+    width: 30px;
+    text-align: center;
+}
+
+.sidebar.collapsed .menu-item span { display: none; }
+
+.sidebar.collapsed .menu-item { justify-content: center; }
+
+.menu-item.active {
+    background: #3e5a77;
+    border-left: 4px solid #f9fafb;
+}
+
+.toggle-btn {
+    position: absolute;
+    top: 20px;
+    right: -40px;
+    z-index: 1010;
+    color: #1c3144;
+    font-size: 1.2rem;
+}
+
+.sidebar.collapsed .toggle-btn { right: -50px; }
+
+/* Media Queries for Mobile (Chỉ phần liên quan đến sidebar) */
+@media (max-width: 768px) {
+    .sidebar {
+        left: -280px;
+        width: 280px;
+    }
+    .sidebar.show { left: 0; }
+    /*... các quy tắc khác được loại bỏ để chỉ giữ lại sidebar*/
+    .sidebar.collapsed { width: 280px; }
+    .sidebar.collapsed .sidebar-title, .sidebar.collapsed .menu-item span { display: block; }
+    .sidebar.collapsed .menu-item { justify-content: flex-start; }
+}
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 280px;
+            padding: 0;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content.expanded { margin-left: 80px; }
+
+        /* Header (Topbar) Styles */
+        .header {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        .header-title { margin: 0; font-size: 1.75rem; color: #1c3144; }
+        .search-input { border-radius: 20px; padding-left: 15px; border: 1px solid #dee2e6; width: 300px; }
+
+
+        /* CSS Riêng cho trang User */
+        .content-body { padding: 0 30px 30px 30px; }
+        .table thead th { font-weight: 600; color: #495057; }
+        .table tbody tr:hover { background-color: #f1f1f1; }
+
+        .badge {
+            padding: 0.5em 0.8em;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            min-width: 60px;
+            display: inline-block;
+            text-align: center;
+        }
+        .badge-primary {
+            background-color: #38b67f;
+            color: white;
+        }
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Media Queries for Mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -280px;
+                width: 280px;
+            }
+            .sidebar.show { left: 0; }
+            .main-content { margin-left: 0; }
+            .main-content.expanded { margin-left: 0; }
+            .toggle-btn { display: none !important; }
+            .header { padding: 15px; }
+            .content-body { padding: 15px; }
+            .sidebar.collapsed { width: 280px; }
+            .sidebar.collapsed .sidebar-title, .sidebar.collapsed .menu-item span { display: block; }
+            .sidebar.collapsed .menu-item { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+
+
+<div id="sidebar" class="sidebar">
+    <button class="btn btn-link text-white toggle-btn d-none d-md-block" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <i class="fas fa-shirt"></i>
+        </div>
+        <h2 class="sidebar-title">Coolmate</h2>
+    </div>
+
+    <nav class="sidebar-menu">
+        <a th:href="@{/admin/home}" class="menu-item">
+            <i class="fas fa-home"></i> <span>Trang chủ</span>
+        </a>
+        <a th:href="@{/admin/products}" class="menu-item">
+            <i class="fas fa-box"></i> <span>Quản lý sản phẩm</span>
+        </a>
+        <a th:href="@{/admin/categories}" class="menu-item">
+            <i class="fas fa-list-alt"></i> <span>Quản lý danh mục</span>
+        </a>
+        <a th:href="@{/admin/sizes}" class="menu-item">
+            <i class="fas fa-ruler-horizontal"></i> <span>Quản lý size</span>
+        </a>
+        <a th:href="@{/admin/orders}" class="menu-item">
+            <i class="fas fa-shopping-cart"></i> <span>Quản lý đơn hàng</span>
+        </a>
+        <a th:href="@{/admin/users}" class="menu-item active">
+            <i class="fas fa-users"></i> <span>Quản lý khách hàng</span>
+        </a>
+        <a th:href="@{/admin/vouchers}" class="menu-item">
+            <i class="fas fa-tag"></i> <span>Quản lý Voucher</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post" class="mt-3"
+              style="width: 100%; padding: 0;">
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}" />
+
+            <button type="submit" class="menu-item"
+                    style="width: 100%; border: none; background: transparent;
+                           padding: 15px 20px; color: white; cursor: pointer;
+                           transition: background 0.2s, border-left 0.2s;
+                           font-weight: 500; display: flex; align-items: center;">
+                <i class="fas fa-sign-out-alt" style="font-size: 1.1rem; width: 30px; text-align: center;"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </form>
+    </nav>
+</div>
+
+
+
+
+<div id="mainContent" class="main-content">
+
+    <div class="header">
+        <button class="btn btn-link d-md-none" onclick="toggleMobileSidebar()">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+        <h2 class="header-title d-none d-md-block">Quản lý Khách hàng</h2>
+
+        <div class="d-flex align-items-center ms-auto">
+            <input type="text" id="searchUserInput" class="form-control search-input me-3" placeholder="Tìm kiếm khách hàng..." onkeyup="filterUsers()">
+            <div class="dropdown">
+                <a class="text-secondary" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-2x"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" onclick="confirmLogout()">Đăng xuất</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="content-body">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <label for="roleFilter" class="me-2 text-muted fw-bold">Lọc theo Vai trò:</label>
+                    <select id="roleFilter" class="form-select form-select-sm" style="width: 150px;" onchange="filterUsers()">
+                        <option value="">Tất cả</option>
+                        <option value="ROLE_USER">Khách hàng (User)</option>
+                        <option value="ROLE_ADMIN">Quản trị viên (Admin)</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="fas fa-plus"></i> Thêm mới
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Họ và Tên</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                        <tr th:each="user : ${users}" th:data-role="${user.role}">
+                            <td th:text="${user.id}">1</td>
+                            <td th:text="${user.fullName}">Nguyễn Văn A</td>
+                            <td th:text="${user.email}">nguyenvana@email.com</td>
+                            <td>
+                                <span th:classappend="${user.role == 'ROLE_ADMIN'} ? 'badge-danger' : 'badge-primary'"
+                                      class="badge"
+                                      th:text="${user.role}">ROLE_USER
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span th:if="${user.enabled}" class="badge bg-success">Đã kích hoạt</span>
+                                <span th:unless="${user.enabled}" class="badge bg-warning text-dark">Chưa kích hoạt</span>
+                            </td>
+                            <td class="text-center">
+                                <button onclick="showDetail(this.getAttribute('data-id'))"
+                                        class="btn btn-sm btn-info text-white me-2"
+                                        title="Xem chi tiết"
+                                        th:attr="data-id=${user.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="showEditModal(this.getAttribute('data-id'))"
+                                        class="btn btn-sm btn-warning text-white me-2"
+                                        title="Chỉnh sửa"
+                                        th:attr="data-id=${user.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="confirmDelete(this.getAttribute('data-id'))"
+                                        class="btn btn-sm btn-danger"
+                                        title="Xóa"
+                                        th:attr="data-id=${user.id}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(users)}" id="noDataRow">
+                            <td colspan="6" class="text-center text-muted py-4">Chưa có người dùng nào được tìm thấy.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="addUserModalLabel">Thêm Khách hàng Mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/admin/users/add}" method="post" th:object="${newUser}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">Họ và Tên</label>
+                        <input type="text" class="form-control" id="add-fullName" th:field="*{fullName}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="add-email" th:field="*{email}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mật khẩu</label>
+                        <input type="password" class="form-control" id="add-password" th:field="*{password}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Vai trò</label>
+                        <select class="form-select" id="add-role" th:field="*{role}">
+                            <option value="ROLE_USER">Khách hàng (ROLE_USER)</option>
+                            <option value="ROLE_ADMIN">Quản trị viên (ROLE_ADMIN)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="add-enabled" th:field="*{enabled}" checked>
+                        <label class="form-check-label" for="add-enabled">Kích hoạt tài khoản</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Thêm Khách hàng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="editUserModalLabel">Sửa Thông Tin Khách Hàng</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editUserForm" action="" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit-id" class="form-label">ID</label>
+                        <input type="text" class="form-control" id="edit-id" name="id" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-fullName" class="form-label">Họ và Tên</label>
+                        <input type="text" class="form-control" id="edit-fullName" name="fullName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit-email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-role" class="form-label">Vai trò</label>
+                        <select class="form-select" id="edit-role" name="role">
+                            <option value="ROLE_USER">Khách hàng (ROLE_USER)</option>
+                            <option value="ROLE_ADMIN">Quản trị viên (ROLE_ADMIN)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="edit-enabled" name="enabled">
+                        <label class="form-check-label" for="edit-enabled">Kích hoạt tài khoản</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-warning text-white"><i class="fas fa-save"></i> Cập Nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="detailUserModal" tabindex="-1" aria-labelledby="detailUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="detailUserModalLabel">Chi Tiết Khách Hàng</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> <span id="detail-id"></span></p>
+                <p><strong>Họ và Tên:</strong> <span id="detail-fullName"></span></p>
+                <p><strong>Email:</strong> <span id="detail-email"></span></p>
+                <p><strong>Vai trò:</strong> <span id="detail-role"></span></p>
+                <p><strong>Trạng thái:</strong> <span id="detail-enabled"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // --- Logic Sidebar (ĐỒNG BỘ VỚI HOME.HTML) ---
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.classList.remove('fa-chevron-left');
+            toggleIcon.classList.add('fa-chevron-right');
+        } else {
+            toggleIcon.classList.remove('fa-chevron-right');
+            toggleIcon.classList.add('fa-chevron-left');
+        }
+    }
+    function toggleMobileSidebar() {
+        document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    function confirmLogout() {
+        if (confirm("Bạn có chắc chắn muốn Đăng xuất không?")) {
+            window.location.href = "/logout";
+        }
+    }
+
+    // --- Logic Lọc và Tìm kiếm (Client-side) ---
+    function filterUsers() {
+        const query = document.getElementById('searchUserInput').value.toLowerCase();
+        const role = document.getElementById('roleFilter').value;
+        const rows = document.querySelectorAll('#userTableBody tr');
+        let visibleRowCount = 0;
+
+        rows.forEach(row => {
+            if(row.id === 'noDataRow') return;
+
+            const fullNameCell = row.cells[1];
+            const emailCell = row.cells[2];
+
+            if (!fullNameCell || !emailCell) return;
+
+            const fullName = fullNameCell.textContent.toLowerCase();
+            const email = emailCell.textContent.toLowerCase();
+            const userRole = row.getAttribute('data-role');
+
+            const textMatch = fullName.includes(query) || email.includes(query);
+            const roleMatch = role === '' || userRole === role;
+
+            if (textMatch && roleMatch) {
+                row.style.display = '';
+                visibleRowCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const noDataRow = document.getElementById('noDataRow');
+        if (noDataRow) {
+             noDataRow.style.display = (visibleRowCount === 0) ? '' : 'none';
+        }
+    }
+
+    // --- Logic Xem Chi Tiết (Dùng AJAX/Fetch) ---
+    function showDetail(userId) {
+        // Gọi API để lấy dữ liệu
+        fetch('/admin/users/detail/' + userId)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Lỗi khi tải dữ liệu. Mã trạng thái: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(user => {
+                // Đổ dữ liệu vào modal
+                document.getElementById('detail-id').textContent = user.id;
+                document.getElementById('detail-fullName').textContent = user.fullName;
+                document.getElementById('detail-email').textContent = user.email;
+                document.getElementById('detail-role').textContent = user.role;
+                document.getElementById('detail-enabled').textContent = user.enabled ? 'Đã kích hoạt' : 'Chưa kích hoạt';
+
+                // Hiển thị modal
+                const detailModal = new bootstrap.Modal(document.getElementById('detailUserModal'));
+                detailModal.show();
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy chi tiết người dùng:', error);
+                alert('Không thể tải chi tiết người dùng. Vui lòng kiểm tra console hoặc endpoint API.');
+            });
+    }
+
+    // --- Logic Sửa Khách Hàng (MỚI) ---
+    function showEditModal(userId) {
+        // 1. Gọi API để lấy dữ liệu người dùng
+        fetch('/admin/users/detail/' + userId)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Lỗi khi tải dữ liệu. Mã trạng thái: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(user => {
+                // 2. Điền dữ liệu vào form Sửa (editUserModal)
+                document.getElementById('edit-id').value = user.id;
+                document.getElementById('edit-fullName').value = user.fullName;
+                document.getElementById('edit-email').value = user.email;
+                document.getElementById('edit-role').value = user.role;
+                document.getElementById('edit-enabled').checked = user.enabled;
+
+                // 3. Set Action cho Form (POST đến /admin/users/update/{id})
+                document.getElementById('editUserForm').action = '/admin/users/update/' + user.id;
+
+                // 4. Hiển thị modal
+                const editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                editModal.show();
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy dữ liệu người dùng để sửa:', error);
+                alert('Không thể tải dữ liệu để chỉnh sửa. Vui lòng kiểm tra console.');
+            });
+    }
+
+    // --- Logic Xóa Tài Khoản ---
+    function confirmDelete(userId) {
+        if (confirm("Bạn có chắc chắn muốn XÓA người dùng có ID " + userId + " này không? Thao tác này không thể hoàn tác.")) {
+            // Chuyển hướng đến endpoint DELETE đã định nghĩa trong Controller
+            window.location.href = "/admin/users/delete/" + userId;
+        }
+    }
+</script>
+</body>
+</html>

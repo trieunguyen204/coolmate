@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử Đơn hàng - COOLMATE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Tông màu Coolmate: Xanh Navy/Đen (#1E2C3D) và Xám/Trắng */
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+            padding-top: 60px;
+        }
+
+        .navbar {
+            background-color: #1E2C3D;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            z-index: 1030;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        .header-title {
+            color: #1E2C3D;
+            font-weight: 700;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #1E2C3D; /* Điểm nhấn Coolmate */
+        }
+
+        .order-status-badge {
+            font-size: 0.9rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .status-MỚI { background-color: #ffc107; color: #343a40; } /* Vàng */
+        .status-ĐANG_XỬ_LÝ { background-color: #0d6efd; color: white; } /* Xanh dương */
+        .status-ĐÃ_GIAO { background-color: #28a745; color: white; } /* Xanh lá */
+        .status-ĐÃ_HỦY { background-color: #dc3545; color: white; } /* Đỏ */
+
+        .btn-outline-primary {
+            color: #1E2C3D;
+            border-color: #1E2C3D;
+        }
+        .btn-outline-primary:hover {
+            background-color: #1E2C3D;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}" href="home.html">COOLMATE</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}" href="home.html">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/products}" href="product.html">Sản phẩm</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/about}" href="about.html">Giới thiệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/contact}" href="contact.html">Liên hệ</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center">
+                <a th:href="@{/cart}" href="cart.html" class="nav-link position-relative me-2" title="Giỏ hàng">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
+                            0
+                            <span class="visually-hidden">sản phẩm trong giỏ</span>
+                        </span>
+                </a>
+                <div class="dropdown">
+                    <a href="#" class="nav-link dropdown-toggle active" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Tài khoản">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+                        <li><a class="dropdown-item" th:href="@{/profile}"><i class="fas fa-user me-2"></i>Tài khoản</a></li>
+                        <li><a class="dropdown-item active" th:href="@{/my-orders}"><i class="fas fa-box me-2"></i>Đơn hàng</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <h1 class="header-title mb-4">
+        <i class="fas fa-box me-2"></i> Lịch sử Đơn hàng của bạn
+    </h1>
+
+    <div th:if="${orders.empty}">
+        <div class="alert alert-info text-center py-4">
+            <i class="fas fa-info-circle me-2"></i> Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm ngay!
+        </div>
+    </div>
+
+    <th:block th:each="order : ${orders}">
+        <div class="order-card">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                <h5 class="fw-bold mb-0">Mã Đơn hàng: <span class="text-secondary" th:text="${order.orderCode}">#CM20240001</span></h5>
+                <span th:classappend="'status-' + ${order.status}" th:text="${order.status}" class="order-status-badge">ĐÃ_GIAO</span>
+            </div>
+
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <div><strong>Ngày đặt</strong></div>
+                    <span th:text="${#dates.format(order.orderDate, 'dd/MM/yyyy')}">20/07/2024</span>
+                </div>
+                <div class="col-md-3">
+                    <div><strong>Số sản phẩm</strong></div>
+                    <span th:text="${order.totalProducts} + ' sản phẩm'">3 sản phẩm</span>
+                </div>
+                <div class="col-md-3">
+                    <div><strong>Tổng tiền</strong></div>
+                    <h5 class="text-danger mb-0" th:text="${order.totalAmountFormatted}">450.000đ</h5>
+                </div>
+                <div class="col-md-3 text-end">
+                    <a th:href="@{'/order/success/' + ${order.idOrder}}" href="order_success.html" class="btn btn-outline-primary">
+                        Xem chi tiết <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <div class="order-card">
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+            <h5 class="fw-bold mb-0">Mã Đơn hàng: <span class="text-secondary">#CM20240002</span></h5>
+            <span class="order-status-badge status-ĐANG_XỬ_LÝ">ĐANG XỬ LÝ</span>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <div><strong>Ngày đặt</strong></div>
+                <span>01/08/2024</span>
+            </div>
+            <div class="col-md-3">
+                <div><strong>Số sản phẩm</strong></div>
+                <span>1 sản phẩm</span>
+            </div>
+            <div class="col-md-3">
+                <div><strong>Tổng tiền</strong></div>
+                <h5 class="text-danger mb-0">199.000đ</h5>
+            </div>
+            <div class="col-md-3 text-end">
+                <a href="order_success.html" class="btn btn-outline-primary">
+                    Xem chi tiết <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartBadge();
+    });
+
+    function updateCartBadge() {
+        // Đổi key localStorage
+        const cart = JSON.parse(localStorage.getItem('coolmateCart') || '[]');
+        const cartCount = document.getElementById('cartCount');
+        if (cartCount) {
+            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            cartCount.textContent = totalItems;
+            cartCount.style.display = totalItems > 0 ? 'inline' : 'none';
+        }
+    }
+</script>
+</body>
+</html>
