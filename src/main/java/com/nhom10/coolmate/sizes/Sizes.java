@@ -1,27 +1,28 @@
 package com.nhom10.coolmate.sizes;
 
+import com.nhom10.coolmate.product.ProductVariant;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size; // Import bình thường, không lo trùng tên class
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
 
 @Entity
 @Table(name = "sizes")
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Sizes { // Tên class là Sizes
-
+public class Sizes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(message = "Tên size không được để trống")
-    @Size(max = 20, message = "Tên size tối đa 20 ký tự")
-    @Column(name = "size_name", length = 20, unique = true, nullable = false)
+    @Column(name = "size_name", nullable = false, length = 20, unique = true)
     private String sizeName;
+
+    // Ánh xạ quan hệ 1-n
+    @OneToMany(mappedBy = "size", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariant> productVariants;
 }

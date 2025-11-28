@@ -1,75 +1,68 @@
 package com.nhom10.coolmate.user;
 
-import com.nhom10.coolmate.comment.Comment; // Import Entity Comment
-import com.nhom10.coolmate.orders.Address; // Import Entity Address
-import com.nhom10.coolmate.vouchers.UserVoucher;
+import com.nhom10.coolmate.address.Address;
+import com.nhom10.coolmate.cart.Cart;
+import com.nhom10.coolmate.comment.Comment;
+import com.nhom10.coolmate.order.Order;
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
-
-    // 1. FIX LỖI InvalidClassException (Quan trọng)
-    private static final long serialVersionUID = 1L;
-
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "full_name", nullable = false)
+    @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, length = 150, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
 
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(nullable = false)
-    private String role = "ROLE_USER"; // ROLE_USER hoặc ROLE_ADMIN
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, columnDefinition = "ENUM('USER','ADMIN') DEFAULT 'USER'")
+    private Role role;
 
-    @Column(columnDefinition = "tinyint default 1")
-    private Integer status = 1;
+    @Column(name = "status", nullable = false, columnDefinition = "TINYINT DEFAULT 1")
+    private Integer status;
 
-    // 2. QUAN HỆ: 1 User có nhiều Address
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private Timestamp createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "render", nullable = false, columnDefinition = "ENUM('Nam','Nu') DEFAULT 'Nam'")
+    private Gender gender;
+
+    // Ánh xạ quan hệ 1-n
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude // Tránh lỗi vòng lặp khi in log
-    private List<Address> addresses = new ArrayList<>();
+    private List<Address> addresses;
 
-    // 3. QUAN HỆ: 1 User có nhiều Comment
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private List<Comment> comments = new ArrayList<>();
+    private List<Comment> comments;
 
-    // --- BỔ SUNG VÍ VOUCHER ---
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private List<UserVoucher> userVouchers = new ArrayList<>();
+    private List<Order> orders;
 
-    // --- PHƯƠNG THỨC CỦA SPRING SECURITY ---
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
-    }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
 
-    @Override public String getUsername() { return email; }
-    @Override public String getPassword() { return password; }
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return status == 1; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return status == 1; }
+
+
+
 }
