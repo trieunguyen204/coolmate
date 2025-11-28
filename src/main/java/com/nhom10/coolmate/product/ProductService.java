@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.nhom10.coolmate.exception.AppException;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -31,21 +32,31 @@ public class ProductService {
 
     // --- Mapper & Calculation ---
 
-    // Tính giá sau khi giảm giá
     private BigDecimal calculateDiscountPrice(BigDecimal price, Integer discountPercent) {
         if (discountPercent == null || discountPercent <= 0) {
             return price;
         }
-        // Rounding Half Up cho tính toán giá tiền
         BigDecimal discountFactor = BigDecimal.valueOf(100 - discountPercent.doubleValue()).divide(BigDecimal.valueOf(100));
         return price.multiply(discountFactor).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     private ProductDTO mapToDTO(Product product) {
-        // Tính giá giảm
         BigDecimal discountPrice = calculateDiscountPrice(product.getPrice(), product.getDiscountPercent());
 
-        // Lấy thông tin biến thể cho hiển thị (ProductSizeColorStockDTO)
+        // --- KHẮC PHỤC LỖI CATEGORY ID 0 ---
+        String categoryName = "-";
+        Integer categoryId = null;
+
+        try {
+            // Sử dụng try-catch khi truy cập Category Entity để xử lý lỗi ID 0
+            if (product.getCategory() != null) {
+                categoryName = product.getCategory().getName();
+                categoryId = product.getCategory().getId();
+            }
+        } catch (EntityNotFoundException | NullPointerException e) {
+            categoryName = "Danh mục bị lỗi";
+        }
+
         List<ProductDTO.ProductSizeColorStockDTO> variantsDto = product.getVariants().stream()
                 .filter(v -> v.getSize() != null)
                 .map(v -> ProductDTO.ProductSizeColorStockDTO.builder()
@@ -56,10 +67,6 @@ public class ProductService {
                         .build())
                 .collect(Collectors.toList());
 
-        // Lấy tên danh mục
-        String categoryName = product.getCategory() != null ? product.getCategory().getName() : "-";
-
-
         return ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -67,11 +74,11 @@ public class ProductService {
                 .price(product.getPrice())
                 .discountPercent(product.getDiscountPercent())
                 .material(product.getMaterial())
-                .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
-                .categoryName(categoryName) // <<< ĐÃ THÊM MAP TRƯỜNG NÀY
-                .discountPrice(discountPrice) // Giá đã giảm
-                .productVariants(variantsDto) // Biến thể cho bảng
-                .existingImages(product.getImages()) // Ảnh hiện tại
+                .categoryId(categoryId)
+                .categoryName(categoryName)
+                .discountPrice(discountPrice)
+                .productVariants(variantsDto)
+                .existingImages(product.getImages())
                 .build();
     }
 

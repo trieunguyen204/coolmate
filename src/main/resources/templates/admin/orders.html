@@ -129,20 +129,23 @@
 
          .badge-status { font-size: 0.85rem; padding: 5px 10px; }
          .bg-pending { background-color: #fff3cd; color: #856404; }
-         .bg-shipping { background-color: #d1ecf1; color: #0c5460; }
+         .bg-processing { background-color: #d1ecf1; color: #0c5460; }
+         .bg-shipped { background-color: #add8e6; color: #000080; } /* Blue/Navy */
          .bg-delivered { background-color: #d4edda; color: #155724; }
          .bg-cancelled { background-color: #f8d7da; color: #721c24; }
+         .bg-secondary { background-color: #6c757d; color: white; } /* Default fallback */
 
          .product-thumb-small { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px; }
          .modal-body { max-height: 80vh; overflow-y: auto; }
 
          /* Step Progress */
          .step-progress { display: flex; justify-content: space-between; margin-bottom: 20px; position: relative; }
-         .step-item { text-align: center; position: relative; z-index: 2; width: 33%; }
+         .step-item { text-align: center; position: relative; z-index: 2; width: 25%; }
          .step-circle { width: 30px; height: 30px; border-radius: 50%; background: #e9ecef; color: #6c757d; line-height: 30px; margin: 0 auto 5px; font-weight: bold; }
          .step-item.active .step-circle { background: #1c3144; color: white; }
          .step-item.completed .step-circle { background: #28a745; color: white; }
-         .progress-line { position: absolute; top: 15px; left: 15%; width: 70%; height: 2px; background: #e9ecef; z-index: 1; }
+         /* Điều chỉnh progress line cho 4 bước */
+         .progress-line { position: absolute; top: 15px; left: 12.5%; width: 75%; height: 2px; background: #e9ecef; z-index: 1; }
     </style>
 </head>
 <body>
@@ -202,8 +205,6 @@
 </div>
 
 
-
-
 <div class="main-content">
     <h2 class="mb-4" style="color: #1c3144;">Quản lý Đơn hàng</h2>
 
@@ -218,9 +219,10 @@
 
     <div class="card border-0 shadow-sm p-3">
         <div class="d-flex mb-3 gap-2 flex-wrap">
-            <a th:href="@{/admin/orders}" class="btn btn-sm" th:classappend="${currentStatus == null} ? 'btn-dark' : 'btn-outline-secondary'">Tất cả</a>
+            <a th:href="@{/admin/orders}" class="btn btn-sm" th:classappend="${currentStatus == 'ALL'} ? 'btn-dark' : 'btn-outline-secondary'">Tất cả</a>
             <a th:href="@{/admin/orders(status='PENDING')}" class="btn btn-sm" th:classappend="${currentStatus == 'PENDING'} ? 'btn-warning' : 'btn-outline-warning'">Chờ xử lý</a>
-            <a th:href="@{/admin/orders(status='SHIPPING')}" class="btn btn-sm" th:classappend="${currentStatus == 'SHIPPING'} ? 'btn-info text-white' : 'btn-outline-info'">Đang giao</a>
+            <a th:href="@{/admin/orders(status='PROCESSING')}" class="btn btn-sm" th:classappend="${currentStatus == 'PROCESSING'} ? 'btn-info text-white' : 'btn-outline-info'">Đang xử lý</a>
+            <a th:href="@{/admin/orders(status='SHIPPED')}" class="btn btn-sm" th:classappend="${currentStatus == 'SHIPPED'} ? 'btn-primary' : 'btn-outline-primary'">Đang giao</a>
             <a th:href="@{/admin/orders(status='DELIVERED')}" class="btn btn-sm" th:classappend="${currentStatus == 'DELIVERED'} ? 'btn-success' : 'btn-outline-success'">Hoàn thành</a>
             <a th:href="@{/admin/orders(status='CANCELLED')}" class="btn btn-sm" th:classappend="${currentStatus == 'CANCELLED'} ? 'btn-danger' : 'btn-outline-danger'">Đã hủy</a>
         </div>
@@ -234,18 +236,20 @@
                     <th>Tổng tiền</th>
                     <th>Thanh toán</th>
                     <th>Trạng thái</th>
+                    <th>Địa chỉ giao hàng</th>
                     <th class="text-center">Hành động</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:if="${orders.empty}"><td colspan="7" class="text-center py-4">Chưa có đơn hàng nào.</td></tr>
+                <tr th:if="${orders.empty}"><td colspan="8" class="text-center py-4">Chưa có đơn hàng nào.</td></tr>
                 <tr th:each="o : ${orders}">
                     <td><span class="fw-bold text-dark">#[[${o.id}]]</span></td>
                     <td>
                         <div class="fw-bold" th:text="${o.user != null ? o.user.fullName : 'Khách vãng lai'}"></div>
                         <small class="text-muted" th:text="${o.user != null ? o.user.email : ''}"></small>
                     </td>
-                    <td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${#dates.format(o.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+
                     <td class="fw-bold text-primary" th:text="${#numbers.formatDecimal(o.finalTotal, 0, 'POINT', 0, 'POINT')} + ' đ'"></td>
                     <td>
                         <span th:text="${o.payment != null ? o.payment.method : 'COD'}"></span>
@@ -255,22 +259,37 @@
                     </td>
                     <td>
                         <span th:if="${o.status == 'PENDING'}" class="badge badge-status bg-pending">Chờ xử lý</span>
-                        <span th:if="${o.status == 'SHIPPING'}" class="badge badge-status bg-shipping">Đang giao</span>
+                        <span th:if="${o.status == 'PROCESSING'}" class="badge badge-status bg-processing">Đang xử lý</span>
+                        <span th:if="${o.status == 'SHIPPED'}" class="badge badge-status bg-shipped">Đang giao</span>
                         <span th:if="${o.status == 'DELIVERED'}" class="badge badge-status bg-delivered">Hoàn thành</span>
                         <span th:if="${o.status == 'CANCELLED'}" class="badge badge-status bg-cancelled">Đã hủy</span>
+
+                        <span th:if="${o.status != 'PENDING' and o.status != 'PROCESSING' and o.status != 'SHIPPED' and o.status != 'DELIVERED' and o.status != 'CANCELLED'}"
+                              class="badge badge-status bg-secondary">
+                              [[${o.status}]]
+                        </span>
                     </td>
+                    <td class="small text-muted" th:text="${o.shippingAddress}">Địa chỉ giao hàng</td>
+
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
                             <a th:href="@{/admin/orders(detailId=${o.id})}" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <form th:if="${o.status == 'PENDING'}" th:action="@{/admin/orders/update-status}" method="post">
-                                <input type="hidden" name="id" th:value="${o.id}">
-                                <input type="hidden" name="status" value="CANCELLED">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Hủy nhanh" onclick="return confirm('Hủy đơn này?');">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </form>
+                            <div th:if="${o.status != 'DELIVERED' and o.status != 'CANCELLED'}">
+                                <form th:action="@{/admin/orders/update-status}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <input type="hidden" name="id" th:value="${o.id}">
+
+                                    <input type="hidden" name="status"
+                                           th:value="${o.status == 'PENDING' ? 'PROCESSING' : (o.status == 'PROCESSING' ? 'SHIPPED' : (o.status == 'SHIPPED' ? 'DELIVERED' : ''))}">
+
+                                    <button type="submit" class="btn btn-sm btn-dark" title="Cập nhật trạng thái"
+                                            th:if="${o.status == 'PENDING' or o.status == 'PROCESSING' or o.status == 'SHIPPED'}">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -293,14 +312,22 @@
             <div class="modal-body">
                 <div class="step-progress mb-4 mt-2" th:if="${orderDetail.status != 'CANCELLED'}">
                     <div class="progress-line"></div>
-                    <div class="step-item" th:classappend="${orderDetail.status == 'PENDING' ? 'active' : (orderDetail.status == 'SHIPPING' or orderDetail.status == 'DELIVERED' ? 'completed' : '')}">
+
+                    <div class="step-item" th:classappend="${orderDetail.status == 'PENDING' ? 'active' : (orderDetail.status != 'PENDING' ? 'completed' : '')}">
                         <div class="step-circle"><i class="fas fa-clipboard-list"></i></div>
                         <div class="small fw-bold">Chờ xử lý</div>
                     </div>
-                    <div class="step-item" th:classappend="${orderDetail.status == 'SHIPPING' ? 'active' : (orderDetail.status == 'DELIVERED' ? 'completed' : '')}">
+
+                    <div class="step-item" th:classappend="${orderDetail.status == 'PROCESSING' ? 'active' : (orderDetail.status == 'SHIPPED' or orderDetail.status == 'DELIVERED' ? 'completed' : '')}">
+                        <div class="step-circle"><i class="fas fa-box-open"></i></div>
+                        <div class="small fw-bold">Đang xử lý</div>
+                    </div>
+
+                    <div class="step-item" th:classappend="${orderDetail.status == 'SHIPPED' ? 'active' : (orderDetail.status == 'DELIVERED' ? 'completed' : '')}">
                         <div class="step-circle"><i class="fas fa-shipping-fast"></i></div>
                         <div class="small fw-bold">Đang giao</div>
                     </div>
+
                     <div class="step-item" th:classappend="${orderDetail.status == 'DELIVERED' ? 'completed active' : ''}">
                         <div class="step-circle"><i class="fas fa-check"></i></div>
                         <div class="small fw-bold">Hoàn thành</div>
@@ -356,38 +383,28 @@
                         <div class="card mb-3 border-primary" th:if="${orderDetail.status != 'DELIVERED' and orderDetail.status != 'CANCELLED'}">
                             <div class="card-header bg-primary text-white fw-bold"><i class="fas fa-tasks me-2"></i>Xử lý đơn hàng</div>
                             <div class="card-body">
-                                <div th:if="${orderDetail.status == 'PENDING'}">
+                                <div th:if="${orderDetail.status == 'PENDING' or orderDetail.status == 'PROCESSING' or orderDetail.status == 'SHIPPED'}">
                                     <form th:action="@{/admin/orders/update-status}" method="post" class="mb-2">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                         <input type="hidden" name="id" th:value="${orderDetail.id}">
-                                        <input type="hidden" name="status" value="SHIPPING">
-                                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
-                                            Next: Đang giao hàng <i class="fas fa-arrow-right ms-2"></i>
-                                        </button>
-                                    </form>
-                                    <form th:action="@{/admin/orders/update-status}" method="post">
-                                        <input type="hidden" name="id" th:value="${orderDetail.id}">
-                                        <input type="hidden" name="status" value="CANCELLED">
-                                        <button type="submit" class="btn btn-outline-danger w-100 btn-sm" onclick="return confirm('Hủy đơn này?');">
-                                            <i class="fas fa-times me-1"></i>Hủy bỏ đơn hàng
+
+                                        <input type="hidden" name="status"
+                                               th:value="${orderDetail.status == 'PENDING' ? 'PROCESSING' : (orderDetail.status == 'PROCESSING' ? 'SHIPPED' : (orderDetail.status == 'SHIPPED' ? 'DELIVERED' : ''))}">
+
+                                        <button type="submit" class="btn btn-dark w-100 fw-bold py-2">
+                                            Next: [[${orderDetail.status == 'PENDING' ? 'Đang xử lý' : (orderDetail.status == 'PROCESSING' ? 'Đang giao' : (orderDetail.status == 'SHIPPED' ? 'Hoàn thành' : ''))}]] <i class="fas fa-arrow-right ms-2"></i>
                                         </button>
                                     </form>
                                 </div>
-                                <div th:if="${orderDetail.status == 'SHIPPING'}">
-                                    <form th:action="@{/admin/orders/update-status}" method="post" class="mb-2">
-                                        <input type="hidden" name="id" th:value="${orderDetail.id}">
-                                        <input type="hidden" name="status" value="DELIVERED">
-                                        <button type="submit" class="btn btn-success w-100 fw-bold py-2">
-                                            Next: Hoàn thành đơn <i class="fas fa-check ms-2"></i>
-                                        </button>
-                                    </form>
-                                    <form th:action="@{/admin/orders/update-status}" method="post">
-                                        <input type="hidden" name="id" th:value="${orderDetail.id}">
-                                        <input type="hidden" name="status" value="CANCELLED">
-                                        <button type="submit" class="btn btn-outline-danger w-100 btn-sm" onclick="return confirm('Khách không nhận? Xác nhận hủy.');">
-                                            <i class="fas fa-undo me-1"></i>Hủy đơn / Hoàn trả
-                                        </button>
-                                    </form>
-                                </div>
+
+                                <form th:action="@{/admin/orders/update-status}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <input type="hidden" name="id" th:value="${orderDetail.id}">
+                                    <input type="hidden" name="status" value="CANCELLED">
+                                    <button type="submit" class="btn btn-outline-danger w-100 btn-sm" onclick="return confirm('Xác nhận Hủy đơn hàng #[[${orderDetail.id}]]?');">
+                                        <i class="fas fa-times me-1"></i>Hủy đơn hàng
+                                    </button>
+                                </form>
                             </div>
                         </div>
 
@@ -458,6 +475,24 @@
             setTimeout(() => alert.remove(), 500);
         });
     }, 4000);
+
+    // Logic cho sidebar (giả định)
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.classList.remove('fa-chevron-left');
+            toggleIcon.classList.add('fa-chevron-right');
+        } else {
+            toggleIcon.classList.remove('fa-chevron-right');
+            toggleIcon.classList.add('fa-chevron-left');
+        }
+    }
 </script>
 </body>
 </html>

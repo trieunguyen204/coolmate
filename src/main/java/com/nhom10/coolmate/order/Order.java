@@ -54,8 +54,5 @@ public class Order {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Payment payment;
 
-    // Enum cho OrderStatus (cần tạo file riêng)
-    public enum OrderStatus {
-        PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
-    }
+
 }

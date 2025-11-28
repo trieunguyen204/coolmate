@@ -28,6 +28,10 @@ public class Payment {
     @Column(name = "payment_method", nullable = false, columnDefinition = "ENUM('COD','PayOS')")
     private PaymentMethod paymentMethod;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, columnDefinition = "ENUM('PAID','UNPAID','FAILED') DEFAULT 'UNPAID'")
+    private PaymentStatus status; // <<< ĐÃ THÊM TRƯỜNG TRẠNG THÁI THANH TOÁN
+
     @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
