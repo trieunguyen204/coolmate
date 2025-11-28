@@ -6,8 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -37,11 +40,13 @@ public class Voucher {
     @Column(name = "min_order", columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal minOrder;
 
+    @CreationTimestamp
     @Column(name = "start_date")
     private Date startDate;
 
+
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "usage_limit", columnDefinition = "INT DEFAULT 1")
     private Integer usageLimit;
