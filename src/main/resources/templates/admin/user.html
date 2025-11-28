@@ -292,9 +292,9 @@ body {
                             <td th:text="${user.fullName}">Nguyễn Văn A</td>
                             <td th:text="${user.email}">nguyenvana@email.com</td>
                             <td>
-                                <span th:classappend="${user.role == 'ROLE_ADMIN'} ? 'badge-danger' : 'badge-primary'"
+                                <span th:classappend="${user.role == 'ADMIN'} ? 'badge-danger' : 'badge-primary'"
                                       class="badge"
-                                      th:text="${user.role}">ROLE_USER
+                                      th:text="${user.role}">USER
                                 </span>
                             </td>
                             <td class="text-center">
@@ -342,29 +342,31 @@ body {
                 <h5 class="modal-title" id="addUserModalLabel">Thêm Khách hàng Mới</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form th:action="@{/admin/users/add}" method="post" th:object="${newUser}">
+            <form th:action="@{/admin/users/add}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="fullName" class="form-label">Họ và Tên</label>
-                        <input type="text" class="form-control" id="add-fullName" th:field="*{fullName}" required>
+                        <input type="text" class="form-control" id="add-fullName" name="fullName" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="add-email" th:field="*{email}" required>
+                        <input type="email" class="form-control" id="add-email" name="email" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Mật khẩu</label>
-                        <input type="password" class="form-control" id="add-password" th:field="*{password}" required>
+                        <input type="password" class="form-control" id="add-password" name="password" required>
                     </div>
                     <div class="mb-3">
                         <label for="role" class="form-label">Vai trò</label>
-                        <select class="form-select" id="add-role" th:field="*{role}">
+                        <select class="form-select" id="add-role" name="role">
                             <option value="ROLE_USER">Khách hàng (ROLE_USER)</option>
                             <option value="ROLE_ADMIN">Quản trị viên (ROLE_ADMIN)</option>
                         </select>
                     </div>
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="add-enabled" th:field="*{enabled}" checked>
+                        <input type="checkbox" class="form-check-input" id="add-enabled" name="enabled" checked>
                         <label class="form-check-label" for="add-enabled">Kích hoạt tài khoản</label>
                     </div>
                 </div>
@@ -385,6 +387,8 @@ body {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editUserForm" action="" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="edit-id" class="form-label">ID</label>
@@ -397,6 +401,10 @@ body {
                     <div class="mb-3">
                         <label for="edit-email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="edit-email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-password" class="form-label">Mật khẩu mới (Bỏ trống nếu không đổi)</label>
+                        <input type="password" class="form-control" id="edit-password" name="password">
                     </div>
                     <div class="mb-3">
                         <label for="edit-role" class="form-label">Vai trò</label>
@@ -466,14 +474,19 @@ body {
 
     function confirmLogout() {
         if (confirm("Bạn có chắc chắn muốn Đăng xuất không?")) {
-            window.location.href = "/logout";
+            document.querySelector("form[th\\:action='@{/logout}']").submit();
         }
     }
 
     // --- Logic Lọc và Tìm kiếm (Client-side) ---
     function filterUsers() {
-        const query = document.getElementById('searchUserInput').value.toLowerCase();
-        const role = document.getElementById('roleFilter').value;
+        // Lấy giá trị tìm kiếm, chuyển thành chữ thường, loại bỏ khoảng trắng thừa
+        const query = document.getElementById('searchUserInput').value.toLowerCase().trim();
+
+        // Lọc theo Role
+        const selectedRoleFromDropdown = document.getElementById('roleFilter').value;
+        const standardizedFilterRole = selectedRoleFromDropdown.replace('ROLE_', '');
+
         const rows = document.querySelectorAll('#userTableBody tr');
         let visibleRowCount = 0;
 
@@ -485,12 +498,18 @@ body {
 
             if (!fullNameCell || !emailCell) return;
 
-            const fullName = fullNameCell.textContent.toLowerCase();
-            const email = emailCell.textContent.toLowerCase();
+            // TỐI ƯU HÓA CÁCH LẤY TEXT: Đảm bảo chỉ lấy nội dung text, loại bỏ khoảng trắng và chuyển về chữ thường
+            const fullName = (fullNameCell.innerText || fullNameCell.textContent || '').toLowerCase().trim();
+            const email = (emailCell.innerText || emailCell.textContent || '').toLowerCase().trim();
+
             const userRole = row.getAttribute('data-role');
 
-            const textMatch = fullName.includes(query) || email.includes(query);
-            const roleMatch = role === '' || userRole === role;
+            // LOGIC TÌM KIẾM THEO CHUỖI CON (Bao gồm fullName VÀ email)
+            // Sẽ khớp nếu query là rỗng HOẶC fullName chứa query HOẶC email chứa query
+            const textMatch = (query === '' || fullName.includes(query) || email.includes(query));
+
+            // Logic lọc Role
+            const roleMatch = standardizedFilterRole === '' || userRole === standardizedFilterRole;
 
             if (textMatch && roleMatch) {
                 row.style.display = '';
@@ -500,6 +519,7 @@ body {
             }
         });
 
+        // Xử lý dòng "Chưa có người dùng nào được tìm thấy"
         const noDataRow = document.getElementById('noDataRow');
         if (noDataRow) {
              noDataRow.style.display = (visibleRowCount === 0) ? '' : 'none';
@@ -549,7 +569,12 @@ body {
                 document.getElementById('edit-id').value = user.id;
                 document.getElementById('edit-fullName').value = user.fullName;
                 document.getElementById('edit-email').value = user.email;
-                document.getElementById('edit-role').value = user.role;
+
+                // Mật khẩu (edit-password) được để trống khi mở modal
+                // document.getElementById('edit-password').value = '';
+
+                // Vì form gửi ROLE_USER/ROLE_ADMIN nên set giá trị đầy đủ
+                document.getElementById('edit-role').value = 'ROLE_' + user.role;
                 document.getElementById('edit-enabled').checked = user.enabled;
 
                 // 3. Set Action cho Form (POST đến /admin/users/update/{id})

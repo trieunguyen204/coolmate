@@ -101,17 +101,23 @@
             <p class="text-muted">Tạo tài khoản để nhận ưu đãi thành viên</p>
         </div>
 
-        <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger" role="alert">
-            <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
-        </div>
-
         <form th:action="@{/register}" method="post" th:object="${registrationDTO}" id="registerForm" class="needs-validation" novalidate>
+
+            <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                <p th:text="${errorMessage}"></p>
+            </div>
+
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger" role="alert">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+            </div>
+
+
             <div class="form-group">
                 <i class="fas fa-user form-icon"></i>
                 <input type="text"
                        class="form-control form-control-icon-padding"
                        id="fullName"
-                       name="fullName" placeholder="Họ và Tên" required
+                       th:field="*{fullName}" placeholder="Họ và Tên" required
                        minlength="5">
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">
                     Vui lòng nhập Họ và Tên (ít nhất 5 ký tự).
@@ -123,12 +129,11 @@
                 <input type="email"
                        class="form-control form-control-icon-padding"
                        id="email"
-                       name="email" placeholder="Địa chỉ Email"
+                       th:field="*{email}" placeholder="Địa chỉ Email"
                        required>
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
                     Vui lòng nhập địa chỉ email hợp lệ.
                 </div>
-                <p class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
             </div>
 
             <div class="form-group">
@@ -136,7 +141,7 @@
                 <input type="tel"
                        class="form-control form-control-icon-padding"
                        id="phone"
-                       placeholder="Số điện thoại"
+                       th:field="*{phone}"             placeholder="Số điện thoại"
                        required
                        pattern="[0-9]{10,11}">
                 <div class="invalid-feedback">
@@ -144,12 +149,15 @@
                 </div>
             </div>
 
+            <input type="hidden" th:field="*{gender}" th:value="${T(com.nhom10.coolmate.user.Gender).Nam}" />
+
+
             <div class="form-group">
                 <i class="fas fa-lock form-icon"></i>
                 <input type="password"
                        class="form-control form-control-icon-padding"
                        id="password"
-                       name="password" placeholder="Mật khẩu (ít nhất 6 ký tự)"
+                       th:field="*{password}" placeholder="Mật khẩu (ít nhất 6 ký tự)"
                        required
                        minlength="6">
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">

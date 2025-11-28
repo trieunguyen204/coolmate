@@ -1,5 +1,6 @@
 package com.nhom10.coolmate.config;
 
+
 import com.nhom10.coolmate.user.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +23,6 @@ public class SecurityConfig {
     @SuppressWarnings("deprecation")
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // LƯU Ý: Đang sử dụng NoOpPasswordEncoder (không mã hóa) cho mục đích demo/học tập.
-        // Trong môi trường thực tế, phải sử dụng BCryptPasswordEncoder.
         return NoOpPasswordEncoder.getInstance();
     }
 
@@ -36,31 +35,33 @@ public class SecurityConfig {
     }
 
     @Bean
-    // Đã thêm UserService vào tham số
     public SecurityFilterChain filterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider, UserService userService) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        // Cho phép truy cập không cần đăng nhập vào các trang công khai
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**", "/webjars/**").permitAll()
 
-                        // BẮT BUỘC đăng nhập VÀ PHẢI CÓ ROLE_ADMIN cho tất cả các đường dẫn /admin/**
+                        .requestMatchers("/", "/user/home", "/login", "/register", "/css/**", "/js/**", "/webjars/**", "/uploads/**").permitAll()
+
+
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // Các request khác bắt buộc phải đăng nhập (USER và ADMIN)
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/", true)
                         .successHandler(customAuthenticationSuccessHandler)
                         .failureUrl("/login?error")
                         .permitAll()
                 )
                 .logout(logout -> logout
+                        .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID", "remember-me")
                         .permitAll()
                 )
-                // Đã sửa lỗi: Dùng trực tiếp userService thay vì authenticationProvider.getUserDetailsService()
                 .rememberMe(rememberMe -> rememberMe
                         .key("CoolmateSecretKey123")
                         .tokenValiditySeconds(86400)
