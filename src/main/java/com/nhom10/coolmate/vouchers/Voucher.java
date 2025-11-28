@@ -30,6 +30,8 @@ public class Voucher {
     @Column(name = "description", length = 255)
     private String description;
 
+
+
     @Enumerated(EnumType.STRING)
     @Column(name = "discount_type", columnDefinition = "ENUM('PERCENT','AMOUNT') DEFAULT 'AMOUNT'")
     private DiscountType discountType;
@@ -61,8 +63,5 @@ public class Voucher {
     @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
 
-    // Enum cho DiscountType (cần tạo file riêng)
-    public enum DiscountType {
-        PERCENT, AMOUNT
-    }
+
 }
