@@ -157,3 +157,19 @@ CREATE TABLE cart_items (
     FOREIGN KEY (cart_id) REFERENCES carts(id),
     FOREIGN KEY (product_variant_id) REFERENCES product_variants(id)
 );
+
+
+Tóm tắt thứ tự xây dựng admin:
+user.html (Khách hàng / Admin)
+
+categories.html (Danh mục)
+
+sizes.html (Kích cỡ)
+
+products.html (Sản phẩm)
+
+vouchers.html (Mã giảm giá)
+
+orders.html (Đơn hàng)
+
+home.html (Trang chủ / Dashboard)
