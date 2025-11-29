@@ -18,7 +18,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        String redirectUrl = "/"; // URL mặc định cho USER
+
+        String redirectUrl = "/user/home";
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 

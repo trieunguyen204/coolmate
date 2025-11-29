@@ -15,6 +15,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode; // Đã thêm
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,12 +37,20 @@ public class ProductService {
         if (discountPercent == null || discountPercent <= 0) {
             return price;
         }
-        BigDecimal discountFactor = BigDecimal.valueOf(100 - discountPercent.doubleValue()).divide(BigDecimal.valueOf(100));
-        return price.multiply(discountFactor).setScale(2, BigDecimal.ROUND_HALF_UP);
+        // Đã sửa: dùng RoundingMode.HALF_UP
+        BigDecimal discountFactor = BigDecimal.valueOf(100 - discountPercent.doubleValue()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        return price.multiply(discountFactor).setScale(0, RoundingMode.HALF_UP); // Set Scale 0 để làm tròn giá bán
     }
 
     private ProductDTO mapToDTO(Product product) {
         BigDecimal discountPrice = calculateDiscountPrice(product.getPrice(), product.getDiscountPercent());
+        // Giá gốc được dùng làm oldPrice khi có giảm giá
+        BigDecimal oldPrice = (product.getDiscountPercent() != null && product.getDiscountPercent() > 0) ? product.getPrice() : null;
+
+        // Lấy URL ảnh đầu tiên làm ảnh đại diện
+        String mainImageUrl = product.getImages() != null && !product.getImages().isEmpty()
+                ? product.getImages().get(0).getImageUrl()
+                : "/images/placeholder_product.jpg"; // Thêm ảnh placeholder nếu không có
 
         // --- KHẮC PHỤC LỖI CATEGORY ID 0 ---
         String categoryName = "-";
@@ -67,23 +76,45 @@ public class ProductService {
                         .build())
                 .collect(Collectors.toList());
 
+        // CHỈNH SỬA DTO: Thêm trường currentPrice và oldPrice
         return ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
-                .price(product.getPrice())
+                .price(product.getPrice()) // Đây là giá gốc
                 .discountPercent(product.getDiscountPercent())
                 .material(product.getMaterial())
                 .categoryId(categoryId)
                 .categoryName(categoryName)
-                .discountPrice(discountPrice)
+                // CÁC TRƯỜNG MỚI ĐỂ HIỂN THỊ Ở CLIENT
+                .discountPrice(discountPrice) // Giá sau chiết khấu (Giá mới)
+                .currentPrice(discountPrice) // Gán discountPrice vào currentPrice cho tiện dùng trong home.html
+                .oldPrice(oldPrice) // Giá gốc (nếu có chiết khấu)
+                .imageUrl(mainImageUrl) // URL ảnh đại diện
                 .productVariants(variantsDto)
                 .existingImages(product.getImages())
                 .build();
     }
 
     // ==========================================================
-    // READ: getAllProducts
+    // CLIENT: getFeaturedProducts
+    // ==========================================================
+    /**
+     * Lấy danh sách sản phẩm nổi bật (Top 8 sản phẩm mới nhất).
+     * @return List<ProductDTO>
+     */
+    public List<ProductDTO> getFeaturedProducts() {
+        List<Product> products = productRepository.findTop8ByOrderByCreatedAtDesc();
+
+        // Thêm logic lọc: Chỉ hiển thị sản phẩm có ít nhất 1 biến thể có tồn kho > 0
+        return products.stream()
+                .filter(p -> p.getVariants() != null && p.getVariants().stream().anyMatch(v -> v.getQuantity() > 0))
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ==========================================================
+    // READ: getAllProducts (ADMIN)
     // ==========================================================
     public List<ProductDTO> getAllProducts(String keyword) {
         List<Product> products;
@@ -99,7 +130,7 @@ public class ProductService {
     }
 
     // ==========================================================
-    // READ: getProductById
+    // READ: getProductById (ADMIN)
     // ==========================================================
     public ProductDTO getProductById(Integer id) {
         Product product = productRepository.findById(id)
@@ -109,7 +140,7 @@ public class ProductService {
     }
 
 
-    // --- CRUD Logic ---
+    // --- CRUD Logic (ADMIN) ---
 
     @Transactional
     public void saveProduct(@Valid ProductDTO dto) {
@@ -206,4 +237,13 @@ public class ProductService {
         }
         productRepository.deleteById(id);
     }
+
+    public List<ProductDTO> findByCategoryId(Integer categoryId) {
+        List<Product> products = productRepository.findByCategoryId(categoryId);
+
+        return products.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
 }

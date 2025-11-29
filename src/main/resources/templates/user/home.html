@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"> <head>
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoolFashion - Thời trang tối giản</title>
@@ -276,7 +277,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid container">
         <a class="navbar-brand" th:href="@{/}" href="#">COOLMATE</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" th:href="@{/}" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -285,23 +286,28 @@
                     <a class="nav-link active" th:href="@{/}" href="#">Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/products}" href="#">Sản phẩm</a>
+                    <a class="nav-link" th:href="@{/user/product}" href="#">Sản phẩm</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
                         Danh mục
                     </a>
+
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">Áo Thun</a></li>
-                        <li><a class="dropdown-item" href="#">Quần Short</a></li>
-                        <li><a class="dropdown-item" href="#">Phụ kiện</a></li>
+                        <li th:each="c : ${categories}">
+                            <a class="dropdown-item"
+                               th:href="@{/products/by-category/{id}(id=${c.id})}"
+                               th:text="${c.name}">
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/about}" href="#">Giới thiệu</a>
+                    <a class="nav-link" th:href="@{/user/about}" href="#">Giới thiệu</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/contact}" href="#">Liên hệ</a>
+                    <a class="nav-link" th:href="@{/user/contact}" href="#">Liên hệ</a>
                 </li>
             </ul>
 
@@ -324,8 +330,8 @@
                             <i class="fas fa-user-circle"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
-                            <li><a class="dropdown-item" th:href="@{/profile}"><i class="fas fa-user me-2"></i>Tài khoản của tôi</a></li>
-                            <li><a class="dropdown-item" th:href="@{/orders}"><i class="fas fa-box me-2"></i>Đơn hàng</a></li>
+                            <li><a class="dropdown-item" th:href="@{/user/profile}"><i class="fas fa-user me-2"></i>Tài khoản của tôi</a></li>
+                            <li><a class="dropdown-item" th:href="@{/user/my_orders}"><i class="fas fa-box me-2"></i>Đơn hàng</a></li>
                             <li><hr class="dropdown-divider"></li>
 
                             <li>
@@ -343,10 +349,10 @@
                     </div>
                 </th:block>
 
-                <a th:href="@{/cart}" class="action-icon position-relative ms-3" title="Giỏ hàng">
+                <a th:href="@{/user/cart}" class="action-icon position-relative ms-3" title="Giỏ hàng">
                     <i class="fas fa-shopping-bag"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${cartItemCount}">
-                            3
+                            0
                             <span class="visually-hidden">sản phẩm trong giỏ</span>
                         </span>
                 </a>
@@ -403,13 +409,13 @@
         <th:block th:each="product : ${featuredProducts}">
             <div class="col-lg-3 col-md-4 col-sm-6">
                 <div class="product-card">
-                    <a th:href="@{/products/{id}(id=${product.id})}" href="#">
+                    <a th:href="@{/product/{id}(id=${product.id})}" href="#">
                         <div class="product-image-wrapper">
-                            <img th:src="${product.imageUrl}" src="placeholder_product.jpg" class="product-image" alt="Tên sản phẩm">
+                            <img th:src="${product.imageUrl}" src="placeholder_product.jpg" class="product-image" th:alt="${product.name}">
                         </div>
                     </a>
                     <div class="product-info">
-                        <a th:href="@{/products/{id}(id=${product.id})}" class="text-decoration-none">
+                        <a th:href="@{/product/{id}(id=${product.id})}" class="text-decoration-none">
                             <h3 class="product-title" th:text="${product.name}">Áo Polo Dry-Ex Coolmate</h3>
                         </a>
                         <div class="product-rating">
@@ -421,8 +427,9 @@
                             <span>(4.0)</span>
                         </div>
                         <div>
-                            <span class="product-price" th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'POINT')} + ' đ'">249.000 đ</span>
-                            <span class="product-old-price" th:if="${product.oldPrice}" th:text="${#numbers.formatDecimal(product.oldPrice, 0, 'POINT', 0, 'POINT')} + ' đ'">299.000 đ</span>
+                            <span class="product-price" th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'">249.000 đ</span>
+
+                            <span class="product-old-price" th:if="${product.oldPrice}" th:text="${#numbers.formatDecimal(product.oldPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'">299.000 đ</span>
                         </div>
 
                         <div class="product-actions">
@@ -437,39 +444,8 @@
                 </div>
             </div>
         </th:block>
-        <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="product-card">
-                <a href="#">
-                    <div class="product-image-wrapper">
-                        <img src="https://i.ibb.co/L8Gj1H5/ao-polo-example.png" class="product-image" alt="Áo Polo">
-                    </div>
-                </a>
-                <div class="product-info">
-                    <a href="#" class="text-decoration-none">
-                        <h3 class="product-title">Áo Polo Thể Thao Kẻ Sọc</h3>
-                    </a>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span>(5.0)</span>
-                    </div>
-                    <div>
-                        <span class="product-price">299.000 đ</span>
-                    </div>
-
-                    <div class="product-actions">
-                        <a href="#" class="btn btn-sm btn-add-cart w-100 mb-2">
-                            <i class="fas fa-shopping-cart me-1"></i> Thêm vào giỏ
-                        </a>
-                        <a href="#" class="btn btn-sm btn-outline-secondary w-100">
-                            <i class="fas fa-bolt me-1"></i> Mua ngay
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <div th:if="${featuredProducts.isEmpty()}" class="col-12 text-center mt-5 mb-5">
+            <p class="fs-4 text-muted">Không tìm thấy sản phẩm nổi bật nào.</p>
         </div>
     </div>
 

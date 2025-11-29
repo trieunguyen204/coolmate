@@ -60,11 +60,7 @@ public class UserController {
         return "user/login";
     }
 
-    // --- TRANG CHỦ USER ---
-    @GetMapping({"/", "/user/home"})
-    public String userHomePage(){
-        return "user/home";
-    }
+
 
     // --- TRANG CHỦ ADMIN ---
     @GetMapping({"/admin/", "/admin/home"})
@@ -171,5 +167,11 @@ public class UserController {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi xóa: " + e.getMessage());
         }
         return "redirect:/admin/users";
+    }
+
+    @GetMapping("/access-denied")
+    public String accessDeniedPage(Model model) {
+        model.addAttribute("message", "Bạn không có quyền truy cập vào trang này.");
+        return "/error/access-denied";
     }
 }

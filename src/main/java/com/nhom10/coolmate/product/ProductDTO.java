@@ -27,7 +27,7 @@ public class ProductDTO {
 
     @NotNull(message = "Giá không được để trống")
     @DecimalMin(value = "0.01", message = "Giá phải lớn hơn 0")
-    private BigDecimal price;
+    private BigDecimal price; // Giá gốc
 
     @Min(value = 0, message = "Giảm giá phải lớn hơn hoặc bằng 0")
     private Integer discountPercent = 0;
@@ -39,21 +39,26 @@ public class ProductDTO {
     private Integer categoryId;
 
     // --- SỬA LỖI HTML: Thêm tên danh mục để hiển thị trong bảng ---
-    private String categoryName; // <--- TRƯỜNG NÀY CẦN THIẾT CHO products.html
+    private String categoryName;
 
-    // --- Dữ liệu Biến thể MỚI ---
+    // --- DỮ LIỆU BỔ SUNG CHO GIAO DIỆN KHÁCH HÀNG ---
+    private String imageUrl; // URL ảnh đại diện (ảnh đầu tiên)
+    private BigDecimal currentPrice; // Giá bán hiện tại (sau chiết khấu)
+    private BigDecimal oldPrice; // Giá gốc (chỉ hiển thị nếu có chiết khấu)
+
+    // --- Dữ liệu Biến thể MỚI (Admin) ---
     private List<VariantInputDTO> variantInputs = new ArrayList<>();
 
-    // --- Xử lý File Upload ---
+    // --- Xử lý File Upload (Admin) ---
     private List<MultipartFile> newImages = new ArrayList<>();
 
-    // --- Dữ liệu hiện tại (Chỉ dùng để hiển thị trong modal) ---
+    // --- Dữ liệu hiện tại (Chỉ dùng để hiển thị trong modal Admin) ---
     private List<ProductImage> existingImages = new ArrayList<>();
 
-    // --- Dữ liệu tổng hợp (Chỉ dùng để hiển thị trong bảng list) ---
+    // --- Dữ liệu tổng hợp (Chỉ dùng để hiển thị trong bảng list Admin) ---
     private BigDecimal discountPrice;
 
-    // List các biến thể (dùng cho việc hiển thị bảng/tải dữ liệu)
+    // List các biến thể (dùng cho việc hiển thị bảng list/tải dữ liệu)
     private List<ProductSizeColorStockDTO> productVariants = new ArrayList<>();
 
 

@@ -39,18 +39,28 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
 
-                        .requestMatchers("/", "/user/home", "/login", "/register", "/css/**", "/js/**", "/webjars/**", "/uploads/**").permitAll()
+                        // 1. PUBLIC: Cho phép truy cập công cộng (Login, Register, Static)
+                        .requestMatchers(
+                                "/login",
+                                "/register",
+                                "/css/**", "/js/**", "/webjars/**", "/uploads/**",
+                                "/",
+                                "/user/product",
+                                "/user/contact",
+                                "/user/about",
 
 
+                        ).permitAll()
+
+                        // 2. PHÂN QUYỀN ADMIN: Chỉ ROLE_ADMIN truy cập /admin/**
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-
+                        // 4. BẤT KỲ CÁI CÒN LẠI: Yêu cầu xác thực (thường là không cần nếu đã bao phủ hết)
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
                         .successHandler(customAuthenticationSuccessHandler)
                         .failureUrl("/login?error")
                         .permitAll()
