@@ -1,248 +1,365 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="|COOLSTYLE - Áo Polo Proze Air Max|" >COOLSTYLE - Chi tiết Sản phẩm</title>
+    <title th:text="${product != null ? product.name : 'Chi tiết sản phẩm'} + ' - CoolFashion'"></title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* CSS MÔ PHỎNG PHONG CÁCH COOLMATE */
-        :root {
-            --color-primary: #007bff; /* Thay bằng màu Coolmate Blue nếu cần: #1c2a41 */
-            --color-coolmate-blue: #1c2a41;
-            --color-coolmate-green: #38b67f;
-            --color-text: #2c3e50;
-        }
-
         body {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f4f4; /* Nền xám nhạt */
+            background: #f8f9fa;
             min-height: 100vh;
-            color: var(--color-text);
+            padding-top: 60px;
         }
 
-        .navbar {
-            background-color: white;
-            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
-            border-bottom: 2px solid var(--color-coolmate-blue);
-        }
+        /* --- Navbar Styles (Đồng bộ) --- */
+        .navbar { background-color: #1E2C3D; box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 1030; }
+        .navbar-brand { font-weight: 700; font-size: 1.5rem; color: white !important; }
+        .nav-link { color: rgba(255, 255, 255, 0.8) !important; font-weight: 500; margin: 0 5px; padding: 10px 15px !important; border-radius: 5px; }
+        .nav-link:hover, .nav-link.active { color: white !important; background-color: rgba(255, 255, 255, 0.1); }
+        .action-icon { color: white; font-size: 1.2rem; margin-left: 15px; }
 
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.6rem;
-            color: var(--color-coolmate-blue) !important;
-        }
-
-        .product-detail-container {
-            margin-top: 30px;
+        /* --- Detail Page Styles --- */
+        .product-detail-card {
             background: white;
-            padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
         }
 
-        .product-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--color-coolmate-blue);
-        }
-
-        .product-price {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #dc3545; /* Màu đỏ nổi bật cho giá */
-            margin-bottom: 20px;
-        }
-
-        .badge-stock {
-            background-color: var(--color-coolmate-green);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-weight: 500;
-        }
-
-        .color-option, .size-option {
-            border: 2px solid #ddd;
-            width: 40px;
-            height: 40px;
-            display: inline-flex;
+        .main-image-display {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #eee;
+            aspect-ratio: 1 / 1; /* Hình vuông */
+            display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 10px;
+            background: #f8f9fa;
+        }
+
+        .main-image-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .thumbnail-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding-bottom: 10px;
+        }
+
+        .thumbnail-scroll img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
             cursor: pointer;
-            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .thumbnail-scroll img.active, .thumbnail-scroll img:hover {
+            border-color: #1E2C3D;
+        }
+
+        .product-name {
+            font-weight: 700;
+            color: #1E2C3D;
+            margin-bottom: 15px;
+            font-size: 2.2rem;
+        }
+
+        .current-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #dc3545; /* Màu đỏ nổi bật */
+            margin-right: 15px;
+        }
+
+        .old-price {
+            font-size: 1.3rem;
+            color: #6c757d;
+            text-decoration: line-through;
+        }
+
+        .variant-option label {
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 500;
             transition: all 0.2s;
-            font-size: 0.8rem;
-            font-weight: 600;
+            margin-right: 10px;
+            min-width: 50px;
+            text-align: center;
         }
-        .color-option:hover, .size-option:hover {
-            border-color: var(--color-coolmate-blue);
+
+        .variant-option input[type="radio"]:checked + label {
+            border-color: #1E2C3D;
+            background-color: #f0f4f7;
         }
-        .color-option.selected, .size-option.selected {
-            border-color: var(--color-coolmate-blue);
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+
+        .color-swatch {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .color-swatch.active {
+            border-color: #1E2C3D;
+            box-shadow: 0 0 0 3px rgba(30, 44, 61, 0.3);
         }
 
         .btn-add-to-cart {
-            background-color: var(--color-coolmate-blue);
+            background-color: #1E2C3D;
+            border-color: #1E2C3D;
             color: white;
+            padding: 15px 30px;
             font-size: 1.1rem;
             font-weight: 600;
-            padding: 12px 30px;
-            border-radius: 8px;
             transition: background-color 0.3s;
         }
         .btn-add-to-cart:hover {
-            background-color: #0d47a1;
+            background-color: #0d1a25;
             color: white;
         }
 
-        .product-description h5, .review-section h4 {
-            border-left: 4px solid var(--color-coolmate-green);
-            padding-left: 10px;
-            margin-top: 20px;
-            margin-bottom: 15px;
+        .btn-buy-now {
+            padding: 15px 30px;
+            font-size: 1.1rem;
             font-weight: 600;
         }
+
+        /* Chatbot Style */
+        .chatbox-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 1050; }
+        .chatbox-toggler { width: 60px; height: 60px; border-radius: 50%; background-color: #1E2C3D; color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.5rem; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg">
-    <div class="container">
-        <a class="navbar-brand" href="#">COOLSTYLE</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item"><a class="nav-link" href="#">Áo</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Quần</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Đồ Lót</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Bộ Sưu Tập</a></li>
-            </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Giỏ hàng <span class="badge bg-danger">0</span></a>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid container">
+        <a class="navbar-brand" th:href="@{/}" href="#">COOLMATE</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" th:href="@{/}" href="home.html">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link active" th:href="@{/user/product}" href="product.html">Sản phẩm</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Danh mục</a>
+                    <ul class="dropdown-menu">
+                        <li th:each="c : ${categories}">
+                            <a class="dropdown-item" th:href="@{/products/by-category/{id}(id=${c.id})}" th:text="${c.name}"></a>
+                        </li>
+                    </ul>
                 </li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/user/about}" href="about.html">Giới thiệu</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/user/contact}" href="contact.html">Liên hệ</a></li>
             </ul>
+
+            <form class="d-flex search-form me-3" role="search" th:action="@{/search}">
+                <input class="form-control search-input" type="search" placeholder="Tìm kiếm..." name="query">
+                <button class="search-button" type="submit"><i class="fas fa-search"></i></button>
+            </form>
+
+            <div class="d-flex align-items-center">
+                <a href="#" class="action-icon"><i class="fas fa-user"></i></a>
+                <a th:href="@{/user/cart}" class="action-icon position-relative ms-3">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${cartItemCount}">0</span>
+                </a>
+            </div>
         </div>
     </div>
 </nav>
-<div class="container my-5">
-    <div class="row product-detail-container">
-        <div class="col-md-6">
-            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="https://via.placeholder.com/600x600/1c2a41/ffffff?text=Product+Image+1" class="d-block w-100 rounded" alt="Áo Polo 1">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="https://via.placeholder.com/600x600/38b67f/ffffff?text=Product+Image+2" class="d-block w-100 rounded" alt="Áo Polo 2">
-                    </div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-            <div class="d-flex mt-3 justify-content-center">
-                <img src="https://via.placeholder.com/100x100/1c2a41/ffffff?text=Thumb+1" class="img-thumbnail me-2" style="width: 80px; height: 80px; cursor: pointer;">
-                <img src="https://via.placeholder.com/100x100/38b67f/ffffff?text=Thumb+2" class="img-thumbnail me-2" style="width: 80px; height: 80px; cursor: pointer;">
-            </div>
-        </div>
 
-        <div class="col-md-6">
-            <span class="badge-stock mb-3">CÒN HÀNG</span>
-            <h1 class="product-title">Áo Polo Thể Thao Proze Air Max M-23</h1>
-            <p class="text-muted">Chất liệu: 50% Cotton, 50% Polyester | Công nghệ: Quick Dry & Anti-UV</p>
-
-            <div class="d-flex align-items-center mb-3">
-                <div class="text-warning me-2">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                </div>
-                <span class="text-muted">(250 đánh giá)</span>
-            </div>
-
-            <p class="product-price">499.000 đ <del class="text-muted fs-5 ms-2">550.000 đ</del></p>
-
-            <h6 class="fw-bold mt-4 mb-2">Màu sắc: <span class="text-primary" id="selectedColor">Xanh Navy</span></h6>
-            <div class="d-flex mb-3">
-                <div class="color-option selected" style="background-color: #1c2a41;"></div>
-                <div class="color-option" style="background-color: #dc3545;"></div>
-                <div class="color-option" style="background-color: #38b67f;"></div>
-                <div class="color-option" style="background-color: #e9ecef;"></div>
-            </div>
-
-            <h6 class="fw-bold mb-2">Kích cỡ: <span class="text-primary" id="selectedSize">L</span></h6>
-            <div class="d-flex mb-4">
-                <div class="size-option selected">S</div>
-                <div class="size-option">M</div>
-                <div class="size-option">L</div>
-                <div class="size-option">XL</div>
-                <div class="size-option">XXL</div>
-            </div>
-
-            <div class="d-flex align-items-center mb-4">
-                <input type="number" id="quantity" value="1" min="1" class="form-control text-center me-3" style="width: 80px;">
-                <button class="btn btn-add-to-cart flex-grow-1"><i class="fas fa-cart-plus"></i> THÊM VÀO GIỎ</button>
-            </div>
-
-            <div class="product-description mt-5">
-                <h5>Đặc điểm nổi bật</h5>
-                <ul>
-                    <li>Thoáng khí vượt trội, khô nhanh gấp 3 lần cotton thường.</li>
-                    <li>Chống tia UV (UPF 50+) bảo vệ da dưới nắng hè.</li>
-                    <li>Co giãn 4 chiều, thoải mái vận động.</li>
-                    <li>Sản xuất tại Việt Nam.</li>
-                </ul>
-            </div>
-        </div>
+<div class="container mt-5 pt-4 mb-5">
+    <div th:if="${product == null}" class="alert alert-warning text-center">
+        Sản phẩm bạn đang tìm kiếm không tồn tại.
+        <a th:href="@{/user/product}" class="alert-link">Quay lại trang sản phẩm.</a>
     </div>
 
-    <div class="row mt-5 review-section p-4 bg-white rounded shadow-sm">
-        <div class="col-12">
-            <h4 class="mt-0">Đánh giá Sản phẩm (250)</h4>
-            <div class="card p-3 mb-3 border-light">
-                <div class="d-flex justify-content-between">
-                    <h6 class="mb-1 fw-bold">Trần Văn A</h6>
-                    <small class="text-muted">20/10/2023</small>
-                </div>
-                <div class="text-warning mb-2">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="mb-0">Áo rất mát, mặc thoải mái, form chuẩn. Màu xanh navy rất đẹp và không bị ra màu khi giặt. Sẽ ủng hộ CoolStyle tiếp!</p>
+    <div th:if="${product != null}" class="row product-detail-card">
+
+        <div class="col-lg-5 mb-4">
+            <div class="main-image-display mb-3">
+                <img id="mainProductImage"
+                     th:src="${product.imageUrl != null ? product.imageUrl : '/images/placeholder_product.jpg'}"
+                     th:alt="${product.name}"
+                     onerror="this.src='/images/placeholder_product.jpg'">
             </div>
-            <div class="text-center mt-4">
-                <a href="#" class="btn btn-outline-secondary">Xem tất cả đánh giá</a>
+
+            <div class="thumbnail-scroll">
+                <th:block th:if="${!product.existingImages.isEmpty()}" th:each="img, stat : ${product.existingImages}">
+                    <img th:src="${img.imageUrl}"
+                         th:alt="'Thumbnail ' + ${stat.index + 1}"
+                         th:class="${stat.index == 0 ? 'active' : ''}"
+                         onclick="changeMainImage(this)">
+                </th:block>
+                <th:block th:if="${product.existingImages.isEmpty()}">
+                    <img th:src="${product.imageUrl}" class="active">
+                </th:block>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <h1 class="product-name" th:text="${product.name}">Tên sản phẩm</h1>
+
+            <div class="mb-3">
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <i class="far fa-star text-warning"></i>
+                <span class="text-muted ms-2">(Đã bán 500+)</span>
+            </div>
+
+            <div class="mb-4 p-3 rounded-3" style="background-color: #fefae0;">
+                <span class="current-price"
+                      th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'">249.000 đ</span>
+
+                <del class="old-price"
+                     th:if="${product.oldPrice != null}"
+                     th:text="${#numbers.formatDecimal(product.oldPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'">299.000 đ</del>
+
+                <span class="badge bg-danger ms-3"
+                      th:if="${product.discountPercent > 0}"
+                      th:text="'-' + ${product.discountPercent} + '%'">-15%</span>
+            </div>
+
+            <form th:action="@{/cart/add}" method="post">
+                <input type="hidden" name="productId" th:value="${product.id}">
+                <input type="hidden" name="variantId" id="selectedVariantId" value="">
+
+                <div class="mb-4">
+                    <label class="d-block fw-bold mb-2">Màu sắc: <span id="selectedColorName" class="text-primary"></span></label>
+                    <div class="color-options">
+                        <th:block th:each="variant : ${product.productVariants}">
+                            <span class="color-swatch"
+                                  th:style="'background-color: ' + ${variant.color.toLowerCase()}"
+                                  th:data-color="${variant.color}"
+                                  onclick="selectColor(this)">
+                            </span>
+                        </th:block>
+                        <span class="text-muted ms-2" th:if="${product.productVariants.isEmpty()}">Hết hàng</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="d-block fw-bold mb-2">Kích cỡ: <span id="selectedSizeName" class="text-primary"></span></label>
+                    <div class="size-options">
+                        <th:block th:each="variant : ${product.productVariants}">
+                            <input type="radio" th:id="'size-' + ${variant.sizeName}" name="size" class="d-none"
+                                   th:value="${variant.sizeName}"
+                                   onclick="selectSize(this.value)">
+                            <label th:for="'size-' + ${variant.sizeName}"
+                                   th:text="${variant.sizeName}"
+                                   class="variant-option"></label>
+                        </th:block>
+                    </div>
+                    <small id="stockInfo" class="text-danger mt-2 d-block">Vui lòng chọn Màu và Size để xem tồn kho.</small>
+                </div>
+
+                <div class="mb-4">
+                    <label class="d-block fw-bold mb-2">Số lượng:</label>
+                    <div class="input-group" style="width: 150px;">
+                        <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" name="quantity" id="quantityInput" class="form-control text-center" value="1" min="1" max="99" required>
+                        <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex mt-4">
+                    <button type="submit" class="btn btn-add-to-cart flex-fill">
+                        <i class="fas fa-shopping-cart me-2"></i> THÊM VÀO GIỎ
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-buy-now flex-fill">
+                        MUA NGAY
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-5 border-top pt-4">
+                <h4 class="fw-bold" style="color: #1E2C3D;">Chi tiết sản phẩm</h4>
+                <p><strong>Chất liệu:</strong> <span th:text="${product.material}">Cotton Compact</span></p>
+                <p><strong>Danh mục:</strong> <span th:text="${product.categoryName}">Áo Polo</span></p>
+                <p th:utext="${product.description} ?: 'Không có mô tả chi tiết cho sản phẩm này.'">Mô tả sản phẩm</p>
             </div>
         </div>
     </div>
 </div>
 
+<div class="chatbox-wrapper">
+    <button class="chatbox-toggler" id="chatboxToggler" onclick="toggleChatbox()">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Thêm logic chọn màu và size
-    document.querySelectorAll('.color-option').forEach(el => {
-        el.addEventListener('click', () => {
-            document.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            document.getElementById('selectedColor').textContent = el.style.backgroundColor.includes('navy') ? 'Xanh Navy' : 'Đỏ';
-        });
-    });
+    // --- JS Logic for Detail Page (Placeholder) ---
 
-    document.querySelectorAll('.size-option').forEach(el => {
-        el.addEventListener('click', () => {
-            document.querySelectorAll('.size-option').forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
-            document.getElementById('selectedSize').textContent = el.textContent;
-        });
-    });
+    // 1. Chuyển ảnh chính khi click vào thumbnail
+    function changeMainImage(element) {
+        document.getElementById('mainProductImage').src = element.src;
+        document.querySelectorAll('.thumbnail-scroll img').forEach(img => img.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    // 2. Tăng giảm số lượng
+    function changeQuantity(change) {
+        const input = document.getElementById('quantityInput');
+        let current = parseInt(input.value);
+        let max = parseInt(input.max);
+        let min = parseInt(input.min);
+
+        current += change;
+
+        if (current < min) current = min;
+        if (current > max) current = max; // Cần thay max bằng tồn kho thực tế
+
+        input.value = current;
+    }
+
+    // 3. Logic chọn Màu và Size (Cần AJAX/JS nâng cao để lọc tồn kho)
+    function selectColor(element) {
+        // Xử lý active state cho swatch
+        document.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('active'));
+        element.classList.add('active');
+
+        const colorName = element.getAttribute('data-color');
+        document.getElementById('selectedColorName').textContent = colorName;
+
+        // TODO: Cần gọi hàm JS để lọc và hiển thị Size tương ứng với màu này
+        // updateStockInfo();
+    }
+
+    function selectSize(sizeName) {
+        document.getElementById('selectedSizeName').textContent = sizeName;
+        // TODO: Cần gọi hàm JS để tìm Variant ID (variantId) và cập nhật #selectedVariantId
+        // updateStockInfo();
+    }
+
+    // 4. Chatbot Toggle (Copy từ home.html)
+    function toggleChatbox() {
+        // Thêm container chatbox nếu cần
+    }
+    // --- End JS Logic ---
 </script>
 </body>
 </html>

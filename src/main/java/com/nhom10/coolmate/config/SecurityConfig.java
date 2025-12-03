@@ -49,6 +49,9 @@ public class SecurityConfig {
                                 "/user/contact",
                                 "/user/about"
                                 ,"/user/home"
+                                ,"/user/product_detail"
+                                ,"/product/{id}"
+                                ,"/user/cart"
 
 
 
