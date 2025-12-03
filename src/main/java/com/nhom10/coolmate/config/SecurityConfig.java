@@ -47,7 +47,10 @@ public class SecurityConfig {
                                 "/",
                                 "/user/product",
                                 "/user/contact",
-                                "/user/about",
+                                "/user/about"
+                                ,"/user/home"
+
+
 
 
                         ).permitAll()

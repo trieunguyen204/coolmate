@@ -3,227 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liên hệ với COOLMATE</title>
+    <title>Liên hệ - CoolFashion</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Tông màu Coolmate: Xanh Navy/Đen (#1E2C3D) và Xám/Trắng */
         body {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f8f9fa;
             min-height: 100vh;
+            padding-top: 60px;
         }
 
-        .navbar {
-            background-color: #1E2C3D; /* Xanh Navy đậm */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            z-index: 1030;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: white !important;
-        }
-
+        /* --- Navbar Styles --- */
+        .navbar { background-color: #1E2C3D; box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 1030; }
+        .navbar-brand { font-weight: 700; font-size: 1.5rem; color: white !important; }
         .nav-link {
-            color: rgba(255, 255, 255, 0.8) !important;
-            font-weight: 500;
-            transition: color 0.3s ease;
-            margin: 0 5px;
-            padding: 10px 15px !important;
-            border-radius: 5px;
+            color: rgba(255, 255, 255, 0.8) !important; font-weight: 500; transition: color 0.3s ease; margin: 0 5px; padding: 10px 15px !important; border-radius: 5px;
         }
+        .nav-link:hover, .nav-link.active { color: white !important; background-color: rgba(255, 255, 255, 0.1); }
+        .search-input {
+            border-radius: 20px; padding-right: 40px; padding-left: 15px; border: none; background: rgba(255, 255, 255, 0.2); color: white;
+        }
+        .search-button { position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255, 255, 255, 0.8); padding-right: 15px; }
+        .action-icon { color: white; font-size: 1.2rem; margin-left: 15px; }
 
-        .nav-link:hover, .nav-link.active {
-            color: white !important;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+        /* --- Contact Specific Styles --- */
+        .contact-card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; }
+        .contact-header { background-color: #1E2C3D; color: white; padding: 30px; text-align: center; }
+        .contact-info-item { display: flex; align-items: flex-start; margin-bottom: 25px; }
+        .contact-icon { width: 40px; height: 40px; background-color: #e8f5e9; color: #1E2C3D; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.2rem; }
+        .form-control:focus { border-color: #1E2C3D; box-shadow: 0 0 0 0.25rem rgba(30, 44, 61, 0.25); }
+        .btn-submit { background-color: #1E2C3D; border-color: #1E2C3D; color: white; padding: 10px 30px; font-weight: 600; }
+        .btn-submit:hover { background-color: #0d1a25; color: white; }
 
-        .hero-section {
-            background: url('placeholder_contact_bg.jpg') no-repeat center center/cover;
-            background-color: #1E2C3D;
-            color: white;
-            padding: 100px 0 50px 0;
-            position: relative;
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .hero-section::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(30, 44, 61, 0.7); /* Lớp phủ Xanh Navy mờ */
-            z-index: 1;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .contact-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            padding: 30px;
-        }
-
-        .info-item i {
-            color: #1E2C3D;
-            font-size: 1.5rem;
-            margin-right: 15px;
-            width: 30px;
-            text-align: center;
-        }
-
-        .map-container {
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            height: 400px;
-        }
-
-        .btn-submit {
-            background-color: #1E2C3D;
-            border-color: #1E2C3D;
-            color: white;
-            padding: 10px 30px;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: background-color 0.3s;
-        }
-
-        .btn-submit:hover {
-            background-color: #0d1a25;
-            border-color: #0d1a25;
-            color: white;
-        }
-
-        .footer {
-            background-color: #1E2C3D;
-            color: white;
-            padding: 20px 0;
-            margin-top: 50px;
-        }
+        /* --- Chatbox Styles --- */
+        .chatbox-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 1050; }
+        .chatbox-toggler { width: 60px; height: 60px; border-radius: 50%; background-color: #1E2C3D; color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.5rem; }
+        .chatbox-container { width: 350px; height: 450px; background: white; border-radius: 10px; box-shadow: 0 5px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; }
+        .chatbox-header { background-color: #1E2C3D; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .chatbox-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chatbox-input { border-top: 1px solid #eee; padding: 10px; display: flex; }
+        .message-bubble { padding: 8px 12px; border-radius: 12px; margin-bottom: 5px; max-width: 80%; }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/}" href="home.html">COOLMATE</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <div class="container-fluid container">
+        <a class="navbar-brand" th:href="@{/}" href="#">COOLMATE</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/}" href="home.html">Trang chủ</a>
+                <li class="nav-item"><a class="nav-link" th:href="@{/}" href="home.html">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/user/product}" href="product.html">Sản phẩm</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Danh mục</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Áo thun</a></li>
+                        <li><a class="dropdown-item" href="#">Quần Short</a></li>
+                    </ul>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/products}" href="product.html">Sản phẩm</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/about}" href="about.html">Giới thiệu</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" th:href="@{/contact}" href="contact.html">Liên hệ</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/user/about}" href="about.html">Giới thiệu</a></li>
+                <li class="nav-item"><a class="nav-link active" th:href="@{/user/contact}" href="#">Liên hệ</a></li>
             </ul>
-
+            <form class="d-flex search-form me-3" role="search" th:action="@{/search}">
+                <input class="form-control search-input" type="search" placeholder="Tìm kiếm sản phẩm..." aria-label="Search" name="query">
+                <button class="search-button" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
             <div class="d-flex align-items-center">
-                <a th:href="@{/cart}" href="cart.html" class="nav-link position-relative me-2" title="Giỏ hàng">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
-                            0
-                            <span class="visually-hidden">sản phẩm trong giỏ</span>
-                        </span>
-                </a>
-                <a th:href="@{/login}" href="login.html" class="nav-link" title="Đăng nhập">
-                    <i class="fas fa-user-circle"></i>
-                </a>
+                <a href="#" class="action-icon"><i class="fas fa-user"></i></a>
+                <a href="#" class="action-icon position-relative ms-3"><i class="fas fa-shopping-bag"></i></a>
             </div>
         </div>
     </div>
 </nav>
 
-<header class="hero-section">
-    <div class="container hero-content">
-        <h1 class="display-4 fw-bold mb-3">Chúng tôi sẵn sàng lắng nghe bạn!</h1>
-        <p class="lead">Mọi ý kiến đóng góp, thắc mắc về sản phẩm hoặc đơn hàng, xin vui lòng liên hệ với COOLMATE.</p>
-    </div>
-</header>
-
-<div class="container mt-5">
-    <div class="row g-5">
-        <div class="col-lg-5">
-            <h2 class="fw-bold mb-4" style="color: #1E2C3D;">Thông tin liên hệ</h2>
-            <div class="d-flex align-items-center mb-3 info-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <div>
-                    <h6 class="fw-bold mb-0">Địa chỉ Trụ sở chính</h6>
-                    <p class="mb-0 text-muted">Tầng 12, Tòa nhà Coolmate Tower, 123 Phố Thời Trang, Quận 1, TP. Hồ Chí Minh</p>
-                </div>
-            </div>
-            <div class="d-flex align-items-center mb-3 info-item">
-                <i class="fas fa-envelope"></i>
-                <div>
-                    <h6 class="fw-bold mb-0">Email Hỗ trợ</h6>
-                    <p class="mb-0 text-muted">support@coolmate.vn</p>
-                </div>
-            </div>
-            <div class="d-flex align-items-center mb-3 info-item">
-                <i class="fas fa-phone-alt"></i>
-                <div>
-                    <h6 class="fw-bold mb-0">Hotline Tư vấn</h6>
-                    <p class="mb-0 text-muted">1900 6655 (Hỗ trợ 24/7)</p>
-                </div>
-            </div>
-            <div class="d-flex align-items-center mb-4 info-item">
-                <i class="fas fa-clock"></i>
-                <div>
-                    <h6 class="fw-bold mb-0">Giờ làm việc</h6>
-                    <p class="mb-0 text-muted">Thứ Hai - Thứ Sáu: 8:00 - 18:00</p>
-                </div>
-            </div>
-
-            <div class="map-container mt-5">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.206331163456!2d106.68962627471966!3d10.79632838934509!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752fe6b4125b29%3A0x6b2e3e5b6c2b189a!2sCoolmate%20Store%20Q1!5e0!3m2!1svi!2svn!4v1700000000000!5m2!1svi!2svn" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-            </div>
+<div class="container mt-5 pt-4 mb-5">
+    <div class="contact-card">
+        <div class="contact-header">
+            <h2 class="fw-bold mb-0">Liên hệ với chúng tôi</h2>
+            <p class="mb-0 mt-2 op-8">Chúng tôi luôn sẵn sàng lắng nghe bạn</p>
         </div>
+        <div class="row g-0 p-4 p-md-5">
+            <div class="col-lg-5 mb-4 mb-lg-0 pe-lg-5 border-end">
+                <h4 class="mb-4 text-dark fw-bold">Thông tin liên lạc</h4>
 
-        <div class="col-lg-7">
-            <div class="contact-card">
-                <h2 class="fw-bold mb-4" style="color: #1E2C3D;">Gửi tin nhắn cho chúng tôi</h2>
-                <form th:action="@{/contact}" method="post" id="contactForm">
+                <div class="contact-info-item">
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Địa chỉ</h6>
+                        <p class="text-muted mb-0">123 Đường Nguyễn Trãi, Quận Thanh Xuân, Hà Nội</p>
+                    </div>
+                </div>
+
+                <div class="contact-info-item">
+                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Hotline</h6>
+                        <p class="text-muted mb-0">1900 123 456</p>
+                    </div>
+                </div>
+
+                <div class="contact-info-item">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Email</h6>
+                        <p class="text-muted mb-0">support@coolmate.me</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.696773531617!2d105.82399631540203!3d21.004787986011464!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ac8109d93b37%3A0xb360b64267425123!2sRoyal%20City!5e0!3m2!1svi!2s!4v1625626000000!5m2!1svi!2s" width="100%" height="200" style="border:0; border-radius: 10px;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+
+            <div class="col-lg-7 ps-lg-5">
+                <h4 class="mb-4 text-dark fw-bold">Gửi tin nhắn cho chúng tôi</h4>
+                <form>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Tên của bạn *</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <label class="form-label">Họ tên</label>
+                            <input type="text" class="form-control" placeholder="Nhập họ tên của bạn">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" placeholder="Nhập địa chỉ email">
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="subject" class="form-label">Chủ đề *</label>
-                        <input type="text" class="form-control" id="subject" name="subject" required>
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="tel" class="form-control" placeholder="Nhập số điện thoại">
                     </div>
-                    <div class="mb-4">
-                        <label for="message" class="form-label">Nội dung tin nhắn *</label>
-                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    <div class="mb-3">
+                        <label class="form-label">Nội dung</label>
+                        <textarea class="form-control" rows="5" placeholder="Bạn cần hỗ trợ gì?"></textarea>
                     </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-submit">
-                            <i class="fas fa-paper-plane me-2"></i> Gửi đi
-                        </button>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-submit">Gửi tin nhắn <i class="fas fa-paper-plane ms-2"></i></button>
                     </div>
                 </form>
             </div>
@@ -231,61 +150,31 @@
     </div>
 </div>
 
-<footer class="footer">
-    <div class="container text-center">
-        <p class="mb-0">&copy; 2024 COOLMATE. All rights reserved.</p>
+<div class="chatbox-wrapper">
+    <button class="chatbox-toggler" onclick="toggleChatbox()"><i class="fas fa-comment-dots"></i></button>
+    <div class="chatbox-container position-absolute bottom-0 end-0 mb-5 d-none" id="chatboxContainer">
+        <div class="chatbox-header"><span>Coolmate AI</span> <button class="btn-close btn-close-white" onclick="toggleChatbox()"></button></div>
+        <div class="chatbox-messages" id="chatboxMessages"></div>
+        <div class="chatbox-input">
+            <input type="text" class="form-control me-2" id="chatboxInput">
+            <button class="btn btn-primary" style="background-color: #1E2C3D;" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
     </div>
-</footer>
-
-<div id="notificationContainer"></div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Logic Thông báo
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        // Xử lý gửi form (thay thế bằng API call thực tế)
-        showNotification('Cảm ơn bạn! Tin nhắn của bạn đã được gửi thành công.', 'success');
-        this.reset();
-    });
-
-    function showNotification(message, type) {
-        const container = document.getElementById('notificationContainer');
-        const notification = document.createElement('div');
-        const alertClass = type === 'success' ? 'alert-success' :
-                           type === 'error' ? 'alert-danger' :
-                           'alert-info';
-
-        notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
-        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-        notification.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-
-        container.appendChild(notification);
-
-        setTimeout(() => {
-            if (notification.parentElement) {
-                new bootstrap.Alert(notification).close();
-            }
-        }, 5000);
+    function toggleChatbox() { document.getElementById('chatboxContainer').classList.toggle('d-none'); }
+    function sendMessage() {
+        const input = document.getElementById('chatboxInput'); if(input.value.trim()==="")return;
+        appendMessage(input.value, 'user'); input.value='';
+        setTimeout(()=>appendMessage("Chúng tôi sẽ phản hồi sớm!", 'bot'), 1000);
     }
-
-    // Logic Cart Badge (đổi localStorage key)
-    document.addEventListener('DOMContentLoaded', function() {
-        updateCartBadge();
-    });
-
-    function updateCartBadge() {
-        // Đổi từ 'bookstoreCart' sang 'coolmateCart'
-        const cart = JSON.parse(localStorage.getItem('coolmateCart') || '[]');
-        const cartCount = document.getElementById('cartCount');
-        if (cartCount) {
-            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-            cartCount.textContent = totalItems;
-            cartCount.style.display = totalItems > 0 ? 'inline' : 'none';
-        }
+    function appendMessage(text, type) {
+        const d = document.createElement('div'); d.className = 'message-bubble'; d.style.maxWidth="80%";
+        if(type==='user'){d.style.alignSelf="flex-end";d.style.backgroundColor="#1E2C3D";d.style.color="white";d.innerText=text;}
+        else{d.style.alignSelf="flex-start";d.style.backgroundColor="#e8f5e9";d.innerText=text;}
+        document.getElementById('chatboxMessages').appendChild(d);
     }
 </script>
 </body>
