@@ -52,6 +52,7 @@ public class SecurityConfig {
                                 ,"/user/product_detail"
                                 ,"/product/{id}"
                                 ,"/user/cart"
+                                ,"/products/by-category/{id}"
 
 
 
