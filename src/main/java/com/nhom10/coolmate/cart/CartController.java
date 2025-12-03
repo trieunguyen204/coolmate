@@ -2,6 +2,8 @@ package com.nhom10.coolmate.controller;
 
 import com.nhom10.coolmate.cart.Cart;
 import com.nhom10.coolmate.cart.CartService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,39 +18,40 @@ public class CartController {
 
     // Xem giỏ hàng
     @GetMapping
-    public String viewCart(Model model) {
-        try {
-            Cart cart = cartService.getCartByCurrentUser();
-            model.addAttribute("cart", cart);
+    public String viewCart(Model model, HttpServletRequest request, HttpServletResponse response) {
+        // Lấy giỏ hàng (User hoặc Guest)
+        Cart cart = cartService.getCart(request, response);
+        model.addAttribute("cart", cart);
 
-            // Tính tổng tiền
-            double grandTotal = cart.getCartItems().stream()
-                    .mapToDouble(item -> item.getPriceAtTime().doubleValue() * item.getQuantity())
-                    .sum();
-            model.addAttribute("grandTotal", grandTotal);
+        // Tính tổng tiền
+        double grandTotal = cart.getCartItems().stream()
+                .mapToDouble(item -> item.getPriceAtTime().doubleValue() * item.getQuantity())
+                .sum();
+        model.addAttribute("grandTotal", grandTotal);
 
-        } catch (Exception e) {
-            // Nếu chưa đăng nhập hoặc lỗi, trả về giỏ rỗng
-            return "redirect:/login";
-        }
-        return "user/cart"; // Trả về file cart.html
+        return "user/cart";
     }
 
-    // Thêm vào giỏ hàng (Xử lý POST từ Product Detail)
+    // Thêm vào giỏ hàng
     @PostMapping("/add")
     public String addToCart(@RequestParam Integer productId,
                             @RequestParam Integer quantity,
                             @RequestParam String size,
-                            @RequestParam String color) {
+                            @RequestParam String color,
+                            HttpServletRequest request,
+                            HttpServletResponse response) {
 
-        cartService.addToCart(productId, quantity, size, color);
-        return "redirect:/user/cart"; // Thêm xong chuyển hướng đến trang giỏ hàng
+        // Truyền request, response xuống service để xử lý Cookie
+        cartService.addToCart(productId, quantity, size, color, request, response);
+        return "redirect:/user/cart";
     }
 
     // Xóa sản phẩm khỏi giỏ
     @GetMapping("/remove/{id}")
-    public String removeFromCart(@PathVariable Integer id) {
-        cartService.removeFromCart(id);
+    public String removeFromCart(@PathVariable Integer id,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response) {
+        cartService.removeFromCart(id, request, response);
         return "redirect:/user/cart";
     }
 }

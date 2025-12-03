@@ -17,14 +17,6 @@
             padding-top: 60px;
         }
 
-        body {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
-            min-height: 100vh;
-            padding-top: 60px;
-        }
-
 
             .search-form {
             position: relative; /* Quan trọng: Để làm mốc tọa độ cho nút search bên trong */
@@ -97,143 +89,75 @@
         .action-icon { color: white; font-size: 1.2rem; margin-left: 15px; transition: color 0.3s; }
         .action-icon:hover { color: #ffc107; }
 
-        /* --- Detail Page Styles --- */
+
+
+
+
+        /* --- PRODUCT DETAIL SPECIFIC STYLES --- */
         .product-detail-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            padding: 30px;
+            background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); padding: 30px;
         }
 
+        /* Image Gallery */
         .main-image-display {
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #eee;
-            aspect-ratio: 1 / 1; /* Hình vuông */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8f9fa;
+            border-radius: 8px; overflow: hidden; border: 1px solid #eee;
+            aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; background: #f8f9fa;
         }
+        .main-image-display img { width: 100%; height: 100%; object-fit: contain; }
+        .thumbnail-scroll { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 10px; margin-top: 10px; }
+        .thumbnail-scroll img { width: 80px; height: 80px; object-fit: cover; border-radius: 5px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
+        .thumbnail-scroll img.active, .thumbnail-scroll img:hover { border-color: #1E2C3D; }
 
-        .main-image-display img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+        /* Product Info */
+        .product-name { font-weight: 700; color: #1E2C3D; margin-bottom: 15px; font-size: 2.2rem; }
+        .current-price { font-size: 2.5rem; font-weight: bold; color: #dc3545; margin-right: 15px; }
+        .old-price { font-size: 1.3rem; color: #6c757d; text-decoration: line-through; }
 
-        .thumbnail-scroll {
-            display: flex;
-            overflow-x: auto;
-            gap: 10px;
-            padding-bottom: 10px;
-        }
-
-        .thumbnail-scroll img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 5px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
-        }
-
-        .thumbnail-scroll img.active, .thumbnail-scroll img:hover {
-            border-color: #1E2C3D;
-        }
-
-        .product-name {
-            font-weight: 700;
-            color: #1E2C3D;
-            margin-bottom: 15px;
-            font-size: 2.2rem;
-        }
-
-        .current-price {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #dc3545; /* Màu đỏ nổi bật */
-            margin-right: 15px;
-        }
-
-        .old-price {
-            font-size: 1.3rem;
-            color: #6c757d;
-            text-decoration: line-through;
-        }
-
-        .variant-option label {
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            padding: 8px 15px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-            margin-right: 10px;
-            min-width: 50px;
-            text-align: center;
-        }
-
-        .variant-option input[type="radio"]:checked + label {
-            border-color: #1E2C3D;
-            background-color: #f0f4f7;
-        }
-
+        /* Variant Buttons */
         .color-swatch {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid #ccc;
-            cursor: pointer;
-            margin-right: 8px;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            display: inline-block; width: 40px; height: 40px; border-radius: 50%;
+            border: 2px solid #ddd; cursor: pointer; margin-right: 12px; margin-bottom: 10px;
+            position: relative; transition: all 0.2s;
+        }
+        .color-swatch:hover { transform: scale(1.1); }
+        .color-swatch.active { border-color: #1E2C3D; box-shadow: 0 0 0 3px rgba(30, 44, 61, 0.2); }
+        .color-swatch.active::after {
+            content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 16px; text-shadow: 0 0 3px rgba(0,0,0,0.5);
         }
 
-        .color-swatch.active {
-            border-color: #1E2C3D;
-            box-shadow: 0 0 0 3px rgba(30, 44, 61, 0.3);
+        .size-btn {
+            min-width: 60px; padding: 8px 15px; border: 1px solid #ddd; background: white;
+            border-radius: 6px; cursor: pointer; margin-right: 10px; margin-bottom: 10px;
+            text-align: center; font-weight: 600; transition: all 0.2s;
         }
+        .size-btn:hover { border-color: #1E2C3D; color: #1E2C3D; }
+        .size-btn.active { background-color: #1E2C3D; color: white; border-color: #1E2C3D; }
+        .size-btn.disabled { background-color: #f8f9fa; color: #ccc; border-color: #eee; cursor: not-allowed; }
 
-        .btn-add-to-cart {
-            background-color: #1E2C3D;
-            border-color: #1E2C3D;
-            color: white;
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: background-color 0.3s;
-        }
-        .btn-add-to-cart:hover {
-            background-color: #0d1a25;
-            color: white;
-        }
+        /* Actions */
+        .btn-add-to-cart { background-color: #1E2C3D; border-color: #1E2C3D; color: white; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; transition: 0.3s; }
+        .btn-add-to-cart:hover { background-color: #0d1a25; }
+        .btn-add-to-cart:disabled { background-color: #6c757d; border-color: #6c757d; cursor: not-allowed; }
 
-        .btn-buy-now {
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        /* Chatbot Style */
+        /* Chatbot */
         .chatbox-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 1050; }
-        .chatbox-toggler { width: 60px; height: 60px; border-radius: 50%; background-color: #1E2C3D; color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.5rem; }
+        .chatbox-toggler { width: 60px; height: 60px; border-radius: 50%; background-color: #1E2C3D; color: white; border: none; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid container">
         <a class="navbar-brand" th:href="@{/}" href="#">COOLMATE</a>
-        <button class="navbar-toggler" th:href="@{/}" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link " th:href="@{/}" href="#">Trang chủ</a>
+                    <a class="nav-link" th:href="@{/}" href="home.html">Trang chủ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active" th:href="@{/user/product}" href="#">Sản phẩm</a>
@@ -253,12 +177,8 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/user/about}" href="#">Giới thiệu</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/user/contact}" href="#">Liên hệ</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/user/about}" href="about.html">Giới thiệu</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/user/contact}" href="contact.html">Liên hệ</a></li>
             </ul>
 
             <form class="d-flex search-form me-3" role="search" th:action="@{/user/product}" method="get">
@@ -313,11 +233,10 @@
         </div>
     </div>
 </nav>
-
 <div class="container mt-5 pt-4 mb-5">
+
     <div th:if="${product == null}" class="alert alert-warning text-center">
-        Sản phẩm bạn đang tìm kiếm không tồn tại.
-        <a th:href="@{/user/product}" class="alert-link">Quay lại trang sản phẩm.</a>
+        Sản phẩm không tồn tại. <a th:href="@{/user/product}">Quay lại danh sách</a>
     </div>
 
     <div th:if="${product != null}" class="row product-detail-card">
@@ -329,11 +248,9 @@
                      th:alt="${product.name}"
                      onerror="this.src='/images/placeholder_product.jpg'">
             </div>
-
             <div class="thumbnail-scroll">
                 <th:block th:if="${!product.existingImages.isEmpty()}" th:each="img, stat : ${product.existingImages}">
                     <img th:src="${img.imageUrl}"
-                         th:alt="'Thumbnail ' + ${stat.index + 1}"
                          th:class="${stat.index == 0 ? 'active' : ''}"
                          onclick="changeMainImage(this)">
                 </th:block>
@@ -351,141 +268,200 @@
                 <i class="fas fa-star text-warning"></i>
                 <i class="fas fa-star text-warning"></i>
                 <i class="fas fa-star text-warning"></i>
-                <i class="far fa-star text-warning"></i>
-                <span class="text-muted ms-2">(Đã bán 500+)</span>
+                <i class="fas fa-star text-warning"></i>
+                <span class="text-muted ms-2">(Đánh giá 5.0)</span>
             </div>
 
-            <div class="mb-4 p-3 rounded-3" style="background-color: #fefae0;">
-                <span class="current-price"
-                      th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'">249.000 đ</span>
-
-                <del class="old-price"
-                     th:if="${product.oldPrice != null}"
-                     th:text="${#numbers.formatDecimal(product.oldPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'">299.000 đ</del>
-
-                <span class="badge bg-danger ms-3"
-                      th:if="${product.discountPercent > 0}"
-                      th:text="'-' + ${product.discountPercent} + '%'">-15%</span>
+            <div class="mb-4 p-3 rounded-3" style="background-color: #f0fdf4; border: 1px solid #dcfce7;">
+                <span class="current-price" th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'"></span>
+                <del class="old-price" th:if="${product.oldPrice != null}" th:text="${#numbers.formatDecimal(product.oldPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'"></del>
+                <span class="badge bg-danger ms-3" th:if="${product.discountPercent > 0}" th:text="'-' + ${product.discountPercent} + '%'"></span>
             </div>
 
-            <form th:action="@{/cart/add}" method="post">
+            <form th:action="@{/user/cart/add}" method="post" id="addToCartForm">
                 <input type="hidden" name="productId" th:value="${product.id}">
-                <input type="hidden" name="variantId" id="selectedVariantId" value="">
+                <input type="hidden" name="color" id="selectedColorInput" required>
+                <input type="hidden" name="size" id="selectedSizeInput" required>
 
                 <div class="mb-4">
-                    <label class="d-block fw-bold mb-2">Màu sắc: <span id="selectedColorName" class="text-primary"></span></label>
-                    <div class="color-options">
-                        <th:block th:each="variant : ${product.productVariants}">
-                            <span class="color-swatch"
-                                  th:style="'background-color: ' + ${variant.color.toLowerCase()}"
-                                  th:data-color="${variant.color}"
-                                  onclick="selectColor(this)">
-                            </span>
-                        </th:block>
-                        <span class="text-muted ms-2" th:if="${product.productVariants.isEmpty()}">Hết hàng</span>
+                    <label class="d-block fw-bold mb-2">Màu sắc: <span id="displaySelectedColor" class="text-primary fw-normal">Chưa chọn</span></label>
+                    <div id="colorContainer" class="d-flex flex-wrap">
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="d-block fw-bold mb-2">Kích cỡ: <span id="selectedSizeName" class="text-primary"></span></label>
-                    <div class="size-options">
-                        <th:block th:each="variant : ${product.productVariants}">
-                            <input type="radio" th:id="'size-' + ${variant.sizeName}" name="size" class="d-none"
-                                   th:value="${variant.sizeName}"
-                                   onclick="selectSize(this.value)">
-                            <label th:for="'size-' + ${variant.sizeName}"
-                                   th:text="${variant.sizeName}"
-                                   class="variant-option"></label>
-                        </th:block>
+                    <label class="d-block fw-bold mb-2">Kích cỡ: <span id="displaySelectedSize" class="text-primary fw-normal">--</span></label>
+                    <div id="sizeContainer" class="d-flex flex-wrap">
+                        <span class="text-muted small fst-italic">Vui lòng chọn màu sắc trước</span>
                     </div>
-                    <small id="stockInfo" class="text-danger mt-2 d-block">Vui lòng chọn Màu và Size để xem tồn kho.</small>
+                    <small id="stockMessage" class="text-danger mt-1 d-block fw-bold"></small>
                 </div>
 
                 <div class="mb-4">
                     <label class="d-block fw-bold mb-2">Số lượng:</label>
-                    <div class="input-group" style="width: 150px;">
-                        <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-</button>
-                        <input type="number" name="quantity" id="quantityInput" class="form-control text-center" value="1" min="1" max="99" required>
-                        <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+</button>
+                    <div class="input-group" style="width: 140px;">
+                        <button type="button" class="btn btn-outline-secondary" onclick="updateQty(-1)">-</button>
+                        <input type="number" name="quantity" id="quantityInput" class="form-control text-center" value="1" min="1" readonly>
+                        <button type="button" class="btn btn-outline-secondary" onclick="updateQty(1)">+</button>
                     </div>
                 </div>
 
                 <div class="d-grid gap-2 d-md-flex mt-4">
-                    <button type="submit" class="btn btn-add-to-cart flex-fill">
+                    <button type="submit" class="btn btn-add-to-cart flex-fill" id="btnSubmitCart" disabled>
                         <i class="fas fa-shopping-cart me-2"></i> THÊM VÀO GIỎ
                     </button>
-                    <button type="button" class="btn btn-outline-danger btn-buy-now flex-fill">
+                    <button type="button" class="btn btn-outline-danger btn-buy-now flex-fill" disabled>
                         MUA NGAY
                     </button>
                 </div>
             </form>
-
             <div class="mt-5 border-top pt-4">
-                <h4 class="fw-bold" style="color: #1E2C3D;">Chi tiết sản phẩm</h4>
-                <p><strong>Chất liệu:</strong> <span th:text="${product.material}">Cotton Compact</span></p>
-                <p><strong>Danh mục:</strong> <span th:text="${product.categoryName}">Áo Polo</span></p>
-                <p th:utext="${product.description} ?: 'Không có mô tả chi tiết cho sản phẩm này.'">Mô tả sản phẩm</p>
+                <h5 class="fw-bold mb-3"><i class="fas fa-info-circle me-2"></i>Thông tin chi tiết</h5>
+                <p><strong>Chất liệu:</strong> <span th:text="${product.material}"></span></p>
+                <p><strong>Danh mục:</strong> <span th:text="${product.categoryName}"></span></p>
+                <div th:utext="${product.description}" class="text-muted"></div>
             </div>
         </div>
     </div>
 </div>
 
 <div class="chatbox-wrapper">
-    <button class="chatbox-toggler" id="chatboxToggler" onclick="toggleChatbox()">
-        <i class="fas fa-comment-dots"></i>
-    </button>
+    <button class="chatbox-toggler"><i class="fas fa-comment-dots"></i></button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // --- JS Logic for Detail Page (Placeholder) ---
 
-    // 1. Chuyển ảnh chính khi click vào thumbnail
+<script th:inline="javascript">
+    const allVariants = [[${product != null ? product.productVariants : '[]'}]];
+
+    const colorContainer = document.getElementById('colorContainer');
+    const sizeContainer = document.getElementById('sizeContainer');
+    const colorInput = document.getElementById('selectedColorInput');
+    const sizeInput = document.getElementById('selectedSizeInput');
+    const displayColor = document.getElementById('displaySelectedColor');
+    const displaySize = document.getElementById('displaySelectedSize');
+    const stockMsg = document.getElementById('stockMessage');
+    const btnSubmit = document.getElementById('btnSubmitCart');
+    const btnBuyNow = document.querySelector('.btn-buy-now');
+
+    const uniqueColors = [...new Set(allVariants.map(v => v.color))];
+
+    if (uniqueColors.length > 0) {
+        uniqueColors.forEach(color => {
+            const swatch = document.createElement('span');
+            swatch.className = 'color-swatch';
+            swatch.style.backgroundColor = mapColorToHex(color);
+            swatch.title = color; // Hiển thị tooltip tên màu khi hover
+            swatch.onclick = () => handleSelectColor(color, swatch);
+            colorContainer.appendChild(swatch);
+        });
+    } else {
+        colorContainer.innerHTML = '<span class="text-danger">Sản phẩm tạm hết hàng</span>';
+    }
+
+    // --- HÀM XỬ LÝ MÀU NÂNG CAO (Tiếng Việt -> HEX) ---
+    function mapColorToHex(colorName) {
+        if (!colorName) return '#ccc';
+        const lower = colorName.toLowerCase().trim();
+
+        // 1. Kiểm tra các màu Đen/Trắng cơ bản
+        if (lower.includes('đen') || lower.includes('black')) return '#000000';
+        if (lower.includes('trắng') || lower.includes('white')) return '#ffffff';
+
+        // 2. Nâu (Yêu cầu của bạn)
+        if (lower.includes('nâu') || lower.includes('brown') || lower.includes('cà phê')) return '#8B4513';
+
+        // 3. Xám/Ghi
+        if (lower.includes('xám') || lower.includes('ghi') || lower.includes('gray') || lower.includes('grey')) return '#808080';
+
+        // 4. Các tông Xanh
+        if (lower.includes('navy') || lower.includes('than')) return '#000080'; // Xanh than
+        if (lower.includes('xanh dương') || lower.includes('blue') || lower.includes('da trời')) return '#2196F3';
+        if (lower.includes('xanh lá') || lower.includes('green') || lower.includes('rêu')) return '#4CAF50';
+        if (lower.includes('olive')) return '#808000';
+        if (lower.includes('xanh')) return '#2196F3'; // Mặc định cho chữ "xanh" đứng một mình
+
+        // 5. Các màu nóng
+        if (lower.includes('đỏ') || lower.includes('red') || lower.includes('đô')) return '#F44336';
+        if (lower.includes('vàng') || lower.includes('yellow')) return '#FFEB3B';
+        if (lower.includes('cam') || lower.includes('orange')) return '#FF9800';
+        if (lower.includes('hồng') || lower.includes('pink')) return '#FFC0CB';
+        if (lower.includes('tím') || lower.includes('purple')) return '#9C27B0';
+
+        // 6. Màu trung tính khác
+        if (lower.includes('be') || lower.includes('beige')) return '#F5F5DC';
+        if (lower.includes('kem') || lower.includes('cream')) return '#FFFDD0';
+        if (lower.includes('nude')) return '#E3BC9A';
+
+        // 7. Nếu database lưu mã HEX (ví dụ #123456) -> trả về chính nó
+        if (lower.startsWith('#')) return lower;
+
+        return '#cccccc'; // Màu mặc định (xám nhạt) nếu không tìm thấy
+    }
+
+    function handleSelectColor(color, element) {
+        document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+
+        displayColor.textContent = color;
+        colorInput.value = color;
+
+        sizeInput.value = '';
+        displaySize.textContent = '--';
+        btnSubmit.disabled = true;
+        btnBuyNow.disabled = true;
+        stockMsg.textContent = '';
+
+        const availableSizes = allVariants.filter(v => v.color === color && v.stock > 0);
+        renderSizes(availableSizes);
+    }
+
+    function renderSizes(variants) {
+        sizeContainer.innerHTML = '';
+        if (variants.length === 0) {
+            sizeContainer.innerHTML = '<span class="text-danger small">Hết hàng màu này</span>';
+            return;
+        }
+
+        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', 'XXL'];
+        variants.sort((a, b) => {
+            return sizeOrder.indexOf(a.sizeName) - sizeOrder.indexOf(b.sizeName);
+        });
+
+        variants.forEach(v => {
+            const btn = document.createElement('div');
+            btn.className = 'size-btn';
+            btn.textContent = v.sizeName;
+            btn.onclick = () => handleSelectSize(v, btn);
+            sizeContainer.appendChild(btn);
+        });
+    }
+
+    function handleSelectSize(variant, element) {
+        document.querySelectorAll('.size-btn').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+
+        displaySize.textContent = variant.sizeName;
+        sizeInput.value = variant.sizeName;
+        stockMsg.textContent = `Còn lại: ${variant.stock} sản phẩm`;
+
+        btnSubmit.disabled = false;
+        btnBuyNow.disabled = false;
+    }
+
+    function updateQty(change) {
+        const input = document.getElementById('quantityInput');
+        let val = parseInt(input.value) + change;
+        if (val < 1) val = 1;
+        input.value = val;
+    }
+
     function changeMainImage(element) {
         document.getElementById('mainProductImage').src = element.src;
         document.querySelectorAll('.thumbnail-scroll img').forEach(img => img.classList.remove('active'));
         element.classList.add('active');
     }
-
-    // 2. Tăng giảm số lượng
-    function changeQuantity(change) {
-        const input = document.getElementById('quantityInput');
-        let current = parseInt(input.value);
-        let max = parseInt(input.max);
-        let min = parseInt(input.min);
-
-        current += change;
-
-        if (current < min) current = min;
-        if (current > max) current = max; // Cần thay max bằng tồn kho thực tế
-
-        input.value = current;
-    }
-
-    // 3. Logic chọn Màu và Size (Cần AJAX/JS nâng cao để lọc tồn kho)
-    function selectColor(element) {
-        // Xử lý active state cho swatch
-        document.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('active'));
-        element.classList.add('active');
-
-        const colorName = element.getAttribute('data-color');
-        document.getElementById('selectedColorName').textContent = colorName;
-
-        // TODO: Cần gọi hàm JS để lọc và hiển thị Size tương ứng với màu này
-        // updateStockInfo();
-    }
-
-    function selectSize(sizeName) {
-        document.getElementById('selectedSizeName').textContent = sizeName;
-        // TODO: Cần gọi hàm JS để tìm Variant ID (variantId) và cập nhật #selectedVariantId
-        // updateStockInfo();
-    }
-
-    // 4. Chatbot Toggle (Copy từ home.html)
-    function toggleChatbox() {
-        // Thêm container chatbox nếu cần
-    }
-    // --- End JS Logic ---
 </script>
+
 </body>
 </html>

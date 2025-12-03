@@ -1,9 +1,12 @@
 package com.nhom10.coolmate.controller;
 
+import com.nhom10.coolmate.cart.CartService;
 import com.nhom10.coolmate.category.CategoryDTO;
 import com.nhom10.coolmate.category.CategoryService;
 import com.nhom10.coolmate.product.ProductDTO; // Import ProductDTO
 import com.nhom10.coolmate.product.ProductService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +23,8 @@ public class HomeController {
 
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final CartService cartService;
+
 
 
     @ModelAttribute("categories")
@@ -79,5 +84,11 @@ public class HomeController {
         ProductDTO product = productService.getProductById(id);
         model.addAttribute("product", product);
         return "/user/product_detail"; // Trả về file này
+    }
+
+    @ModelAttribute("cartItemCount")
+    public int getCartItemCount(HttpServletRequest request, HttpServletResponse response) {
+        // Gọi hàm count mới trong Service
+        return cartService.countItemsInCart(request, response);
     }
 }
