@@ -73,11 +73,6 @@ public class HomeController {
         return "/user/my_orders";
     }
 
-    @GetMapping("/user/cart")
-    public String cart(Model model) {
-        return "/user/cart";
-    }
-
     @GetMapping("/product/{id}")
     public String viewProductDetail(@PathVariable Integer id, Model model) {
         // Giả sử ProductService có getProductDTOById
