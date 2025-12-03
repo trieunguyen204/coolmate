@@ -311,11 +311,14 @@
                 </li>
             </ul>
 
-            <form class="d-flex search-form me-3" role="search" th:action="@{/search}">
-                <input class="form-control search-input" type="search" placeholder="Tìm kiếm sản phẩm..." aria-label="Search" name="query">
-                <button class="search-button" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
+            <form class="d-flex search-form me-3" role="search" th:action="@{/user/product}" method="get">
+                <input class="form-control search-input" type="search"
+                       placeholder="Tìm kiếm sản phẩm..."
+                       aria-label="Search"
+                       name="keyword"
+                       th:value="${keyword}"> <button class="search-button" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
             </form>
 
             <div class="d-flex align-items-center">

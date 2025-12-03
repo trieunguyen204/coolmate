@@ -41,20 +41,17 @@ public class HomeController {
     }
 
 
+    // Trong HomeController.java
     @GetMapping("/user/product")
     public String product(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
-        // 1. Gọi service lấy danh sách sản phẩm (có hỗ trợ tìm kiếm theo tên)
+        // Gọi service tìm kiếm (Service này sẽ gọi Repository dùng LIKE %keyword%)
         List<ProductDTO> products = productService.getAllProducts(keyword);
 
-        // 2. Đưa dữ liệu vào model
         model.addAttribute("products", products);
-
-        // 3. Giữ lại từ khóa tìm kiếm để hiển thị trên ô input (nếu cần)
-        model.addAttribute("keyword", keyword);
-
+        model.addAttribute("keyword", keyword); // Để hiển thị lại trên thanh tìm kiếm
         return "user/product";
     }
-    // --------------------------
+
 
     @GetMapping("/products/by-category/{id}")
     public String productByCategory(@PathVariable Integer id, Model model) {
