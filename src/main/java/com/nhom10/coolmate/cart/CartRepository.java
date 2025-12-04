@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface CartRepository extends JpaRepository<Cart, Integer> {
     Optional<Cart> findByUser(User user);
 
-
+    // THÊM: Tìm theo session token
     Optional<Cart> findBySessionToken(String sessionToken);
 }

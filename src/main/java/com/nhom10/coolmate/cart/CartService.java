@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,107 +37,81 @@ public class CartService {
     private final SizesRepository sizesRepository;
 
     private static final String CART_COOKIE_NAME = "CART_SESSION";
+    private static final int COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 ngày
 
-    // --- HÀM HỖ TRỢ LẤY GIỎ HÀNG THÔNG MINH (USER HOẶC GUEST) ---
+    // --- 1. CORE: LẤY GIỎ HÀNG (XỬ LÝ CẢ USER VÀ GUEST) ---
     public Cart getCart(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // 1. TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP
+        // A. Trường hợp: Đã đăng nhập
         if (authentication != null && isAuthenticated(authentication)) {
             String email = authentication.getName();
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new AppException("User not found"));
 
-            // Tìm giỏ hàng của User, nếu chưa có thì tạo mới
+            // Tìm giỏ hàng theo User, nếu chưa có thì tạo mới
             return cartRepository.findByUser(user).orElseGet(() -> {
-                Cart newCart = Cart.builder().user(user).cartItems(new ArrayList<>()).build();
+                Cart newCart = Cart.builder()
+                        .user(user)
+                        .cartItems(new ArrayList<>())
+                        .build();
                 return cartRepository.save(newCart);
             });
         }
 
-        // 2. TRƯỜNG HỢP KHÁCH VÃNG LAI (GUEST)
+        // B. Trường hợp: Khách vãng lai (Guest) - Dùng Cookie
         else {
-            String sessionToken = null;
+            String sessionToken = getSessionTokenFromCookie(request);
 
-            // Tìm cookie token
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
-                    if (CART_COOKIE_NAME.equals(cookie.getName())) {
-                        sessionToken = cookie.getValue();
-                        break;
-                    }
-                }
-            }
-
-            // Nếu chưa có token hoặc tìm không thấy giỏ hàng tương ứng -> Tạo mới
+            // Nếu chưa có cookie token -> Tạo mới
             if (sessionToken == null) {
                 return createGuestCart(response);
             } else {
-                String finalToken = sessionToken;
-                return cartRepository.findBySessionToken(finalToken).orElseGet(() -> createGuestCart(response));
+                // Nếu có token -> Tìm giỏ hàng, nếu không thấy (VD DB bị xóa) -> Tạo mới
+                return cartRepository.findBySessionToken(sessionToken)
+                        .orElseGet(() -> createGuestCart(response));
             }
         }
     }
 
-    private boolean isAuthenticated(Authentication authentication) {
-        return authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
-    }
-
-    private Cart createGuestCart(HttpServletResponse response) {
-        String token = UUID.randomUUID().toString();
-
-        // Tạo Cookie
-        Cookie cookie = new Cookie(CART_COOKIE_NAME, token);
-        cookie.setPath("/");
-        cookie.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
-
-        // Tạo Giỏ hàng trong DB (User = null)
-        Cart newCart = Cart.builder()
-                .sessionToken(token)
-                .user(null) // Quan trọng: User là null
-                .cartItems(new ArrayList<>())
-                .build();
-        return cartRepository.save(newCart);
-    }
-
-    // --- LOGIC THÊM VÀO GIỎ (Đã sửa để nhận Request/Response) ---
+    // --- 2. LOGIC THÊM VÀO GIỎ ---
     @Transactional
     public void addToCart(Integer productId, Integer quantity, String sizeName, String color,
                           HttpServletRequest request, HttpServletResponse response) {
 
-        // Lấy giỏ hàng (Tự động xử lý Guest hay User)
+        // Bước 1: Lấy giỏ hàng hiện tại (Guest hoặc User)
         Cart cart = getCart(request, response);
 
-        // ... Logic tìm sản phẩm giữ nguyên ...
+        // Bước 2: Validate dữ liệu đầu vào
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException("Sản phẩm không tồn tại"));
 
         Sizes size = sizesRepository.findBySizeName(sizeName)
                 .orElseThrow(() -> new AppException("Size không hợp lệ: " + sizeName));
 
+        // Bước 3: Tìm Product Variant (Sự kết hợp giữa SP + Màu + Size)
         ProductVariant variant = productVariantRepository.findByProductIdAndSizeIdAndColor(productId, size.getId(), color)
                 .orElseThrow(() -> new AppException("Sản phẩm màu " + color + " size " + sizeName + " hiện không khả dụng."));
 
+        // Bước 4: Kiểm tra tồn kho
         if (variant.getQuantity() < quantity) {
-            throw new AppException("Số lượng tồn kho không đủ.");
+            throw new AppException("Số lượng tồn kho không đủ (chỉ còn " + variant.getQuantity() + ").");
         }
 
+        // Bước 5: Kiểm tra xem sản phẩm đã có trong giỏ chưa
         Optional<CartItem> existingItem = cart.getCartItems().stream()
                 .filter(item -> item.getProductVariant().getId().equals(variant.getId()))
                 .findFirst();
 
         if (existingItem.isPresent()) {
+            // Nếu có rồi -> Cộng dồn số lượng
             CartItem item = existingItem.get();
             item.setQuantity(item.getQuantity() + quantity);
+            // Có thể check lại tồn kho sau khi cộng dồn ở đây nếu muốn chặt chẽ hơn
             cartItemRepository.save(item);
         } else {
-            BigDecimal finalPrice = product.getPrice();
-            if(product.getDiscountPercent() > 0) {
-                BigDecimal discountFactor = BigDecimal.valueOf(100 - product.getDiscountPercent()).divide(BigDecimal.valueOf(100));
-                finalPrice = product.getPrice().multiply(discountFactor);
-            }
+            // Nếu chưa có -> Tạo mục mới
+            BigDecimal finalPrice = calculateFinalPrice(product);
 
             CartItem newItem = CartItem.builder()
                     .cart(cart)
@@ -144,23 +119,107 @@ public class CartService {
                     .quantity(quantity)
                     .priceAtTime(finalPrice)
                     .build();
+
+            // Thêm vào list để đồng bộ (nếu dùng cascade) và lưu
+            cart.getCartItems().add(newItem);
             cartItemRepository.save(newItem);
         }
     }
 
-    // Xóa item (Cần Request/Response để xác định đúng giỏ)
+    // --- 3. XÓA ITEM KHỎI GIỎ ---
     @Transactional
     public void removeFromCart(Integer cartItemId, HttpServletRequest request, HttpServletResponse response) {
         Cart cart = getCart(request, response);
 
-        // Chỉ xóa nếu item thuộc về giỏ hàng hiện tại (Bảo mật)
-        cart.getCartItems().removeIf(item -> item.getId().equals(cartItemId));
-        cartItemRepository.deleteById(cartItemId);
+        // Bảo mật: Chỉ xóa nếu item đó thực sự nằm trong giỏ hàng của người đang request
+        boolean removed = cart.getCartItems().removeIf(item -> item.getId().equals(cartItemId));
+
+        if (removed) {
+            // Xóa cứng trong DB
+            cartItemRepository.deleteById(cartItemId);
+        } else {
+            throw new AppException("Không tìm thấy sản phẩm trong giỏ hàng để xóa.");
+        }
     }
 
-    // Đếm số lượng item cho Badge
+    // --- 4. CẬP NHẬT SỐ LƯỢNG (Tăng/Giảm ở trang giỏ hàng) ---
+    @Transactional
+    public void updateQuantity(Integer cartItemId, Integer newQuantity, HttpServletRequest request, HttpServletResponse response) {
+        if (newQuantity <= 0) {
+            removeFromCart(cartItemId, request, response);
+            return;
+        }
+
+        Cart cart = getCart(request, response);
+        CartItem item = cart.getCartItems().stream()
+                .filter(i -> i.getId().equals(cartItemId))
+                .findFirst()
+                .orElseThrow(() -> new AppException("Sản phẩm không tồn tại trong giỏ."));
+
+        // Check tồn kho
+        if (item.getProductVariant().getQuantity() < newQuantity) {
+            throw new AppException("Kho không đủ hàng.");
+        }
+
+        item.setQuantity(newQuantity);
+        cartItemRepository.save(item);
+    }
+
+    // --- 5. ĐẾM SỐ LƯỢNG (Hiển thị lên icon giỏ hàng) ---
     public int countItemsInCart(HttpServletRequest request, HttpServletResponse response) {
         Cart cart = getCart(request, response);
+        if (cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
+            return 0;
+        }
+        // Tính tổng số lượng sản phẩm (Ví dụ: 2 áo A + 1 áo B = 3)
         return cart.getCartItems().stream().mapToInt(CartItem::getQuantity).sum();
+    }
+
+    // ================= HELPER METHODS =================
+
+    private Cart createGuestCart(HttpServletResponse response) {
+        String token = UUID.randomUUID().toString();
+
+        // Tạo Cookie gửi về client
+        Cookie cookie = new Cookie(CART_COOKIE_NAME, token);
+        cookie.setPath("/");
+        cookie.setMaxAge(COOKIE_MAX_AGE);
+        cookie.setHttpOnly(true); // Bảo mật: JS không đọc được
+        response.addCookie(cookie);
+
+        // Lưu Cart Guest vào DB
+        Cart newCart = Cart.builder()
+                .sessionToken(token)
+                .user(null) // Quan trọng: User null
+                .cartItems(new ArrayList<>())
+                .build();
+        return cartRepository.save(newCart);
+    }
+
+    private String getSessionTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (CART_COOKIE_NAME.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean isAuthenticated(Authentication authentication) {
+        return authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken);
+    }
+
+    private BigDecimal calculateFinalPrice(Product product) {
+        BigDecimal price = product.getPrice();
+        if (product.getDiscountPercent() != null && product.getDiscountPercent() > 0) {
+            BigDecimal discount = BigDecimal.valueOf(product.getDiscountPercent());
+            BigDecimal factor = BigDecimal.valueOf(100).subtract(discount).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            return price.multiply(factor);
+        }
+        return price;
     }
 }

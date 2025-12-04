@@ -20,12 +20,12 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
+    // SỬA: nullable = true (Để khách vãng lai không cần User)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true, unique = true)
     private User user;
 
-
+    // THÊM: Token để định danh khách vãng lai
     @Column(name = "session_token", length = 255)
     private String sessionToken;
 

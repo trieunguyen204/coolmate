@@ -15,7 +15,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode; // Đã thêm
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,27 +37,22 @@ public class ProductService {
         if (discountPercent == null || discountPercent <= 0) {
             return price;
         }
-        // Đã sửa: dùng RoundingMode.HALF_UP
         BigDecimal discountFactor = BigDecimal.valueOf(100 - discountPercent.doubleValue()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         return price.multiply(discountFactor).setScale(0, RoundingMode.HALF_UP); // Set Scale 0 để làm tròn giá bán
     }
 
     private ProductDTO mapToDTO(Product product) {
         BigDecimal discountPrice = calculateDiscountPrice(product.getPrice(), product.getDiscountPercent());
-        // Giá gốc được dùng làm oldPrice khi có giảm giá
         BigDecimal oldPrice = (product.getDiscountPercent() != null && product.getDiscountPercent() > 0) ? product.getPrice() : null;
 
-        // Lấy URL ảnh đầu tiên làm ảnh đại diện
         String mainImageUrl = product.getImages() != null && !product.getImages().isEmpty()
                 ? product.getImages().get(0).getImageUrl()
-                : "/images/placeholder_product.jpg"; // Thêm ảnh placeholder nếu không có
+                : "/images/placeholder_product.jpg";
 
-        // --- KHẮC PHỤC LỖI CATEGORY ID 0 ---
         String categoryName = "-";
         Integer categoryId = null;
 
         try {
-            // Sử dụng try-catch khi truy cập Category Entity để xử lý lỗi ID 0
             if (product.getCategory() != null) {
                 categoryName = product.getCategory().getName();
                 categoryId = product.getCategory().getId();
@@ -76,42 +71,81 @@ public class ProductService {
                         .build())
                 .collect(Collectors.toList());
 
-        // CHỈNH SỬA DTO: Thêm trường currentPrice và oldPrice
         return ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
-                .price(product.getPrice()) // Đây là giá gốc
+                .price(product.getPrice())
                 .discountPercent(product.getDiscountPercent())
                 .material(product.getMaterial())
                 .categoryId(categoryId)
                 .categoryName(categoryName)
-                // CÁC TRƯỜNG MỚI ĐỂ HIỂN THỊ Ở CLIENT
-                .discountPrice(discountPrice) // Giá sau chiết khấu (Giá mới)
-                .currentPrice(discountPrice) // Gán discountPrice vào currentPrice cho tiện dùng trong home.html
-                .oldPrice(oldPrice) // Giá gốc (nếu có chiết khấu)
-                .imageUrl(mainImageUrl) // URL ảnh đại diện
+                .discountPrice(discountPrice)
+                .currentPrice(discountPrice)
+                .oldPrice(oldPrice)
+                .imageUrl(mainImageUrl)
                 .productVariants(variantsDto)
                 .existingImages(product.getImages())
                 .build();
     }
 
     // ==========================================================
-    // CLIENT: getFeaturedProducts
+    // CLIENT: getFilteredProducts (CHỨC NĂNG LỌC VÀ SẮP XẾP)
     // ==========================================================
     /**
-     * Lấy danh sách sản phẩm nổi bật (Top 8 sản phẩm mới nhất).
+     * Lọc và sắp xếp sản phẩm dựa trên keyword, khoảng giá và thứ tự sắp xếp.
+     * @param keyword Từ khóa tìm kiếm
+     * @param priceRanges Danh sách các chuỗi khoảng giá (ví dụ: ["0-200000"])
+     * @param sortOrder Thứ tự sắp xếp (ví dụ: "price_asc", "createdAt_desc")
      * @return List<ProductDTO>
      */
+    public List<ProductDTO> getFilteredProducts(String keyword, List<String> priceRanges, String sortOrder) {
+        // 1. Phân tích khoảng giá (Giữ nguyên logic từ bước trước)
+        BigDecimal minPrice = null;
+        BigDecimal maxPrice = null;
+
+        if (priceRanges != null && !priceRanges.isEmpty()) {
+            for (String range : priceRanges) {
+                String[] parts = range.split("-");
+
+                if (!parts[0].isEmpty()) {
+                    BigDecimal currentMin = new BigDecimal(parts[0]);
+                    if (minPrice == null || currentMin.compareTo(minPrice) < 0) {
+                        minPrice = currentMin;
+                    }
+                }
+
+                if (parts.length > 1 && !parts[1].isEmpty()) {
+                    BigDecimal currentMax = new BigDecimal(parts[1]);
+                    if (maxPrice == null || currentMax.compareTo(maxPrice) > 0) {
+                        maxPrice = currentMax;
+                    }
+                }
+            }
+        }
+
+        // 2. Gọi Repository với logic phức tạp (Filter, Sắp xếp)
+        // LỖI ĐÃ XẢY RA Ở ĐÂY: THIẾU THAM SỐ sortOrder
+        List<Product> products = productRepository.findByKeywordAndPriceRange(keyword, minPrice, maxPrice, sortOrder);
+
+
+        return products.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ==========================================================
+    // CLIENT: getFeaturedProducts
+    // ==========================================================
     public List<ProductDTO> getFeaturedProducts() {
         List<Product> products = productRepository.findTop8ByOrderByCreatedAtDesc();
 
-        // Thêm logic lọc: Chỉ hiển thị sản phẩm có ít nhất 1 biến thể có tồn kho > 0
         return products.stream()
                 .filter(p -> p.getVariants() != null && p.getVariants().stream().anyMatch(v -> v.getQuantity() > 0))
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+
 
     // ==========================================================
     // READ: getAllProducts (ADMIN)
@@ -144,13 +178,10 @@ public class ProductService {
 
     @Transactional
     public void saveProduct(@Valid ProductDTO dto) {
-        // 1. Validate Category
+        // ... (Logic save product giữ nguyên) ...
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new AppException("Danh mục không tồn tại."));
 
-        // 2. Validation cơ bản cho Material (đã chuyển sang @NotBlank trong DTO)
-
-        // 3. Map DTO to Entity (CREATE / UPDATE)
         Product product;
         if (dto.getId() != null) {
             product = productRepository.findById(dto.getId())
@@ -168,29 +199,22 @@ public class ProductService {
         product.setMaterial(dto.getMaterial());
         product.setCategory(category);
 
-        // 4. Save Product (Lưu trước để lấy ID)
         Product savedProduct = productRepository.save(product);
 
-        // 5. Handle Variants (Sử dụng VariantInputDTO)
         if (dto.getVariantInputs() != null && !dto.getVariantInputs().isEmpty()) {
 
-            // Dùng Set để kiểm tra trùng lặp (SizeId + Color) ngay trong input
             java.util.Set<String> uniqueVariants = new java.util.HashSet<>();
 
             for (ProductDTO.VariantInputDTO input : dto.getVariantInputs()) {
 
-                // 5a. Kiểm tra trùng lặp trong input
                 String uniqueKey = input.getSizeId() + "_" + input.getColor().trim().toLowerCase();
                 if (!uniqueVariants.add(uniqueKey)) {
                     throw new AppException("Biến thể trùng lặp được phát hiện trong dữ liệu nhập: Size ID " + input.getSizeId() + " và Màu " + input.getColor());
                 }
 
-                // 5b. Lấy Size Entity
                 Sizes size = sizesRepository.findById(input.getSizeId())
                         .orElseThrow(() -> new AppException("Size không tồn tại: " + input.getSizeId()));
 
-                // 5c. Tìm hoặc Tạo ProductVariant
-                // Tìm theo variantId (nếu có) hoặc theo ProductId + SizeId + Color
                 Optional<ProductVariant> existingVariant = Optional.empty();
                 if (input.getVariantId() != null) {
                     existingVariant = variantRepository.findById(input.getVariantId());
@@ -201,7 +225,6 @@ public class ProductService {
 
                 ProductVariant variant = existingVariant.orElseGet(ProductVariant::new);
 
-                // 5d. Cập nhật/Tạo mới biến thể
                 variant.setProduct(savedProduct);
                 variant.setSize(size);
                 variant.setColor(input.getColor().trim());
@@ -211,7 +234,6 @@ public class ProductService {
             }
         }
 
-        // 6. Handle Image Upload
         if (dto.getNewImages() != null && !dto.getNewImages().isEmpty()) {
             for (MultipartFile file : dto.getNewImages()) {
                 if (!file.isEmpty()) {

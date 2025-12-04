@@ -46,14 +46,24 @@ public class HomeController {
     }
 
 
-    // Trong HomeController.java
-    @GetMapping("/user/product")
-    public String product(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
-        // Gọi service tìm kiếm (Service này sẽ gọi Repository dùng LIKE %keyword%)
-        List<ProductDTO> products = productService.getAllProducts(keyword);
 
+
+    @GetMapping("/user/product")
+    public String product(Model model,
+                          @RequestParam(value = "keyword", required = false) String keyword,
+                          @RequestParam(value = "priceRange", required = false) List<String> priceRanges,
+                          // THÊM: Chấp nhận tham số sắp xếp
+                          @RequestParam(value = "sortOrder", required = false) String sortOrder) {
+
+        // Cập nhật tên hàm Service để truyền thêm tham số sắp xếp
+        List<ProductDTO> products = productService.getFilteredProducts(keyword, priceRanges, sortOrder);
+
+        // Truyền lại các tham số đã chọn để giữ trạng thái trên View
         model.addAttribute("products", products);
-        model.addAttribute("keyword", keyword); // Để hiển thị lại trên thanh tìm kiếm
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedPriceRanges", priceRanges);
+        model.addAttribute("sortOrder", sortOrder); // TRUYỀN THAM SỐ SẮP XẾP
+
         return "user/product";
     }
 

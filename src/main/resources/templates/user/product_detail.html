@@ -12,67 +12,24 @@
         body {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
+            background: #f8f9fa; /* Nền sáng */
             min-height: 100vh;
-            padding-top: 60px;
+            padding-top: 60px; /* Cho Navbar cố định */
         }
 
-
-            .search-form {
-            position: relative; /* Quan trọng: Để làm mốc tọa độ cho nút search bên trong */
-        }
-
-        .search-input {
-            border-radius: 20px; /* Bo tròn ô tìm kiếm */
-            padding-right: 40px; /* Chừa khoảng trống bên phải để chữ không bị nút search che mất */
-            padding-left: 15px;
-            border: none;
-            background: rgba(255, 255, 255, 0.2); /* Nền trắng mờ (trong suốt 20%) */
-            color: white; /* Chữ màu trắng */
-            transition: all 0.3s; /* Hiệu ứng chuyển động mượt */
-        }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.7); /* Màu chữ gợi ý (placeholder) trắng mờ */
-        }
-
-        /* Trạng thái khi người dùng nhấn vào ô input */
-        .search-input:focus {
-            background: white; /* Nền chuyển sang trắng hẳn */
-            color: #1E2C3D; /* Chữ chuyển sang màu xanh navy đậm */
-            box-shadow: none;
-        }
-
-        .search-button {
-            position: absolute; /* Định vị tuyệt đối để nằm đè lên input */
-            right: 0; /* Căn sát lề phải */
-            top: 50%; /* Căn giữa theo chiều dọc */
-            transform: translateY(-50%); /* Căn chỉnh chính xác giữa tâm */
-            background: none; /* Xóa nền mặc định của button */
-            border: none; /* Xóa viền */
-            color: rgba(255, 255, 255, 0.8); /* Màu icon trắng mờ */
-            padding-right: 15px;
-            transition: color 0.3s;
-        }
-
-        /* Khi input được focus, đổi màu icon nút tìm kiếm sang xanh navy */
-        .search-input:focus ~ .search-button {
-            color: #1E2C3D;
-        }
-
-
-
-        /* --- Navbar Styles (Đồng bộ home.html) --- */
+        /* Thay đổi màu Navbar sang Xanh Navy */
         .navbar {
-            background-color: #1E2C3D;
+            background-color: #1E2C3D; /* Xanh Navy đậm */
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
             z-index: 1030;
         }
+
         .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
             color: white !important;
         }
+
         .nav-link {
             color: rgba(255, 255, 255, 0.8) !important;
             font-weight: 500;
@@ -81,62 +38,85 @@
             padding: 10px 15px !important;
             border-radius: 5px;
         }
+
         .nav-link:hover, .nav-link.active {
             color: white !important;
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .action-icon { color: white; font-size: 1.2rem; margin-left: 15px; transition: color 0.3s; }
-        .action-icon:hover { color: #ffc107; }
+        .search-form {
+            position: relative;
+        }
 
+        .search-input {
+            border-radius: 20px;
+            padding-right: 40px;
+            padding-left: 15px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s;
+        }
 
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
 
+        .search-input:focus {
+            background: white;
+            color: #1E2C3D;
+            box-shadow: none;
+        }
 
+        .search-button {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            padding-right: 15px;
+            transition: color 0.3s;
+        }
+
+        .search-input:focus ~ .search-button {
+            color: #1E2C3D;
+        }
+
+        .action-icon {
+            color: white;
+            font-size: 1.2rem;
+            margin-left: 15px;
+            transition: color 0.3s;
+        }
+
+        .action-icon:hover {
+            color: #ffc107; /* Vàng nổi bật */
+        }
 
         /* --- PRODUCT DETAIL SPECIFIC STYLES --- */
-        .product-detail-card {
-            background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); padding: 30px;
-        }
-
-        /* Image Gallery */
-        .main-image-display {
-            border-radius: 8px; overflow: hidden; border: 1px solid #eee;
-            aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; background: #f8f9fa;
-        }
+        .product-detail-card { background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); padding: 30px; }
+        .main-image-display { border-radius: 8px; overflow: hidden; border: 1px solid #eee; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; background: #f8f9fa; }
         .main-image-display img { width: 100%; height: 100%; object-fit: contain; }
         .thumbnail-scroll { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 10px; margin-top: 10px; }
         .thumbnail-scroll img { width: 80px; height: 80px; object-fit: cover; border-radius: 5px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
         .thumbnail-scroll img.active, .thumbnail-scroll img:hover { border-color: #1E2C3D; }
 
-        /* Product Info */
         .product-name { font-weight: 700; color: #1E2C3D; margin-bottom: 15px; font-size: 2.2rem; }
         .current-price { font-size: 2.5rem; font-weight: bold; color: #dc3545; margin-right: 15px; }
         .old-price { font-size: 1.3rem; color: #6c757d; text-decoration: line-through; }
 
         /* Variant Buttons */
-        .color-swatch {
-            display: inline-block; width: 40px; height: 40px; border-radius: 50%;
-            border: 2px solid #ddd; cursor: pointer; margin-right: 12px; margin-bottom: 10px;
-            position: relative; transition: all 0.2s;
-        }
+        .color-swatch { display: inline-block; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; margin-right: 12px; margin-bottom: 10px; position: relative; transition: all 0.2s; }
         .color-swatch:hover { transform: scale(1.1); }
         .color-swatch.active { border-color: #1E2C3D; box-shadow: 0 0 0 3px rgba(30, 44, 61, 0.2); }
-        .color-swatch.active::after {
-            content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900;
-            color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 16px; text-shadow: 0 0 3px rgba(0,0,0,0.5);
-        }
+        .color-swatch.active::after { content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; text-shadow: 0 0 3px rgba(0,0,0,0.5); }
+        .color-swatch.active[title="Trắng"]::after, .color-swatch.active[title="White"]::after { color: #1E2C3D; text-shadow: none; } /* Dấu tích màu đen cho nền trắng */
 
-        .size-btn {
-            min-width: 60px; padding: 8px 15px; border: 1px solid #ddd; background: white;
-            border-radius: 6px; cursor: pointer; margin-right: 10px; margin-bottom: 10px;
-            text-align: center; font-weight: 600; transition: all 0.2s;
-        }
+        .size-btn { min-width: 60px; padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; text-align: center; font-weight: 600; transition: all 0.2s; }
         .size-btn:hover { border-color: #1E2C3D; color: #1E2C3D; }
         .size-btn.active { background-color: #1E2C3D; color: white; border-color: #1E2C3D; }
-        .size-btn.disabled { background-color: #f8f9fa; color: #ccc; border-color: #eee; cursor: not-allowed; }
-
-        /* Actions */
         .btn-add-to-cart { background-color: #1E2C3D; border-color: #1E2C3D; color: white; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; transition: 0.3s; }
         .btn-add-to-cart:hover { background-color: #0d1a25; }
         .btn-add-to-cart:disabled { background-color: #6c757d; border-color: #6c757d; cursor: not-allowed; }
@@ -151,13 +131,13 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid container">
         <a class="navbar-brand" th:href="@{/}" href="#">COOLMATE</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" th:href="@{/}" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/}" href="home.html">Trang chủ</a>
+                    <a class="nav-link " th:href="@{/}" href="#">Trang chủ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active" th:href="@{/user/product}" href="#">Sản phẩm</a>
@@ -177,8 +157,12 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/user/about}" href="about.html">Giới thiệu</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/user/contact}" href="contact.html">Liên hệ</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/about}" href="#">Giới thiệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/contact}" href="#">Liên hệ</a>
+                </li>
             </ul>
 
             <form class="d-flex search-form me-3" role="search" th:action="@{/user/product}" method="get">
@@ -233,8 +217,19 @@
         </div>
     </div>
 </nav>
-<div class="container mt-5 pt-4 mb-5">
 
+<div class="container mt-5 pt-4 mb-5">
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <div th:if="${product == null}" class="alert alert-warning text-center">
         Sản phẩm không tồn tại. <a th:href="@{/user/product}">Quay lại danh sách</a>
     </div>
@@ -279,6 +274,8 @@
             </div>
 
             <form th:action="@{/user/cart/add}" method="post" id="addToCartForm">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
                 <input type="hidden" name="productId" th:value="${product.id}">
                 <input type="hidden" name="color" id="selectedColorInput" required>
                 <input type="hidden" name="size" id="selectedSizeInput" required>
@@ -315,6 +312,7 @@
                     </button>
                 </div>
             </form>
+
             <div class="mt-5 border-top pt-4">
                 <h5 class="fw-bold mb-3"><i class="fas fa-info-circle me-2"></i>Thông tin chi tiết</h5>
                 <p><strong>Chất liệu:</strong> <span th:text="${product.material}"></span></p>
@@ -400,18 +398,21 @@
     }
 
     function handleSelectColor(color, element) {
+        // Cập nhật UI và biến
         document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
 
         displayColor.textContent = color;
         colorInput.value = color;
 
+        // Reset Size
         sizeInput.value = '';
         displaySize.textContent = '--';
         btnSubmit.disabled = true;
         btnBuyNow.disabled = true;
         stockMsg.textContent = '';
 
+        // Lọc size có sẵn
         const availableSizes = allVariants.filter(v => v.color === color && v.stock > 0);
         renderSizes(availableSizes);
     }
@@ -438,13 +439,18 @@
     }
 
     function handleSelectSize(variant, element) {
+        // Cập nhật UI và biến
         document.querySelectorAll('.size-btn').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
 
         displaySize.textContent = variant.sizeName;
         sizeInput.value = variant.sizeName;
-        stockMsg.textContent = `Còn lại: ${variant.stock} sản phẩm`;
 
+        // Hiển thị tồn kho
+        stockMsg.textContent = `Còn lại: ${variant.stock} sản phẩm`;
+        document.getElementById('quantityInput').max = variant.stock; // Cập nhật max qty
+
+        // Bật nút mua hàng
         btnSubmit.disabled = false;
         btnBuyNow.disabled = false;
     }
@@ -452,7 +458,21 @@
     function updateQty(change) {
         const input = document.getElementById('quantityInput');
         let val = parseInt(input.value) + change;
+        let max = parseInt(input.max) || 99; // Lấy max từ tồn kho
+
         if (val < 1) val = 1;
+        if (val > max) {
+            val = max;
+            stockMsg.textContent = `Chỉ còn tối đa ${max} sản phẩm!`;
+        } else if (max > 0) {
+             // Xóa thông báo nếu số lượng hợp lệ
+             const selectedColor = colorInput.value;
+             const selectedSize = sizeInput.value;
+             if (selectedColor && selectedSize) {
+                 const currentVariant = allVariants.find(v => v.color === selectedColor && v.sizeName === selectedSize);
+                 stockMsg.textContent = `Còn lại: ${currentVariant ? currentVariant.stock : 0} sản phẩm`;
+             }
+        }
         input.value = val;
     }
 

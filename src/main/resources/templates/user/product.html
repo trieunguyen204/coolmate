@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
@@ -61,7 +62,7 @@
 
 
 
-        /* --- Navbar Styles (Đồng bộ home.html) --- */
+        /* -&#45;&#45; Navbar Styles (Đồng bộ home.html) -&#45;&#45; */
         .navbar {
             background-color: #1E2C3D;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
@@ -88,53 +89,33 @@
         .action-icon { color: white; font-size: 1.2rem; margin-left: 15px; transition: color 0.3s; }
         .action-icon:hover { color: #ffc107; }
 
-        /* --- Product Specific Styles --- */
-        .product-card {
-            background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; height: 100%;
-        }
+        /* Product Card Styles */
+        .product-card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; height: 100%; position: relative; }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
-        .product-image-wrapper {
-            background: #f8f9fa; border-bottom: 1px solid #eee; position: relative;
-            overflow: hidden; height: 220px; display: flex; align-items: center; justify-content: center;
-        }
+        .product-image-wrapper { background: #f8f9fa; border-bottom: 1px solid #eee; position: relative; overflow: hidden; height: 220px; display: flex; align-items: center; justify-content: center; }
         .product-image { width: 100%; height: 100%; object-fit: contain; transition: transform 0.5s ease; }
         .product-card:hover .product-image { transform: scale(1.05); }
         .product-info { padding: 15px; text-align: center; }
-        .product-title {
-            font-size: 1rem; font-weight: 600; color: #1E2C3D; margin-bottom: 5px;
-            height: 40px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-        }
+        .product-title { font-size: 1rem; font-weight: 600; color: #1E2C3D; margin-bottom: 5px; height: 40px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
         .product-price { font-size: 1.2rem; color: #dc3545; font-weight: bold; display: block; margin-top: 5px; }
         .product-old-price { font-size: 0.85rem; color: #6c757d; text-decoration: line-through; margin-left: 5px; }
-        .btn-add-cart {
-            background-color: #1E2C3D; border-color: #1E2C3D; color: white; transition: background-color 0.3s;
-        }
+
+        /* Button Styles */
+        .btn-add-cart { background-color: #1E2C3D; border-color: #1E2C3D; color: white; transition: background-color 0.3s; }
         .btn-add-cart:hover { background-color: #0d1a25; border-color: #0d1a25; color: white; }
 
-        /* Filter Sidebar */
+        /* Modal Variant Styles */
+        .color-swatch { display: inline-block; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; margin-right: 10px; position: relative; transition: all 0.2s; }
+        .color-swatch.active { border-color: #1E2C3D; box-shadow: 0 0 0 2px rgba(30, 44, 61, 0.3); transform: scale(1.1); }
+        .color-swatch.active::after { content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; text-shadow: 0 0 2px black; }
+
+        .size-btn { min-width: 50px; padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; margin-right: 8px; margin-bottom: 8px; text-align: center; font-weight: 600; transition: all 0.2s; }
+        .size-btn:hover { border-color: #1E2C3D; color: #1E2C3D; }
+        .size-btn.active { background-color: #1E2C3D; color: white; border-color: #1E2C3D; }
+
+        /* Filter & Sidebar */
         .filter-sidebar { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .filter-header { font-weight: 700; color: #1E2C3D; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .form-check-input:checked { background-color: #1E2C3D; border-color: #1E2C3D; }
-
-        /* Pagination */
-        .pagination .page-link { color: #1E2C3D; }
-        .pagination .page-item.active .page-link { background-color: #1E2C3D; border-color: #1E2C3D; color: white; }
-
-        /* --- Chatbot Styles (Đồng bộ home.html) --- */
-        .chatbox-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 1050; }
-        .chatbox-toggler {
-            width: 60px; height: 60px; border-radius: 50%; background-color: #1E2C3D; color: white;
-            border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.5rem; transition: transform 0.3s;
-        }
-        .chatbox-toggler:hover { transform: scale(1.05); background-color: #0d1a25; }
-        .chatbox-container {
-            width: 350px; height: 450px; background: white; border-radius: 10px;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden;
-        }
-        .chatbox-header { background-color: #1E2C3D; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-        .chatbox-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .chatbox-input { border-top: 1px solid #eee; padding: 10px; display: flex; }
     </style>
 </head>
 <body>
@@ -225,149 +206,347 @@
     </div>
 </nav>
 
+
 <div class="container mt-5 pt-3">
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
     <div class="row">
         <div class="col-lg-3 mb-4">
             <div class="filter-sidebar">
                 <div class="filter-header">Danh mục</div>
                 <div class="list-group list-group-flush mb-4">
-                    <a href="#" class="list-group-item list-group-item-action border-0 px-0 fw-bold text-primary">Tất cả sản phẩm</a>
-                    <a href="#" class="list-group-item list-group-item-action border-0 px-0">Áo Polo</a>
-                    <a href="#" class="list-group-item list-group-item-action border-0 px-0">Áo Thun</a>
-                    <a href="#" class="list-group-item list-group-item-action border-0 px-0">Quần Short</a>
-                    <a href="#" class="list-group-item list-group-item-action border-0 px-0">Quần Lót</a>
+                    <a th:href="@{/user/product}" class="list-group-item list-group-item-action border-0 px-0 fw-bold text-primary">Tất cả sản phẩm</a>
+                    <a th:each="c : ${categories}" th:href="@{/products/by-category/{id}(id=${c.id})}" th:text="${c.name}" class="list-group-item list-group-item-action border-0 px-0"></a>
                 </div>
-
-                <div class="filter-header">Khoảng giá</div>
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="price1">
-                        <label class="form-check-label" for="price1">Dưới 200.000đ</label>
+                <form th:action="@{/user/product}" method="get">
+                    <input type="hidden" name="keyword" th:value="${keyword}">
+                    <div class="filter-header">Khoảng giá</div>
+                    <div class="mb-3">
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="priceRange" value="0-200000" id="price1"><label class="form-check-label" for="price1">Dưới 200.000đ</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="priceRange" value="200000-500000" id="price2"><label class="form-check-label" for="price2">200.000đ - 500.000đ</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="priceRange" value="500000-" id="price3"><label class="form-check-label" for="price3">Trên 500.000đ</label></div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="price2">
-                        <label class="form-check-label" for="price2">200.000đ - 500.000đ</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="price3">
-                        <label class="form-check-label" for="price3">Trên 500.000đ</label>
-                    </div>
-                </div>
-                <button class="btn btn-add-cart w-100">Lọc sản phẩm</button>
+                    <button type="submit" class="btn btn-add-cart w-100">Lọc sản phẩm</button>
+                </form>
             </div>
         </div>
 
         <div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 style="color: #1E2C3D; font-weight: 700;">
-                    <span th:if="${keyword}">Kết quả tìm kiếm: "<span th:text="${keyword}"></span>"</span>
+                    <span th:if="${keyword}">Kết quả: "<span th:text="${keyword}"></span>"</span>
                     <span th:unless="${keyword}">Tất cả sản phẩm</span>
                 </h2>
-                <select class="form-select w-auto">
-                    <option selected>Sắp xếp theo: Mới nhất</option>
-                    <option value="1">Giá: Thấp đến Cao</option>
-                    <option value="2">Giá: Cao đến Thấp</option>
-                </select>
+                <form th:action="@{/user/product}" method="get" id="sortForm">
+                    <input type="hidden" name="keyword" th:value="${keyword}">
+                    <select name="sortOrder" class="form-select w-auto" onchange="document.getElementById('sortForm').submit()">
+                        <option value="createdAt_desc" th:selected="${sortOrder == 'createdAt_desc'}">Mới nhất</option>
+                        <option value="price_asc" th:selected="${sortOrder == 'price_asc'}">Giá: Thấp đến Cao</option>
+                        <option value="price_desc" th:selected="${sortOrder == 'price_desc'}">Giá: Cao đến Thấp</option>
+                    </select>
+                </form>
             </div>
 
             <div class="row g-4">
                 <th:block th:each="product : ${products}">
-                    <div class="col-md-4 col-sm-6">
+                    <div class="col-md-4 col-sm-6 product-item-container">
+                        <div class="d-none product-variants-data">
+                            <span th:each="v : ${product.productVariants}"
+                                  th:data-color="${v.color}"
+                                  th:data-size="${v.sizeName}"
+                                  th:data-stock="${v.stock}"></span>
+                        </div>
+
                         <div class="product-card">
                             <a th:href="@{/product/{id}(id=${product.id})}">
                                 <div class="product-image-wrapper">
-                                    <img th:src="${product.imageUrl}" class="product-image" th:alt="${product.name}"
-                                         onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+                                    <img th:src="${product.imageUrl}" class="product-image"
+                                         th:alt="${product.name}"
+                                         onerror="this.src='/images/placeholder_product.jpg'">
                                 </div>
                             </a>
                             <div class="product-info">
                                 <h3 class="product-title">
-                                    <a th:href="@{/product/{id}(id=${product.id})}"
-                                       th:text="${product.name}"
-                                       class="text-decoration-none text-dark">
-                                        Tên sản phẩm
-                                    </a>
+                                    <a th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}" class="text-decoration-none text-dark"></a>
                                 </h3>
-
-                                <div class="product-rating">
-                                    <i class="fas fa-star text-warning"></i> 5.0
-                                </div>
-
-                                <span class="product-price"
-                                      th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'">
-                            0 đ
-                        </span>
-
-                                <span class="product-old-price"
-                                      th:if="${product.oldPrice != null}"
-                                      th:text="${#numbers.formatDecimal(product.oldPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'">
-                        </span>
+                                <div class="product-rating"><i class="fas fa-star text-warning"></i> 5.0</div>
+                                <span class="product-price" th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'"></span>
+                                <span class="product-old-price" th:if="${product.oldPrice != null}" th:text="${#numbers.formatDecimal(product.oldPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'"></span>
 
                                 <div class="mt-3">
-                                    <a th:href="@{/cart/add(productId=${product.id})}" class="btn btn-sm btn-add-cart w-100">
+                                    <button type="button" class="btn btn-sm btn-add-cart w-100"
+                                            th:onclick="openQuickAdd(this, [[${product.id}]], [[${product.name}]], [[${product.imageUrl}]], [[${product.currentPrice}]])">
                                         <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </th:block>
-
                 <div th:if="${products.isEmpty()}" class="col-12 text-center mt-5">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4076/4076432.png" width="100" class="mb-3 opacity-50">
                     <p class="text-muted fs-5">Không tìm thấy sản phẩm nào.</p>
                 </div>
             </div>
-
-            <nav class="mt-5" th:if="${!products.isEmpty()}">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Sau</a></li>
-                </ul>
-            </nav>
         </div>
     </div>
 </div>
 
-<div class="chatbox-wrapper">
-    <button class="chatbox-toggler" onclick="toggleChatbox()"><i class="fas fa-comment-dots"></i></button>
-    <div class="chatbox-container position-absolute bottom-0 end-0 mb-5 d-none" id="chatboxContainer">
-        <div class="chatbox-header">
-            <span>Coolmate AI Assistant</span>
-            <button class="btn-close btn-close-white" onclick="toggleChatbox()"></button>
-        </div>
-        <div class="chatbox-messages" id="chatboxMessages">
-            <div class="message-bubble" style="align-self: flex-start; background-color: #dcfce7; color: #14532d; border-radius: 12px 12px 12px 2px;">
-                <strong>Bot:</strong> Cần tìm sản phẩm nào, hãy hỏi tôi nhé!
+<div class="modal fade" id="quickAddModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="modalProductName">Tên sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        </div>
-        <div class="chatbox-input">
-            <input type="text" class="form-control me-2" placeholder="Nhập tin nhắn..." id="chatboxInput">
-            <button class="btn btn-primary" style="background-color: #1E2C3D; border-color: #1E2C3D;" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            <div class="modal-body">
+                <div class="d-flex mb-3">
+                    <img id="modalProductImage" src="" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px; margin-right: 15px;">
+                    <div>
+                        <p class="text-danger fw-bold fs-5 mb-1" id="modalProductPrice">0 đ</p>
+                        <small class="text-muted">Vui lòng chọn Màu và Size</small>
+                    </div>
+                </div>
+
+                <form th:action="@{/user/cart/add}" method="post" id="quickAddForm">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <input type="hidden" name="productId" id="modalProductId">
+                    <input type="hidden" name="color" id="modalColorInput" required>
+                    <input type="hidden" name="size" id="modalSizeInput" required>
+                    <input type="hidden" name="quantity" value="1"> <div class="mb-3">
+                    <label class="fw-bold mb-2">Màu sắc: <span id="modalDisplayColor" class="fw-normal text-primary"></span></label>
+                    <div id="modalColorContainer"></div>
+                </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold mb-2">Kích cỡ: <span id="modalDisplaySize" class="fw-normal text-primary"></span></label>
+                        <div id="modalSizeContainer">
+                            <small class="text-muted">Chọn màu trước</small>
+                        </div>
+                        <small id="modalStockMsg" class="text-danger d-block mt-1"></small>
+                    </div>
+
+                    <button type="submit" class="btn btn-add-cart w-100" id="modalSubmitBtn" disabled>
+                        XÁC NHẬN THÊM VÀO GIỎ
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    function toggleChatbox() { document.getElementById('chatboxContainer').classList.toggle('d-none'); }
-    function sendMessage() {
-        const input = document.getElementById('chatboxInput');
-        if (input.value.trim() === "") return;
-        appendMessage(input.value, 'user');
-        input.value = '';
-        setTimeout(() => appendMessage("Tôi đang tìm kiếm sản phẩm phù hợp cho bạn...", 'bot'), 1000);
+    // --- JS XỬ LÝ MODAL QUICK ADD ---
+
+    // Biến toàn cục lưu trữ variants của sản phẩm đang mở
+    let currentVariants = [];
+
+    function openQuickAdd(btn, productId, name, imgUrl, price) {
+        // 1. Reset Form
+        document.getElementById('quickAddForm').reset();
+        document.getElementById('modalColorInput').value = '';
+        document.getElementById('modalSizeInput').value = '';
+        document.getElementById('modalDisplayColor').textContent = '';
+        document.getElementById('modalDisplaySize').textContent = '';
+        document.getElementById('modalStockMsg').textContent = '';
+        document.getElementById('modalSubmitBtn').disabled = true;
+
+        // 2. Điền thông tin cơ bản
+        document.getElementById('modalProductId').value = productId;
+        document.getElementById('modalProductName').textContent = name;
+        document.getElementById('modalProductImage').src = imgUrl;
+        document.getElementById('modalProductPrice').textContent = new Intl.NumberFormat('vi-VN').format(price) + ' đ';
+
+        // 3. Lấy dữ liệu Variants từ các thẻ ẩn
+        const container = btn.closest('.product-item-container');
+        const variantSpans = container.querySelectorAll('.product-variants-data span');
+
+        currentVariants = [];
+        variantSpans.forEach(span => {
+            currentVariants.push({
+                color: span.getAttribute('data-color'),
+                sizeName: span.getAttribute('data-size'),
+                stock: parseInt(span.getAttribute('data-stock'))
+            });
+        });
+
+        // 4. Render Màu Sắc
+        renderModalColors();
+
+        // 5. Hiển thị Modal
+        const modal = new bootstrap.Modal(document.getElementById('quickAddModal'));
+        modal.show();
     }
-    function appendMessage(text, type) {
-        const container = document.getElementById('chatboxMessages');
-        const div = document.createElement('div');
-        div.className = 'message-bubble';
-        div.style.padding = "8px 12px"; div.style.borderRadius = "12px"; div.style.marginBottom = "5px"; div.style.maxWidth="80%";
-        if (type === 'user') { div.style.alignSelf = "flex-end"; div.style.backgroundColor = "#1E2C3D"; div.style.color = "white"; div.innerHTML = `<strong>Bạn:</strong> ${text}`; }
-        else { div.style.alignSelf = "flex-start"; div.style.backgroundColor = "#e8f5e9"; div.style.color = "#1E2C3D"; div.innerHTML = `<strong>Bot:</strong> ${text}`; }
-        container.appendChild(div); container.scrollTop = container.scrollHeight;
+
+    function renderModalColors() {
+        const container = document.getElementById('modalColorContainer');
+        container.innerHTML = '';
+
+        const uniqueColors = [...new Set(currentVariants.map(v => v.color))];
+
+        if (uniqueColors.length === 0) {
+            container.innerHTML = '<span class="text-danger">Hết hàng</span>';
+            return;
+        }
+
+        uniqueColors.forEach(color => {
+            const span = document.createElement('span');
+            span.className = 'color-swatch';
+            // Gọi hàm xử lý màu thông minh
+            span.style.backgroundColor = mapColorToHex(color);
+            span.title = color;
+            span.onclick = () => selectModalColor(color, span);
+            container.appendChild(span);
+        });
+
+        document.getElementById('modalSizeContainer').innerHTML = '<small class="text-muted">Vui lòng chọn màu trước</small>';
+    }
+
+    function selectModalColor(color, element) {
+        document.querySelectorAll('#modalColorContainer .color-swatch').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+
+        document.getElementById('modalColorInput').value = color;
+        document.getElementById('modalDisplayColor').textContent = color;
+
+        const availableSizes = currentVariants.filter(v => v.color === color && v.stock > 0);
+        renderModalSizes(availableSizes);
+
+        document.getElementById('modalSizeInput').value = '';
+        document.getElementById('modalDisplaySize').textContent = '';
+        document.getElementById('modalSubmitBtn').disabled = true;
+    }
+
+    function renderModalSizes(variants) {
+        const container = document.getElementById('modalSizeContainer');
+        container.innerHTML = '';
+
+        if (variants.length === 0) {
+            container.innerHTML = '<span class="text-danger small">Hết size màu này</span>';
+            return;
+        }
+
+        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+        variants.sort((a, b) => sizeOrder.indexOf(a.sizeName) - sizeOrder.indexOf(b.sizeName));
+
+        variants.forEach(v => {
+            const btn = document.createElement('div');
+            btn.className = 'size-btn';
+            btn.textContent = v.sizeName;
+            btn.onclick = () => selectModalSize(v, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function selectModalSize(variant, element) {
+        document.querySelectorAll('#modalSizeContainer .size-btn').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+
+        document.getElementById('modalSizeInput').value = variant.sizeName;
+        document.getElementById('modalDisplaySize').textContent = variant.sizeName;
+        document.getElementById('modalStockMsg').textContent = `Còn lại: ${variant.stock}`;
+        document.getElementById('modalSubmitBtn').disabled = false;
+    }
+
+    // ============================================================
+    // --- BỘ XỬ LÝ MÀU SẮC THÔNG MINH (PHIÊN BẢN FIX LỖI) ---
+    // ============================================================
+    function mapColorToHex(colorName) {
+        if (!colorName) return '#ccc';
+        let cleanName = colorName.trim().toLowerCase();
+
+        // 1. Dịch từ Việt -> Anh/Hex (Ưu tiên từ ghép trước)
+        let translated = translateVietnameseColor(cleanName);
+
+        // 2. Nếu là mã Hex (bắt đầu bằng #) thì trả về luôn
+        if (translated.startsWith('#')) return translated;
+
+        // 3. Kiểm tra xem trình duyệt có hiểu màu này không
+        if (isValidColor(translated)) {
+            return translated;
+        }
+
+        // 4. Fallback: Hash chuỗi thành màu cố định
+        return stringToColorHash(cleanName);
+    }
+
+    function isValidColor(strColor) {
+        const s = new Option().style;
+        s.color = strColor;
+        return s.color !== '';
+    }
+
+    function translateVietnameseColor(name) {
+        // TỪ ĐIỂN MÀU (Quan trọng: Đặt từ dài/cụ thể lên TRƯỚC từ ngắn)
+        const dictionary = [
+            // Nhóm màu Kem / Be (Trình duyệt không hiểu 'cream', phải map ra Hex hoặc 'beige')
+            { k: 'kem', v: '#FFFDD0' },
+            { k: 'cream', v: '#FFFDD0' },
+            { k: 'be', v: 'beige' },
+            { k: 'nude', v: 'bisque' },
+
+            // Nhóm Xanh (Phải check 'xanh lá', 'xanh dương' trước khi check 'xanh')
+            { k: 'xanh lá', v: 'green' },
+            { k: 'xanh lục', v: 'green' },
+            { k: 'rêu', v: 'olive' },
+            { k: 'bạc hà', v: '#98FF98' }, // Mint
+            { k: 'mint', v: '#98FF98' },
+
+            { k: 'xanh dương', v: '#2196F3' },
+            { k: 'xanh biển', v: '#2196F3' },
+            { k: 'navy', v: 'navy' },
+            { k: 'than', v: '#36454F' }, // Charcoal (Xám than)
+            { k: 'cổ vịt', v: 'teal' },
+            { k: 'ngọc', v: 'turquoise' },
+            { k: 'xanh', v: 'blue' }, // "Xanh" đứng cuối cùng làm fallback
+
+            // Nhóm Đỏ / Hồng / Tím
+            { k: 'đỏ đô', v: 'firebrick' },
+            { k: 'mận', v: 'plum' },
+            { k: 'đỏ', v: 'red' },
+            { k: 'hồng', v: 'pink' },
+            { k: 'tím', v: 'purple' },
+
+            // Nhóm Đen / Trắng / Xám
+            { k: 'đen', v: 'black' },
+            { k: 'trắng', v: 'white' },
+            { k: 'xám', v: 'gray' },
+            { k: 'ghi', v: 'gray' },
+            { k: 'bạc', v: 'silver' },
+
+            // Nhóm Vàng / Cam
+            { k: 'vàng', v: 'gold' },
+            { k: 'cam', v: 'orange' },
+            { k: 'nâu', v: 'sienna' },
+            { k: 'bò', v: 'peru' } // Màu da bò
+        ];
+
+        for (let item of dictionary) {
+            if (name.includes(item.k)) {
+                return item.v;
+            }
+        }
+        return name;
+    }
+
+    function stringToColorHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        let color = '#';
+        for (let i = 0; i < 3; i++) {
+            let value = (hash >> (i * 8)) & 0xFF;
+            color += ('00' + value.toString(16)).substr(-2);
+        }
+        return color;
     }
 </script>
+
 </body>
 </html>

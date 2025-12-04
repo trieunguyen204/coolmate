@@ -54,6 +54,8 @@ public class SecurityConfig {
                                 ,"/user/cart"
                                 ,"/products/by-category/{id}"
                                 ,"/user/cart/add"
+                                ,"/user/cart/remove/**"
+                                ,"/error/access-denied"
 
 
 
