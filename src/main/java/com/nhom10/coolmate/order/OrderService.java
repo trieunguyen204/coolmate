@@ -9,9 +9,9 @@ import com.nhom10.coolmate.product.ProductVariantRepository;
 import com.nhom10.coolmate.user.User;
 import com.nhom10.coolmate.user.UserDTO;
 import com.nhom10.coolmate.user.UserRepository;
-import com.nhom10.coolmate.vouchers.Voucher; // Import Voucher entity
+import com.nhom10.coolmate.vouchers.Voucher;
 import com.nhom10.coolmate.vouchers.VoucherDTO;
-import com.nhom10.coolmate.vouchers.VoucherService; // Import VoucherService
+import com.nhom10.coolmate.vouchers.VoucherService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,10 +37,10 @@ public class OrderService {
     private final CartService cartService;
     private final ProductVariantRepository productVariantRepository;
     private final UserRepository userRepository;
-    private final VoucherService voucherService; // THÊM VOUCHERSERVICE VÀO ĐÂY
+    private final VoucherService voucherService;
 
     // =========================================================================
-    // 1. LOGIC ĐẶT HÀNG (CHECKOUT) - ĐÃ CẬP NHẬT
+    // 1. LOGIC ĐẶT HÀNG (CHECKOUT)
     // =========================================================================
     @Transactional
     public Order createOrder(
@@ -52,8 +52,8 @@ public class OrderService {
             HttpServletRequest request,
             HttpServletResponse response,
             Principal principal,
-            String voucherCode, // THAM SỐ MỚI
-            BigDecimal discountAmount // THAM SỐ MỚI
+            String voucherCode,
+            BigDecimal discountAmount
     ) {
         // 1. Lấy giỏ hàng
         Cart cart = cartService.getCart(request, response);
@@ -67,7 +67,7 @@ public class OrderService {
             user = userRepository.findByEmail(principal.getName()).orElse(null);
         }
 
-        // 3. Tính tổng tiền tạm tính (Sub Total) và kiểm tra tồn kho trước khi lưu
+        // 3. Tính tổng tiền tạm tính (Sub Total) và kiểm tra tồn kho
         BigDecimal subTotal = BigDecimal.ZERO;
         for (CartItem ci : cart.getCartItems()) {
             ProductVariant variant = ci.getProductVariant();
@@ -78,30 +78,21 @@ public class OrderService {
             subTotal = subTotal.add(itemTotal);
         }
 
-        // 4. Xử lý Voucher (Xác thực và Cập nhật)
+        // 4. Xử lý Voucher
         Voucher voucher = null;
         BigDecimal finalDiscountAmount = discountAmount != null ? discountAmount : BigDecimal.ZERO;
 
         if (voucherCode != null && !voucherCode.trim().isEmpty() && finalDiscountAmount.compareTo(BigDecimal.ZERO) > 0) {
-            // Xác thực lại Voucher ở Backend
             voucher = voucherService.validateVoucher(voucherCode, subTotal);
-
-            // Tính lại số tiền giảm thực tế (để tránh Frontend gửi sai)
             BigDecimal backendCalculatedDiscount = voucherService.calculateDiscount(voucher, subTotal);
-
-            // Nếu có sự khác biệt lớn (tùy theo logic của bạn), bạn có thể báo lỗi hoặc sử dụng giá trị Backend
-            // Ở đây, ta sẽ sử dụng giá trị tính toán từ Backend để đảm bảo tính an toàn.
             finalDiscountAmount = backendCalculatedDiscount;
-
-            // Tăng số lần sử dụng và giảm số lượng còn lại
             voucherService.increaseVoucherUsedCount(voucher);
         } else {
             finalDiscountAmount = BigDecimal.ZERO;
         }
 
-        // 5. Tính tổng tiền cuối cùng (Final Total)
+        // 5. Tính tổng tiền cuối cùng
         BigDecimal finalTotal = subTotal.subtract(finalDiscountAmount);
-        // Đảm bảo tổng tiền không âm
         if (finalTotal.compareTo(BigDecimal.ZERO) < 0) {
             finalTotal = BigDecimal.ZERO;
         }
@@ -119,14 +110,10 @@ public class OrderService {
                 .note(note)
                 .paymentMethod(paymentMethod)
                 .status(OrderStatus.PENDING)
-
-                // CẬP NHẬT CÁC TRƯỜNG GIÁ
-                .subTotal(subTotal) // THÊM TRƯỜNG NÀY VÀO ORDER ENTITY
-                .total(finalTotal)  // ĐÃ LÀ FINAL TOTAL
-                .discountAmount(finalDiscountAmount) // SỐ TIỀN GIẢM
-                .voucher(voucher) // LƯU VOUCHER ENTITY
-                // END CẬP NHẬT
-
+                .subTotal(subTotal)
+                .total(finalTotal)
+                .discountAmount(finalDiscountAmount)
+                .voucher(voucher)
                 .build();
 
         Order savedOrder = orderRepository.save(newOrder);
@@ -136,18 +123,15 @@ public class OrderService {
 
         for (CartItem ci : cart.getCartItems()) {
             ProductVariant variant = ci.getProductVariant();
-
-            // Trừ tồn kho (đã kiểm tra ở bước 3, giờ chỉ trừ)
             variant.setQuantity(variant.getQuantity() - ci.getQuantity());
             productVariantRepository.save(variant);
 
-            // Tạo OrderItem
             OrderItem orderItem = OrderItem.builder()
                     .order(savedOrder)
                     .productVariant(variant)
                     .quantity(ci.getQuantity())
-                    .price(ci.getPriceAtTime()) // Giá tại thời điểm đặt hàng
-                    .discountPrice(BigDecimal.ZERO) // (Nếu có giảm giá trên từng item, bạn sẽ xử lý ở đây)
+                    .price(ci.getPriceAtTime())
+                    .discountPrice(BigDecimal.ZERO)
                     .build();
 
             orderItems.add(orderItem);
@@ -155,7 +139,7 @@ public class OrderService {
 
         orderItemRepository.saveAll(orderItems);
 
-        // 9. Cập nhật Order (Set OrderItems vào Order)
+        // 9. Cập nhật Order
         savedOrder.setOrderItems(orderItems);
         orderRepository.save(savedOrder);
 
@@ -172,14 +156,14 @@ public class OrderService {
     }
 
     // =========================================================================
-    // 2. CÁC HÀM CRUD & MAPPER (ĐÃ CẬP NHẬT)
+    // 2. CÁC HÀM CRUD & MAPPER
     // =========================================================================
 
     public OrderDTO getOrderDetail(Integer id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new AppException("Đơn hàng không tìm thấy với ID: " + id));
 
-        // Load lazy data
+        // Load lazy data an toàn
         if(order.getOrderItems() != null) order.getOrderItems().size();
 
         return mapToDTO(order);
@@ -213,18 +197,26 @@ public class OrderService {
 
     // --- MAPPER QUAN TRỌNG: Đổ dữ liệu từ Entity sang DTO ---
     private OrderDTO mapToDTO(Order order) {
-        // Sử dụng subTotal đã lưu trong Entity (thay vì tính lại từ items)
         BigDecimal subTotal = order.getSubTotal() != null ? order.getSubTotal() : BigDecimal.ZERO;
 
-        // Map User
+        // --- SỬA LỖI TẠI ĐÂY ---
+        // Sử dụng try-catch để bắt lỗi EntityNotFoundException khi User ID = 0 hoặc không tồn tại
         UserDTO userDTO = null;
-        if (order.getUser() != null) {
-            userDTO = UserDTO.builder()
-                    .fullName(order.getUser().getFullName())
-                    .email(order.getUser().getEmail())
-                    .phone(order.getUser().getPhone())
-                    .build();
+        try {
+            if (order.getUser() != null) {
+                userDTO = UserDTO.builder()
+                        // Các dòng dưới đây sẽ kích hoạt Proxy tải dữ liệu từ DB
+                        .fullName(order.getUser().getFullName())
+                        .email(order.getUser().getEmail())
+                        .phone(order.getUser().getPhone())
+                        .build();
+            }
+        } catch (EntityNotFoundException e) {
+            // Nếu lỗi (do ID = 0 hoặc ID rác), ta coi như User null (Khách vãng lai)
+            // Có thể log warning nếu cần: System.err.println("Order " + order.getId() + " has invalid User ID");
+            userDTO = null;
         }
+        // -----------------------
 
         // Map Voucher
         VoucherDTO voucherDTO = null;
@@ -234,19 +226,16 @@ public class OrderService {
 
         return OrderDTO.builder()
                 .id(order.getId())
-
-                // MAPPING CÁC TRƯỜNG MỚI CHO GIAO DIỆN ORDER SUCCESS
-                .orderCode(order.getOrderCode())          // Mã đơn
-                .recipientName(order.getRecipientName())  // Tên người nhận
-                .recipientPhone(order.getRecipientPhone())// SĐT người nhận
-                .deliveryAddress(order.getDeliveryAddress()) // Địa chỉ giao
-                .paymentMethod(order.getPaymentMethod())  // Phương thức thanh toán
-
+                .orderCode(order.getOrderCode())
+                .recipientName(order.getRecipientName())
+                .recipientPhone(order.getRecipientPhone())
+                .deliveryAddress(order.getDeliveryAddress())
+                .paymentMethod(order.getPaymentMethod())
                 .user(userDTO)
                 .voucher(voucherDTO)
                 .discountAmount(order.getDiscountAmount())
-                .total(subTotal) // Tiền hàng (SubTotal)
-                .finalTotal(order.getTotal()) // Tổng thanh toán (FinalTotal)
+                .total(subTotal)
+                .finalTotal(order.getTotal())
                 .status(order.getStatus())
                 .createdAt(order.getCreatedAt())
                 .orderItems(mapOrderItems(order))
@@ -271,7 +260,7 @@ public class OrderService {
                                     .collect(Collectors.toList());
                         }
                     } catch (Exception e) {
-                        // Ignore mapping error
+                        // Ignore mapping error if product/variant deleted
                     }
 
                     return OrderDTO.OrderItemDTO.builder()
@@ -289,16 +278,12 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // --- THÊM HÀM NÀY VÀO OrderService ---
     public List<OrderDTO> getMyOrders(String email) {
-        // 1. Tìm User theo email
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("Người dùng không tồn tại"));
 
-        // 2. Lấy danh sách đơn hàng từ DB
         List<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(user);
 
-        // 3. Convert sang DTO
         return orders.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
