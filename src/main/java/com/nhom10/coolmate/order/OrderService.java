@@ -39,6 +39,10 @@ public class OrderService {
     private final UserRepository userRepository;
     private final VoucherService voucherService;
 
+    // [MỚI] DTO cho thống kê doanh số sản phẩm
+    public record ProductSaleDTO(String productName, String sizeName, Long quantitySold) {}
+
+
     // =========================================================================
     // 1. LOGIC ĐẶT HÀNG (CHECKOUT)
     // =========================================================================
@@ -156,7 +160,28 @@ public class OrderService {
     }
 
     // =========================================================================
-    // 2. CÁC HÀM CRUD & MAPPER
+    // [MỚI] 2. LOGIC THỐNG KÊ DASHBOARD
+    // =========================================================================
+
+    public BigDecimal getTotalRevenue() {
+        BigDecimal revenue = orderRepository.calculateTotalRevenue();
+        return revenue != null ? revenue : BigDecimal.ZERO;
+    }
+
+    public List<ProductSaleDTO> getTopSellingProducts() {
+        List<Object[]> results = orderItemRepository.findTopSellingProductVariants();
+        return results.stream()
+                .map(result -> new ProductSaleDTO(
+                        (String) result[1], // Product Name
+                        (String) result[2], // Size Name
+                        ((Number) result[3]).longValue() // Quantity Sold
+                ))
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    // =========================================================================
+    // 3. CÁC HÀM CRUD & MAPPER
     // =========================================================================
 
     public OrderDTO getOrderDetail(Integer id) {

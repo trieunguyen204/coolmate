@@ -75,10 +75,7 @@ public class UserController {
 
 
     // --- TRANG CHỦ ADMIN ---
-    @GetMapping({"/admin/", "/admin/home"})
-    public String adminHomePage(){
-        return "admin/home";
-    }
+   
 
     // ============================================================
     // QUẢN LÝ USER (CRUD CHO ADMIN)
