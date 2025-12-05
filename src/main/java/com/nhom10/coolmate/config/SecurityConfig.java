@@ -59,6 +59,7 @@ public class SecurityConfig {
                                 "/user/checkout",
                                 "/user/order_success/**",
                                 "/place-order"
+                                ,"/user/cart/add-and-checkout"
 
                         ).permitAll()
 

@@ -421,17 +421,16 @@
 
 <script th:inline="javascript">
     /*
-     * QUAN TRỌNG: MAPPING DỮ LIỆU TỪ DTO XUỐNG JS
-     * Trong ProductDTO, variants được lưu trong biến "productVariants"
-     * Kiểu dữ liệu là: ProductSizeColorStockDTO (fields: variantId, sizeName, color, stock)
+     * DỮ LIỆU BIẾN THỂ (VARIANTS)
+     * Đã sửa mapping để khớp với ProductDTO.ProductSizeColorStockDTO
      */
     const allVariants = [
         /*[# th:each="v : ${product.productVariants}"]*/
         {
-            "id": [[${v.variantId}]],      // SỬA: Dùng v.variantId thay vì v.id
-            "color": [[${v.color}]],       // OK
-            "sizeName": [[${v.sizeName}]], // SỬA: Dùng v.sizeName (DTO) thay vì v.size.sizeName (Entity)
-            "stock": [[${v.stock}]]        // SỬA: Dùng v.stock (DTO) thay vì v.quantity (Entity)
+            "id": [[${v.variantId}]],      // Khớp với DTO
+            "color": [[${v.color}]],       // Khớp với DTO
+            "sizeName": [[${v.sizeName}]], // Khớp với DTO
+            "stock": [[${v.stock}]]        // Khớp với DTO
         },
         /*[/]*/
     ];
@@ -452,13 +451,12 @@
     const addToCartForm = document.getElementById('addToCartForm');
     const quantityInput = document.getElementById('quantityInput');
 
-    const uniqueColors = [...new Set(allVariants.map(v => v.color))];
+    const uniqueColors = [...new Set(allVariants.map(v => v.color).filter(color => color))]; // Lọc các giá trị null/undefined
 
     // --- KHỞI TẠO MÀU SẮC KHI TẢI TRANG ---
     document.addEventListener("DOMContentLoaded", function() {
-        if (uniqueColors.length > 0 && uniqueColors[0] !== null) {
+        if (uniqueColors.length > 0) {
             uniqueColors.forEach(color => {
-                if(!color) return;
                 const swatch = document.createElement('span');
                 swatch.className = 'color-swatch';
                 swatch.style.backgroundColor = mapColorToHex(color);
@@ -591,11 +589,13 @@
     }
 
     // --- XỬ LÝ NÚT MUA NGAY ---
+    // Nút này gọi đến CartController.java @PostMapping("/add-and-checkout")
     function submitForCheckout() {
         if (!colorInput.value || !sizeInput.value) {
             alert("Vui lòng chọn Màu sắc và Kích cỡ trước khi Mua Ngay.");
             return;
         }
+        // Thay đổi action của form để gọi đến endpoint MUA NGAY
         addToCartForm.action = [[@{/user/cart/add-and-checkout}]];
         addToCartForm.submit();
     }
