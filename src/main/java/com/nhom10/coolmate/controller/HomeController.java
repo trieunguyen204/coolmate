@@ -3,7 +3,6 @@ package com.nhom10.coolmate.controller;
 import com.nhom10.coolmate.cart.CartService;
 import com.nhom10.coolmate.category.CategoryDTO;
 import com.nhom10.coolmate.category.CategoryService;
-import com.nhom10.coolmate.product.ProductDTO; // Import ProductDTO
 import com.nhom10.coolmate.product.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam; // Import RequestParam
 
 import java.util.List;
 
@@ -25,7 +23,8 @@ public class HomeController {
     private final CategoryService categoryService;
     private final CartService cartService;
 
-
+    // --- LOGIC TẢI DỮ LIỆU CHUNG (Navbar) ---
+    // Được tự động gọi cho tất cả các Controller khác có return về View
 
     @ModelAttribute("categories")
     public List<CategoryDTO> getCategories() {
@@ -33,11 +32,11 @@ public class HomeController {
     }
 
     @ModelAttribute("cartItemCount")
-    public int getCartItemCount() {
-        return 0; // TODO: Cập nhật sau khi làm giỏ hàng
+    public int getCartItemCount(HttpServletRequest request, HttpServletResponse response) {
+        return cartService.countItemsInCart(request, response);
     }
 
-
+    // --- CÁC TRANG CƠ BẢN ---
 
     @GetMapping({"/", "/user/home", "/user/"})
     public String home(Model model) {
@@ -45,32 +44,12 @@ public class HomeController {
         return "user/home";
     }
 
-
-
-
-    @GetMapping("/user/product")
-    public String product(Model model,
-                          @RequestParam(value = "keyword", required = false) String keyword,
-                          @RequestParam(value = "priceRange", required = false) List<String> priceRanges,
-                          // THÊM: Chấp nhận tham số sắp xếp
-                          @RequestParam(value = "sortOrder", required = false) String sortOrder) {
-
-        // Cập nhật tên hàm Service để truyền thêm tham số sắp xếp
-        List<ProductDTO> products = productService.getFilteredProducts(keyword, priceRanges, sortOrder);
-
-        // Truyền lại các tham số đã chọn để giữ trạng thái trên View
-        model.addAttribute("products", products);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("selectedPriceRanges", priceRanges);
-        model.addAttribute("sortOrder", sortOrder);
-
-        return "user/product";
-    }
-
-
+    // Trang lọc theo danh mục (Navbar dropdown link tới đây)
     @GetMapping("/products/by-category/{id}")
     public String productByCategory(@PathVariable Integer id, Model model) {
         model.addAttribute("products", productService.findByCategoryId(id));
+        model.addAttribute("pageTitle", "Sản phẩm theo danh mục");
+        // Reuse view danh sách sản phẩm
         return "user/product";
     }
 
@@ -79,22 +58,4 @@ public class HomeController {
 
     @GetMapping("/user/contact")
     public String contact() { return "user/contact"; }
-
-
-
-
-    @GetMapping("/product/{id}")
-    public String viewProductDetail(@PathVariable Integer id, Model model) {
-        // Giả sử ProductService có getProductDTOById
-        ProductDTO product = productService.getProductById(id);
-        model.addAttribute("product", product);
-        return "/user/product_detail"; // Trả về file này
-    }
-
-    @ModelAttribute("cartItemCount")
-    public int getCartItemCount(HttpServletRequest request, HttpServletResponse response) {
-        // Gọi hàm count mới trong Service
-        return cartService.countItemsInCart(request, response);
-    }
-
 }

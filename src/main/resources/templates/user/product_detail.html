@@ -206,6 +206,67 @@
             cursor: not-allowed;
         }
 
+        /* --- Comment Section Styles --- */
+        .comment-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .star-rating .fa-star {
+            font-size: 1.5rem;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star-rating .fa-star.checked,
+        .star-rating .fa-star:hover,
+        .star-rating .fa-star:hover ~ .fa-star {
+            color: #ffc107;
+        }
+
+        .comment-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+
+        .comment-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #1E2C3D;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        .comment-user-info strong {
+            font-size: 1rem;
+        }
+
+        .comment-rating .fa-star {
+            color: #ffc107;
+            font-size: 0.9rem;
+        }
+
         /* Chatbox */
         .chatbox-wrapper {
             position: fixed;
@@ -350,13 +411,18 @@
         <div class="col-lg-7">
             <h1 class="product-name" th:text="${product.name}">Tên sản phẩm</h1>
 
-            <div class="mb-3">
-                <i class="fas fa-star text-warning"></i>
-                <i class="fas fa-star text-warning"></i>
-                <i class="fas fa-star text-warning"></i>
-                <i class="fas fa-star text-warning"></i>
-                <i class="fas fa-star text-warning"></i>
-                <span class="text-muted ms-2">(Đánh giá 5.0)</span>
+            <div class="mb-3 d-flex align-items-center">
+                <div class="me-2">
+                    <th:block th:with="ratingInt=${T(java.lang.Math).round(averageRating)}">
+                        <i th:each="i : ${#numbers.sequence(1, 5)}"
+                           th:class="${i <= ratingInt ? 'fas fa-star text-warning' : 'far fa-star text-warning'}">
+                        </i>
+                    </th:block>
+                </div>
+                <span class="text-muted ms-1">
+                    (<span th:text="${#numbers.formatDecimal(averageRating, 0, 1)}">0.0</span>/5 sao -
+                    <span th:text="${productComments != null ? productComments.size() : 0}">0</span> đánh giá)
+                </span>
             </div>
 
             <div class="mb-4 p-3 rounded-3" style="background-color: #f0fdf4; border: 1px solid #dcfce7;">
@@ -411,6 +477,75 @@
             </div>
         </div>
     </div>
+
+    <div class="comment-section mt-5">
+        <h3 class="fw-bold mb-4"><i class="fas fa-comments me-2"></i>Đánh giá và Bình luận</h3>
+
+        <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+            <div class="p-3 mb-4 border rounded-3 bg-light">
+                <h5 class="mb-3">Gửi đánh giá của bạn</h5>
+                <form th:action="@{/user/comments/add}" method="post" id="commentForm">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <input type="hidden" name="rate" id="ratingInput" value="0" required>
+
+                    <div class="mb-3">
+                        <label for="ratingStars" class="form-label fw-bold">Đánh giá sao:</label>
+                        <div id="ratingStars" class="star-rating d-flex flex-row-reverse justify-content-end">
+                            <i class="far fa-star" data-rating="5"></i>
+                            <i class="far fa-star" data-rating="4"></i>
+                            <i class="far fa-star" data-rating="3"></i>
+                            <i class="far fa-star" data-rating="2"></i>
+                            <i class="far fa-star" data-rating="1"></i>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="commentContent" class="form-label fw-bold">Nội dung bình luận:</label>
+                        <textarea class="form-control" name="content" id="commentContent" rows="3"
+                                  placeholder="Viết đánh giá chi tiết của bạn..." required></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Gửi Bình Luận</button>
+                    </div>
+                </form>
+            </div>
+        </th:block>
+        <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+            <div class="alert alert-info text-center">
+                Vui lòng <a th:href="@{/login}" class="alert-link">Đăng nhập</a> để gửi bình luận và đánh giá sản phẩm.
+            </div>
+        </th:block>
+
+
+        <h4 class="mb-3 mt-4">Tất cả đánh giá (<span th:text="${productComments != null ? productComments.size() : 0}">0</span>)</h4>
+
+        <div th:if="${productComments == null || productComments.isEmpty()}" class="alert alert-warning text-center">
+            Sản phẩm này chưa có bình luận nào. Hãy là người đầu tiên!
+        </div>
+
+        <div th:if="${productComments != null && !productComments.isEmpty()}">
+            <div th:each="comment : ${productComments}" class="comment-item">
+                <div class="comment-header">
+                    <div class="comment-avatar" th:text="${#strings.substring(comment.user.username, 0, 1).toUpperCase()}">U</div>
+                    <div class="comment-user-info">
+                        <strong th:text="${comment.user.username}">Anonymous User</strong>
+                        <div class="comment-rating">
+                            <th:block th:with="ratingVal=${comment.rate != null ? comment.rate : 0}">
+                                <i th:each="i : ${#numbers.sequence(1, 5)}"
+                                   th:class="${i <= ratingVal ? 'fas fa-star' : 'far fa-star'}">
+                                </i>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+                <p class="mb-1" th:text="${comment.content}">Nội dung bình luận</p>
+                <small class="text-muted" th:text="${#dates.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}">20/12/2025 10:30</small>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <div class="chatbox-wrapper">
@@ -450,6 +585,9 @@
     const btnBuyNow = document.getElementById('btnBuyNow');
     const addToCartForm = document.getElementById('addToCartForm');
     const quantityInput = document.getElementById('quantityInput');
+    const ratingStars = document.getElementById('ratingStars');
+    const ratingInput = document.getElementById('ratingInput');
+
 
     const uniqueColors = [...new Set(allVariants.map(v => v.color).filter(color => color))]; // Lọc các giá trị null/undefined
 
@@ -467,7 +605,58 @@
         } else {
             colorContainer.innerHTML = '<span class="text-danger">Sản phẩm tạm hết hàng hoặc chưa cập nhật biến thể</span>';
         }
+
+        // Khởi tạo Rating Stars
+        if (ratingStars) {
+            ratingStars.querySelectorAll('.fa-star').forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = this.getAttribute('data-rating');
+                    setRating(parseInt(rating));
+                });
+                star.addEventListener('mouseover', function() {
+                    hoverRating(this.getAttribute('data-rating'));
+                });
+                star.addEventListener('mouseout', function() {
+                    // Trở về trạng thái đã chọn khi rời chuột
+                    setRating(parseInt(ratingInput.value), true);
+                });
+            });
+
+            // Đặt lại trạng thái ban đầu (0 sao)
+            setRating(0);
+        }
     });
+
+    // --- LOGIC ĐÁNH GIÁ SAO (JS) ---
+    function setRating(rating, preserveHover = false) {
+        if(!preserveHover) {
+            ratingInput.value = rating;
+        }
+
+        const stars = ratingStars.querySelectorAll('.fa-star');
+        stars.forEach(star => {
+            const starRating = parseInt(star.getAttribute('data-rating'));
+            if (starRating <= rating) {
+                star.classList.remove('far');
+                star.classList.add('fas', 'checked');
+            } else {
+                star.classList.remove('fas', 'checked');
+                star.classList.add('far');
+            }
+        });
+    }
+
+    function hoverRating(hoveredRating) {
+        const stars = ratingStars.querySelectorAll('.fa-star');
+        stars.forEach(star => {
+            const starRating = parseInt(star.getAttribute('data-rating'));
+            if (starRating <= hoveredRating) {
+                star.style.color = '#ffc107'; // Màu khi hover
+            } else {
+                star.style.color = '#ccc'; // Màu không được hover
+            }
+        });
+    }
 
     // --- HÀM XỬ LÝ MÀU (Tiếng Việt -> HEX) ---
     function mapColorToHex(colorName) {

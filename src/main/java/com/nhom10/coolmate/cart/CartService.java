@@ -242,4 +242,16 @@ public class CartService {
             cartRepository.save(cart);
         }
     }
+
+    public int getCartItemCountForLoggedInUser(Authentication authentication) {
+
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+
+
+            return 0;
+        }
+        return 0;
+    }
 }

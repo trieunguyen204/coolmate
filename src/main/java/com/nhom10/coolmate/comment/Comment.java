@@ -1,4 +1,4 @@
-package com.nhom10.coolmate.comment    ;
+package com.nhom10.coolmate.comment;
 
 import com.nhom10.coolmate.user.User;
 import jakarta.persistence.*;
@@ -32,6 +32,7 @@ public class Comment {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    // Cập nhật: Thêm @Column để định nghĩa rõ ràng
     @Column(name = "rate")
     private Integer rate;
 
