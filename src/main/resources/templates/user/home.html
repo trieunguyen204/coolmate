@@ -270,6 +270,35 @@
             border-radius: 12px;
             font-size: 0.9rem;
         }
+
+        .voucher-carousel-item {
+
+            height: 400px;
+
+
+            background-size: cover;
+
+            /* 3. Căn giữa ảnh nền */
+            background-position: center;
+
+
+            position: relative;
+
+
+            background-repeat: no-repeat;
+        }
+
+
+        @media (max-width: 768px) {
+            .voucher-carousel-item {
+                height: 250px;
+            }
+        }
+
+
+        .carousel-caption {
+            padding-bottom: 3rem;
+        }
     </style>
 </head>
 <body>
@@ -373,23 +402,18 @@
             <button type="button" data-bs-target="#voucherCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
         </div>
         <div class="carousel-inner">
-            <div class="carousel-item active voucher-carousel-item" style="background-image: url('placeholder_banner1.jpg'); background-color: #3b5998;">
+            <div class="carousel-item active voucher-carousel-item" style="background-image: url('/images/winter_sale_banner.png'); background-color: #3b5998;">
                 <div class="carousel-caption d-none d-md-block text-start">
-                    <h1 class="display-4 fw-bold">SIÊU SALE MÙA ĐÔNG</h1>
-                    <p class="fs-5">Giảm đến 50% các sản phẩm Áo Khoác và Nỉ.</p>
+
                     <a href="#" class="btn btn-warning btn-lg fw-bold mt-2">MUA NGAY</a>
                 </div>
             </div>
-            <div class="carousel-item voucher-carousel-item" style="background-image: url('placeholder_banner2.jpg'); background-color: #2c3e50;">
+            <div class="carousel-item voucher-carousel-item" style="background-image: url('/images/freeship_banner.png'); background-color: #2c3e50;">
                 <div class="carousel-caption d-none d-md-block">
-                    <h1 class="display-4 fw-bold">FREESHIP TOÀN QUỐC</h1>
-                    <p class="fs-5">Áp dụng cho đơn hàng từ 499K. Sắm Tết thả ga!</p>
                 </div>
             </div>
-            <div class="carousel-item voucher-carousel-item" style="background-image: url('placeholder_banner3.jpg'); background-color: #f39c12;">
+            <div class="carousel-item voucher-carousel-item" style="background-image: url('/images/tshirt_banner.png'); background-color: #f39c12;">
                 <div class="carousel-caption d-none d-md-block">
-                    <h1 class="display-4 fw-bold text-dark">ÁO THUN COTTON TỰ NHIÊN</h1>
-                    <p class="fs-5 text-dark">Thoải mái, bền bỉ, giá chỉ từ 149K.</p>
                 </div>
             </div>
         </div>
@@ -402,6 +426,9 @@
             <span class="visually-hidden">Next</span>
         </button>
     </div>
+
+
+
 
     <div class="voucher-banner bg-primary text-white text-center p-3 rounded-3 mb-5 shadow-sm" style="background-color: #1E2C3D !important;">
         <p class="mb-0 fs-5 fw-bold">GIẢM 20% ĐƠN HÀNG ĐẦU TIÊN! Dùng Mã: <span class="badge bg-warning text-dark fs-5">COOL20</span></p>

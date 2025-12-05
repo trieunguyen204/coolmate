@@ -42,7 +42,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/login",
                                 "/register",
-                                "/css/**", "/js/**", "/webjars/**", "/uploads/**",
+                                "/css/**", "/js/**", "/webjars/**", "/uploads/**","/images/**",
                                 "/",
                                 "/error/**",
                                 "/user/product",
