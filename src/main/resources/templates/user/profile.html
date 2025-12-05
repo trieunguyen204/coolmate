@@ -8,172 +8,172 @@
 
     <style>
         body {
-           box-sizing: border-box;
-           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-           background: #f8f9fa;
-           min-height: 100vh;
-           padding-top: 60px;
-       }
+             box-sizing: border-box;
+             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+             background: #f8f9fa;
+             min-height: 100vh;
+             padding-top: 60px;
+         }
 
 
-           .search-form {
-           position: relative; /* Quan trọng: Để làm mốc tọa độ cho nút search bên trong */
-       }
+             .search-form {
+             position: relative; /* Quan trọng: Để làm mốc tọa độ cho nút search bên trong */
+         }
 
-       .search-input {
-           border-radius: 20px; /* Bo tròn ô tìm kiếm */
-           padding-right: 40px; /* Chừa khoảng trống bên phải để chữ không bị nút search che mất */
-           padding-left: 15px;
-           border: none;
-           background: rgba(255, 255, 255, 0.2); /* Nền trắng mờ (trong suốt 20%) */
-           color: white; /* Chữ màu trắng */
-           transition: all 0.3s; /* Hiệu ứng chuyển động mượt */
-       }
+         .search-input {
+             border-radius: 20px; /* Bo tròn ô tìm kiếm */
+             padding-right: 40px; /* Chừa khoảng trống bên phải để chữ không bị nút search che mất */
+             padding-left: 15px;
+             border: none;
+             background: rgba(255, 255, 255, 0.2); /* Nền trắng mờ (trong suốt 20%) */
+             color: white; /* Chữ màu trắng */
+             transition: all 0.3s; /* Hiệu ứng chuyển động mượt */
+         }
 
-       .search-input::placeholder {
-           color: rgba(255, 255, 255, 0.7); /* Màu chữ gợi ý (placeholder) trắng mờ */
-       }
+         .search-input::placeholder {
+             color: rgba(255, 255, 255, 0.7); /* Màu chữ gợi ý (placeholder) trắng mờ */
+         }
 
-       /* Trạng thái khi người dùng nhấn vào ô input */
-       .search-input:focus {
-           background: white; /* Nền chuyển sang trắng hẳn */
-           color: #1E2C3D; /* Chữ chuyển sang màu xanh navy đậm */
-           box-shadow: none;
-       }
+         /* Trạng thái khi người dùng nhấn vào ô input */
+         .search-input:focus {
+             background: white; /* Nền chuyển sang trắng hẳn */
+             color: #1E2C3D; /* Chữ chuyển sang màu xanh navy đậm */
+             box-shadow: none;
+         }
 
-       .search-button {
-           position: absolute; /* Định vị tuyệt đối để nằm đè lên input */
-           right: 0; /* Căn sát lề phải */
-           top: 50%; /* Căn giữa theo chiều dọc */
-           transform: translateY(-50%); /* Căn chỉnh chính xác giữa tâm */
-           background: none; /* Xóa nền mặc định của button */
-           border: none; /* Xóa viền */
-           color: rgba(255, 255, 255, 0.8); /* Màu icon trắng mờ */
-           padding-right: 15px;
-           transition: color 0.3s;
-       }
+         .search-button {
+             position: absolute; /* Định vị tuyệt đối để nằm đè lên input */
+             right: 0; /* Căn sát lề phải */
+             top: 50%; /* Căn giữa theo chiều dọc */
+             transform: translateY(-50%); /* Căn chỉnh chính xác giữa tâm */
+             background: none; /* Xóa nền mặc định của button */
+             border: none; /* Xóa viền */
+             color: rgba(255, 255, 255, 0.8); /* Màu icon trắng mờ */
+             padding-right: 15px;
+             transition: color 0.3s;
+         }
 
-       /* Khi input được focus, đổi màu icon nút tìm kiếm sang xanh navy */
-       .search-input:focus ~ .search-button {
-           color: #1E2C3D;
-       }
-
-
-
-       /* -&#45;&#45; Navbar Styles (Đồng bộ home.html) -&#45;&#45; */
-       .navbar {
-           background-color: #1E2C3D;
-           box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-           z-index: 1030;
-       }
-       .navbar-brand {
-           font-weight: 700;
-           font-size: 1.5rem;
-           color: white !important;
-       }
-       .nav-link {
-           color: rgba(255, 255, 255, 0.8) !important;
-           font-weight: 500;
-           transition: color 0.3s ease;
-           margin: 0 5px;
-           padding: 10px 15px !important;
-           border-radius: 5px;
-       }
-       .nav-link:hover, .nav-link.active {
-           color: white !important;
-           background-color: rgba(255, 255, 255, 0.1);
-       }
-
-       .action-icon { color: white; font-size: 1.2rem; margin-left: 15px; transition: color 0.3s; }
-       .action-icon:hover { color: #ffc107; }
+         /* Khi input được focus, đổi màu icon nút tìm kiếm sang xanh navy */
+         .search-input:focus ~ .search-button {
+             color: #1E2C3D;
+         }
 
 
 
+         /* --- Navbar Styles (Đồng bộ home.html) --- */
+         .navbar {
+             background-color: #1E2C3D;
+             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+             z-index: 1030;
+         }
+         .navbar-brand {
+             font-weight: 700;
+             font-size: 1.5rem;
+             color: white !important;
+         }
+         .nav-link {
+             color: rgba(255, 255, 255, 0.8) !important;
+             font-weight: 500;
+             transition: color 0.3s ease;
+             margin: 0 5px;
+             padding: 10px 15px !important;
+             border-radius: 5px;
+         }
+         .nav-link:hover, .nav-link.active {
+             color: white !important;
+             background-color: rgba(255, 255, 255, 0.1);
+         }
+
+         .action-icon { color: white; font-size: 1.2rem; margin-left: 15px; transition: color 0.3s; }
+         .action-icon:hover { color: #ffc107; }
 
 
-       /* Sidebar Styles */
-       .sidebar-menu {
-           background: white;
-           border-radius: 8px;
-           overflow: hidden;
-           box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-       }
-       .sidebar-menu a {
-           display: block;
-           padding: 15px 20px;
-           color: #1E2C3D;
-           text-decoration: none;
-           border-bottom: 1px solid #eee;
-           transition: all 0.2s;
-       }
-       .sidebar-menu a:hover {
-           background-color: #f8f9fa;
-           color: #1E2C3D;
-           padding-left: 25px; /* Hiệu ứng hover nhẹ */
-       }
-       .sidebar-menu a.active {
-           background-color: #f0f8ff;
-           color: #1E2C3D;
-           border-left: 4px solid #1E2C3D;
-           font-weight: 600;
-       }
 
-       /* Profile Card Styles */
-       .profile-card {
-           background: white;
-           border-radius: 8px;
-           padding: 30px;
-           box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-       }
 
-       /* Avatar Styles */
-       .avatar-container {
-           position: relative;
-           display: inline-block;
-       }
-       .avatar-upload {
-           width: 150px;
-           height: 150px;
-           object-fit: cover;
-           border-radius: 50%;
-           border: 4px solid #f8f9fa;
-           box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-       }
-       .btn-upload-icon {
-           position: absolute;
-           bottom: 5px;
-           right: 5px;
-           background: #1E2C3D;
-           color: white;
-           border-radius: 50%;
-           width: 35px;
-           height: 35px;
-           display: flex;
-           align-items: center;
-           justify-content: center;
-           cursor: pointer;
-           border: 2px solid white;
-           transition: transform 0.2s;
-       }
-       .btn-upload-icon:hover {
-           transform: scale(1.1);
-           background: #0d1a25;
-       }
 
-       /* Button Styles */
-       .btn-save {
-           background-color: #1E2C3D;
-           color: white;
-           padding: 10px 40px;
-           border-radius: 6px;
-           border: none;
-           font-weight: 600;
-           transition: background 0.3s;
-       }
-       .btn-save:hover {
-           background-color: #0d1a25;
-           color: white;
-       }
+        /* Sidebar Styles */
+        .sidebar-menu {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .sidebar-menu a {
+            display: block;
+            padding: 15px 20px;
+            color: #1E2C3D;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+            transition: all 0.2s;
+        }
+        .sidebar-menu a:hover {
+            background-color: #f8f9fa;
+            color: #1E2C3D;
+            padding-left: 25px; /* Hiệu ứng hover nhẹ */
+        }
+        .sidebar-menu a.active {
+            background-color: #f0f8ff;
+            color: #1E2C3D;
+            border-left: 4px solid #1E2C3D;
+            font-weight: 600;
+        }
+
+        /* Profile Card Styles */
+        .profile-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Avatar Styles */
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+        .avatar-upload {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #f8f9fa;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn-upload-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: #1E2C3D;
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: transform 0.2s;
+        }
+        .btn-upload-icon:hover {
+            transform: scale(1.1);
+            background: #0d1a25;
+        }
+
+        /* Button Styles */
+        .btn-save {
+            background-color: #1E2C3D;
+            color: white;
+            padding: 10px 40px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .btn-save:hover {
+            background-color: #0d1a25;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -181,85 +181,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid container">
         <a class="navbar-brand" th:href="@{/}" href="#">COOLMATE</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/}" href="home.html">Trang chủ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" th:href="@{/user/product}" href="#">Sản phẩm</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        Danh mục
-                    </a>
-
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li th:each="c : ${categories}">
-                            <a class="dropdown-item"
-                               th:href="@{/products/by-category/{id}(id=${c.id})}"
-                               th:text="${c.name}">
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/user/about}" href="about.html">Giới thiệu</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/user/contact}" href="contact.html">Liên hệ</a></li>
-            </ul>
-
-            <form class="d-flex search-form me-3" role="search" th:action="@{/user/product}" method="get">
-                <input class="form-control search-input" type="search"
-                       placeholder="Tìm kiếm sản phẩm..."
-                       aria-label="Search"
-                       name="keyword"
-                       th:value="${keyword}"> <button class="search-button" type="submit">
-                <i class="fas fa-search"></i>
-            </button>
-            </form>
-
-            <div class="d-flex align-items-center">
-                <th:block th:if="${#authorization.expression('!isAuthenticated()')}">
-                    <a th:href="@{/login}" class="action-icon" title="Đăng nhập/Đăng ký">
-                        <i class="fas fa-user"></i>
-                    </a>
-                </th:block>
-                <th:block th:if="${#authorization.expression('isAuthenticated()')}">
-                    <div class="dropdown">
-                        <a href="#" class="action-icon dropdown-toggle" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
-                            <li><a class="dropdown-item" th:href="@{/user/profile}"><i class="fas fa-user me-2"></i>Tài khoản của tôi</a></li>
-                            <li><a class="dropdown-item" th:href="@{/user/my_orders}"><i class="fas fa-box me-2"></i>Đơn hàng</a></li>
-                            <li><hr class="dropdown-divider"></li>
-
-                            <li>
-                                <form th:action="@{/logout}" method="post" style="display: block;">
-                                    <input type="hidden"
-                                           th:name="${_csrf.parameterName}"
-                                           th:value="${_csrf.token}" />
-                                    <button type="submit" class="dropdown-item"
-                                            style="width: 100%; text-align: left;">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                </th:block>
-
-                <a th:href="@{/user/cart}" class="action-icon position-relative ms-3" title="Giỏ hàng">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${cartItemCount}">
-                            0
-                            <span class="visually-hidden">sản phẩm trong giỏ</span>
-                        </span>
-                </a>
-            </div>
         </div>
     </div>
 </nav>
@@ -284,7 +205,6 @@
                 <a th:href="@{/user/address}" th:classappend="${activeTab == 'address'} ? 'active' : ''">
                     <i class="fas fa-map-marker-alt me-2"></i> Sổ địa chỉ
                 </a>
-
 
             </div>
         </div>

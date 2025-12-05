@@ -62,7 +62,7 @@ public class HomeController {
         model.addAttribute("products", products);
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedPriceRanges", priceRanges);
-        model.addAttribute("sortOrder", sortOrder); // TRUYỀN THAM SỐ SẮP XẾP
+        model.addAttribute("sortOrder", sortOrder);
 
         return "user/product";
     }
@@ -96,4 +96,5 @@ public class HomeController {
         // Gọi hàm count mới trong Service
         return cartService.countItemsInCart(request, response);
     }
+
 }

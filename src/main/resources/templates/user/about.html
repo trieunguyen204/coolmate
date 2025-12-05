@@ -15,71 +15,59 @@
             padding-top: 60px;
         }
 
-        .search-form {
-            position: relative; /* Quan trọng: Để làm mốc tọa độ cho nút search bên trong */
-        }
-
+        /* --- Search Form Styles (Giữ nguyên) --- */
+        .search-form { position: relative; }
         .search-input {
-            border-radius: 20px; /* Bo tròn ô tìm kiếm */
-            padding-right: 40px; /* Chừa khoảng trống bên phải để chữ không bị nút search che mất */
+            border-radius: 20px;
+            padding-right: 40px;
             padding-left: 15px;
             border: none;
-            background: rgba(255, 255, 255, 0.2); /* Nền trắng mờ (trong suốt 20%) */
-            color: white; /* Chữ màu trắng */
-            transition: all 0.3s; /* Hiệu ứng chuyển động mượt */
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s;
         }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.7); /* Màu chữ gợi ý (placeholder) trắng mờ */
-        }
-
-        /* Trạng thái khi người dùng nhấn vào ô input */
+        .search-input::placeholder { color: rgba(255, 255, 255, 0.7); }
         .search-input:focus {
-            background: white; /* Nền chuyển sang trắng hẳn */
-            color: #1E2C3D; /* Chữ chuyển sang màu xanh navy đậm */
+            background: white;
+            color: #1E2C3D;
             box-shadow: none;
         }
-
         .search-button {
-            position: absolute; /* Định vị tuyệt đối để nằm đè lên input */
-            right: 0; /* Căn sát lề phải */
-            top: 50%; /* Căn giữa theo chiều dọc */
-            transform: translateY(-50%); /* Căn chỉnh chính xác giữa tâm */
-            background: none; /* Xóa nền mặc định của button */
-            border: none; /* Xóa viền */
-            color: rgba(255, 255, 255, 0.8); /* Màu icon trắng mờ */
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
             padding-right: 15px;
             transition: color 0.3s;
         }
-
-        /* Khi input được focus, đổi màu icon nút tìm kiếm sang xanh navy */
         .search-input:focus ~ .search-button {
             color: #1E2C3D;
         }
 
-
-
-
-
-
-
-        /* --- Navbar Styles --- */
+        /* --- Navbar Styles (Giữ nguyên) --- */
         .navbar { background-color: #1E2C3D; box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 1030; }
         .navbar-brand { font-weight: 700; font-size: 1.5rem; color: white !important; }
         .nav-link { color: rgba(255, 255, 255, 0.8) !important; font-weight: 500; transition: color 0.3s ease; margin: 0 5px; padding: 10px 15px !important; border-radius: 5px; }
         .nav-link:hover, .nav-link.active { color: white !important; background-color: rgba(255, 255, 255, 0.1); }
-
-
         .action-icon { color: white; font-size: 1.2rem; margin-left: 15px; }
+        .action-icon:hover { color: #ffc107; }
 
-        /* --- About Page Styles --- */
+        /* --- About Page Styles (Nâng cấp) --- */
         .about-header { background: #1E2C3D; color: white; padding: 60px 0; margin-bottom: 40px; }
-        .feature-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; height: 100%; transition: transform 0.3s; }
-        .feature-box:hover { transform: translateY(-5px); }
+        .feature-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; height: 100%; transition: transform 0.3s; border-bottom: 5px solid transparent; }
+        .feature-box:hover { transform: translateY(-5px); border-bottom: 5px solid #0d6efd; }
         .feature-icon { font-size: 3rem; color: #1E2C3D; margin-bottom: 20px; }
-        .about-img { border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 100%; }
 
-        /* --- Chatbox --- */
+        /* Đã xóa .about-img vì không dùng ảnh bên trái nữa */
+
+        .cta-section { background-color: #E9ECEF; padding: 60px 0; text-align: center; border-radius: 12px; margin-top: 50px; }
+        .cta-btn { background-color: #dc3545; border-color: #dc3545; font-weight: 600; padding: 12px 30px; font-size: 1.1rem; transition: background-color 0.3s; }
+        .cta-btn:hover { background-color: #c82333; border-color: #bd2130; }
+
+        /* --- Chatbox (Giữ nguyên) --- */
         .chatbox-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 1050; }
         .chatbox-toggler { width: 60px; height: 60px; border-radius: 50%; background-color: #1E2C3D; color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.5rem; }
         .chatbox-container { width: 350px; height: 450px; background: white; border-radius: 10px; box-shadow: 0 5px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; }
@@ -180,46 +168,64 @@
 </div>
 
 <div class="container mb-5">
-    <div class="row align-items-center mb-5">
-        <div class="col-lg-6 mb-4 mb-lg-0">
-            <img src="https://via.placeholder.com/600x400" alt="About Team" class="about-img">
+
+    <div class="row mb-5 justify-content-center">
+
+        <div class="col-lg-10 col-md-12 mb-5">
+            <div class="p-4 text-center" style="background-color: #f0fdf4; border-left: 5px solid #1E2C3D; border-radius: 8px;">
+                <h3 class="mb-0 fw-light fst-italic" style="color: #1E2C3D;">
+                    "Sự tối giản là chìa khóa của phong cách lâu dài. <br>Chúng tôi tạo ra sản phẩm, bạn tạo ra sự tự tin."
+                </h3>
+            </div>
         </div>
-        <div class="col-lg-6">
-            <h2 class="fw-bold" style="color: #1E2C3D;">Sứ mệnh của chúng tôi</h2>
+
+        <div class="col-lg-8 col-md-10 text-center">
+            <h2 class="fw-bold mb-4" style="color: #1E2C3D;">Định nghĩa lại phong cách tiện lợi</h2>
             <p class="text-muted fs-5 mt-3">
-                CoolFashion ra đời với mong muốn mang lại giải pháp mua sắm tiện lợi, nhanh chóng và tiết kiệm cho nam giới.
-                Chúng tôi tập trung vào chất lượng sản phẩm, sự thoải mái và dịch vụ khách hàng tận tâm.
+                CoolFashion tin rằng trang phục nam giới cần phải **thực dụng, chất lượng cao và có giá trị vượt trội**.
+                Chúng tôi cắt giảm mọi chi phí trung gian không cần thiết, tập trung 100% vào việc tìm kiếm chất liệu tốt nhất và tối ưu hóa quy trình sản xuất.
             </p>
             <p class="text-muted">
-                Không chỉ là bán quần áo, chúng tôi bán sự tự tin và phong cách sống hiện đại.
-                Mỗi sản phẩm đều được kiểm tra kỹ lưỡng trước khi đến tay khách hàng.
+                Sứ mệnh của chúng tôi là mang lại những sản phẩm cơ bản nhưng không bao giờ lỗi thời, giúp phái mạnh tiết kiệm thời gian, tiền bạc, nhưng vẫn tự tin với phong cách tối giản, hiện đại.
             </p>
+            <div class="d-flex justify-content-center mt-4 mb-4">
+                <div class="me-4"><h5 class="fw-bold" style="color: #dc3545;"><i class="fas fa-check-circle me-2"></i>Chất lượng tốt, giá thành hợp lý.</h5></div>
+                <div><h5 class="fw-bold" style="color: #dc3545;"><i class="fas fa-check-circle me-2"></i>Dịch vụ thân thiện, minh bạch.</h5></div>
+            </div>
         </div>
     </div>
 
+    <h2 class="fw-bold text-center mb-4" style="color: #1E2C3D;">Giá trị cốt lõi</h2>
     <div class="row g-4 mt-4">
         <div class="col-md-4">
             <div class="feature-box">
-                <div class="feature-icon"><i class="fas fa-tshirt"></i></div>
-                <h4>Chất liệu cao cấp</h4>
-                <p class="text-muted">Sử dụng vải Cotton Compact, Modal, Bamboo thân thiện với môi trường và làn da.</p>
+                <div class="feature-icon" style="color: #0d6efd;"><i class="fas fa-leaf"></i></div>
+                <h4>Thân thiện với môi trường</h4>
+                <p class="text-muted">Ưu tiên sử dụng các loại vải bền vững như **Bamboo, Modal**, mang lại cảm giác mềm mại và thoáng khí tuyệt vời.</p>
             </div>
         </div>
         <div class="col-md-4">
             <div class="feature-box">
-                <div class="feature-icon"><i class="fas fa-shipping-fast"></i></div>
-                <h4>Giao hàng nhanh</h4>
-                <p class="text-muted">Cam kết giao hàng trong 24h nội thành và 48h toàn quốc. Đổi trả trong 60 ngày.</p>
+                <div class="feature-icon" style="color: #ffc107;"><i class="fas fa-sync-alt"></i></div>
+                <h4>Đổi trả 60 ngày</h4>
+                <p class="text-muted">Chính sách đổi trả linh hoạt lên đến **60 ngày**, bao gồm cả lỗi do nhà sản xuất và sai kích cỡ từ phía khách hàng.</p>
             </div>
         </div>
         <div class="col-md-4">
             <div class="feature-box">
-                <div class="feature-icon"><i class="fas fa-headset"></i></div>
-                <h4>Hỗ trợ 24/7</h4>
-                <p class="text-muted">Đội ngũ chăm sóc khách hàng luôn sẵn sàng giải đáp mọi thắc mắc của bạn.</p>
+                <div class="feature-icon" style="color: #28a745;"><i class="fas fa-hand-holding-usd"></i></div>
+                <h4>Giá trị lâu dài</h4>
+                <p class="text-muted">Đầu tư vào chất lượng để sản phẩm có độ bền cao, giúp bạn tiết kiệm chi phí mua sắm về lâu dài.</p>
             </div>
         </div>
     </div>
+
+    <div class="cta-section">
+        <h3 class="fw-bold text-dark">Bạn đã sẵn sàng nâng cấp tủ đồ của mình?</h3>
+        <p class="lead text-muted">Khám phá sự khác biệt mà chất lượng mang lại ngay hôm nay.</p>
+        <a th:href="@{/user/product}" class="btn cta-btn btn-lg mt-3"><i class="fas fa-shopping-bag me-2"></i> MUA SẮM NGAY</a>
+    </div>
+
 </div>
 
 <div class="chatbox-wrapper">

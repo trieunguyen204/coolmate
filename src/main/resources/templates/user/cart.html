@@ -8,185 +8,177 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-            /* --- 1. Cấu hình cơ bản cho trang để Navbar cố định không che nội dung --- */
-    body {
-        padding-top: 60px; /* Đẩy nội dung xuống vì Navbar đang để fixed-top */
-    }
+        body {
+         box-sizing: border-box;
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+         background: #f8f9fa;
+         min-height: 100vh;
+         padding-top: 60px;
+     }
 
-    /* --- 2. Khung Navbar chính --- */
-    .navbar {
-        background-color: #1E2C3D; /* Màu nền Xanh Navy đậm chủ đạo */
-        box-shadow: 0 2px 10px rgba(0,0,0,0.15); /* Tạo bóng đổ nhẹ phía dưới */
-        z-index: 1030; /* Đảm bảo Menu luôn nổi trên các thành phần khác */
-    }
 
-    /* --- 3. Logo (Brand) --- */
-    .navbar-brand {
-        font-weight: 700;
-        font-size: 1.5rem;
-        color: white !important; /* Luôn giữ màu trắng */
-    }
+         .search-form {
+         position: relative; /* Quan trọng: Để làm mốc tọa độ cho nút search bên trong */
+     }
 
-    /* --- 4. Các liên kết Menu (Trang chủ, Sản phẩm...) --- */
-    .nav-link {
-        color: rgba(255, 255, 255, 0.8) !important; /* Màu chữ trắng mờ (80%) */
-        font-weight: 500;
-        transition: color 0.3s ease; /* Hiệu ứng chuyển màu mượt */
-        margin: 0 5px; /* Khoảng cách giữa các mục menu */
-        padding: 10px 15px !important;
-        border-radius: 5px; /* Bo góc nhẹ khi hover */
-    }
+     .search-input {
+         border-radius: 20px; /* Bo tròn ô tìm kiếm */
+         padding-right: 40px; /* Chừa khoảng trống bên phải để chữ không bị nút search che mất */
+         padding-left: 15px;
+         border: none;
+         background: rgba(255, 255, 255, 0.2); /* Nền trắng mờ (trong suốt 20%) */
+         color: white; /* Chữ màu trắng */
+         transition: all 0.3s; /* Hiệu ứng chuyển động mượt */
+     }
 
-    /* Hiệu ứng khi di chuột vào hoặc menu đang được chọn (Active) */
-    .nav-link:hover, .nav-link.active {
-        color: white !important; /* Chuyển sang trắng sáng */
-        background-color: rgba(255, 255, 255, 0.1); /* Nền trắng mờ nhẹ */
-    }
+     .search-input::placeholder {
+         color: rgba(255, 255, 255, 0.7); /* Màu chữ gợi ý (placeholder) trắng mờ */
+     }
 
-    /* --- 5. Thanh tìm kiếm (Search Bar) --- */
-    .search-form {
-        position: relative; /* Để làm mốc tọa độ cho nút search bên trong */
-    }
+     /* Trạng thái khi người dùng nhấn vào ô input */
+     .search-input:focus {
+         background: white; /* Nền chuyển sang trắng hẳn */
+         color: #1E2C3D; /* Chữ chuyển sang màu xanh navy đậm */
+         box-shadow: none;
+     }
 
-    .search-input {
-        border-radius: 20px; /* Bo tròn 2 đầu */
-        padding-right: 40px; /* Chừa chỗ bên phải để nút search không che chữ */
-        padding-left: 15px;
-        border: none;
-        background: rgba(255, 255, 255, 0.2); /* Nền trong suốt 20% */
-        color: white;
-        transition: all 0.3s;
-    }
+     .search-button {
+         position: absolute; /* Định vị tuyệt đối để nằm đè lên input */
+         right: 0; /* Căn sát lề phải */
+         top: 50%; /* Căn giữa theo chiều dọc */
+         transform: translateY(-50%); /* Căn chỉnh chính xác giữa tâm */
+         background: none; /* Xóa nền mặc định của button */
+         border: none; /* Xóa viền */
+         color: rgba(255, 255, 255, 0.8); /* Màu icon trắng mờ */
+         padding-right: 15px;
+         transition: color 0.3s;
+     }
 
-    /* Màu chữ placeholder (gợi ý) */
-    .search-input::placeholder {
-        color: rgba(255, 255, 255, 0.7);
-    }
+     /* Khi input được focus, đổi màu icon nút tìm kiếm sang xanh navy */
+     .search-input:focus ~ .search-button {
+         color: #1E2C3D;
+     }
 
-    /* Trạng thái khi click vào ô tìm kiếm */
-    .search-input:focus {
-        background: white; /* Nền chuyển sang trắng */
-        color: #1E2C3D; /* Chữ chuyển màu xanh navy */
-        box-shadow: none; /* Bỏ viền xanh mặc định của Bootstrap */
-    }
 
-    /* Nút kính lúp tìm kiếm */
-    .search-button {
-        position: absolute; /* Đặt nằm đè lên ô input */
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%); /* Căn giữa theo chiều dọc */
-        background: none;
-        border: none;
-        color: rgba(255, 255, 255, 0.8);
-        padding-right: 15px;
-        transition: color 0.3s;
-    }
 
-    /* Khi ô input được focus, đổi màu icon kính lúp */
-    .search-input:focus ~ .search-button {
-        color: #1E2C3D;
-    }
+     /* -&#45;&#45; Navbar Styles (Đồng bộ home.html) -&#45;&#45; */
+     .navbar {
+         background-color: #1E2C3D;
+         box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+         z-index: 1030;
+     }
+     .navbar-brand {
+         font-weight: 700;
+         font-size: 1.5rem;
+         color: white !important;
+     }
+     .nav-link {
+         color: rgba(255, 255, 255, 0.8) !important;
+         font-weight: 500;
+         transition: color 0.3s ease;
+         margin: 0 5px;
+         padding: 10px 15px !important;
+         border-radius: 5px;
+     }
+     .nav-link:hover, .nav-link.active {
+         color: white !important;
+         background-color: rgba(255, 255, 255, 0.1);
+     }
 
-    /* --- 6. Các Icon hành động (Giỏ hàng, User) --- */
-    .action-icon {
-        color: white;
-        font-size: 1.2rem; /* Kích thước icon */
-        margin-left: 15px;
-        transition: color 0.3s;
-    }
+     .action-icon { color: white; font-size: 1.2rem; margin-left: 15px; transition: color 0.3s; }
+     .action-icon:hover { color: #ffc107; }
 
-    /* Hiệu ứng khi di chuột vào icon */
-    .action-icon:hover {
-        color: #ffc107; /* Chuyển sang màu vàng nổi bật */
-    }
-        .cart-title {
-            color: #1E2C3D;
-            font-weight: 700;
-        }
+ /* Hiệu ứng khi di chuột vào icon */
+ .action-icon:hover {
+     color: #ffc107; /* Chuyển sang màu vàng nổi bật */
+ }
+     .cart-title {
+         color: #1E2C3D;
+         font-weight: 700;
+     }
 
-        .cart-item-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-        }
+     .cart-item-card {
+         background: white;
+         border-radius: 12px;
+         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+         margin-bottom: 20px;
+     }
 
-        .product-image {
-            width: 100%;
-            height: 120px;
-            object-fit: contain;
-            border-radius: 8px;
-            background: #f8f9fa;
-        }
+     .product-image {
+         width: 100%;
+         height: 120px;
+         object-fit: contain;
+         border-radius: 8px;
+         background: #f8f9fa;
+     }
 
-        .product-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1E2C3D;
-        }
+     .product-name {
+         font-size: 1.1rem;
+         font-weight: 600;
+         color: #1E2C3D;
+     }
 
-        .price-text {
-            color: #dc3545;
-            font-weight: bold;
-        }
+     .price-text {
+         color: #dc3545;
+         font-weight: bold;
+     }
 
-        .quantity-control {
-            display: flex;
-            align-items: center;
-        }
+     .quantity-control {
+         display: flex;
+         align-items: center;
+     }
 
-        .quantity-control button {
-            width: 35px;
-            height: 35px;
-            border-radius: 5px;
-            background: #eee;
-            border: 1px solid #ccc;
-            font-weight: bold;
-            color: #1E2C3D;
-        }
+     .quantity-control button {
+         width: 35px;
+         height: 35px;
+         border-radius: 5px;
+         background: #eee;
+         border: 1px solid #ccc;
+         font-weight: bold;
+         color: #1E2C3D;
+     }
 
-        .quantity-control input {
-            width: 50px;
-            text-align: center;
-            border: 1px solid #ccc;
-            margin: 0 5px;
-            height: 35px;
-            border-radius: 5px;
-        }
+     .quantity-control input {
+         width: 50px;
+         text-align: center;
+         border: 1px solid #ccc;
+         margin: 0 5px;
+         height: 35px;
+         border-radius: 5px;
+     }
 
-        .summary-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            padding: 25px;
-            position: sticky;
-            top: 80px;
-        }
+     .summary-card {
+         background: white;
+         border-radius: 12px;
+         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+         padding: 25px;
+         position: sticky;
+         top: 80px;
+     }
 
-        .btn-checkout {
-            background-color: #1E2C3D;
-            border-color: #1E2C3D;
-            color: white;
-            padding: 12px;
-            font-weight: 700;
-            border-radius: 8px;
-            transition: background-color 0.3s;
-        }
+     .btn-checkout {
+         background-color: #1E2C3D;
+         border-color: #1E2C3D;
+         color: white;
+         padding: 12px;
+         font-weight: 700;
+         border-radius: 8px;
+         transition: background-color 0.3s;
+     }
 
-        .btn-checkout:hover {
-            background-color: #0d1a25;
-            border-color: #0d1a25;
-            color: white;
-        }
+     .btn-checkout:hover {
+         background-color: #0d1a25;
+         border-color: #0d1a25;
+         color: white;
+     }
 
-        .empty-cart-message {
-            text-align: center;
-            padding: 50px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
+     .empty-cart-message {
+         text-align: center;
+         padding: 50px;
+         background: white;
+         border-radius: 12px;
+         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+     }
     </style>
 </head>
 <body>
@@ -194,17 +186,11 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid container">
         <a class="navbar-brand" th:href="@{/}" href="#">COOLMATE</a>
-        <button class="navbar-toggler" th:href="@{/}" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/}" href="#">Trang chủ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/user/product}" href="#">Sản phẩm</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/}" href="home.html">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/user/product}" href="product.html">Sản phẩm</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
@@ -220,12 +206,8 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/user/about}" href="#">Giới thiệu</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/user/contact}" href="#">Liên hệ</a>
-                </li>
+                <li class="nav-item"><a class="nav-link " th:href="@{/user/about}" href="#">Giới thiệu</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/user/contact}" href="contact.html">Liên hệ</a></li>
             </ul>
 
             <form class="d-flex search-form me-3" role="search" th:action="@{/user/product}" method="get">
@@ -237,6 +219,7 @@
                 <i class="fas fa-search"></i>
             </button>
             </form>
+
 
             <div class="d-flex align-items-center">
                 <th:block th:if="${#authorization.expression('!isAuthenticated()')}">
@@ -269,7 +252,7 @@
                     </div>
                 </th:block>
 
-                <a th:href="@{/user/cart}" class="action-icon position-relative ms-3 active" title="Giỏ hàng">
+                <a th:href="@{/user/cart}" class="action-icon position-relative ms-3" title="Giỏ hàng">
                     <i class="fas fa-shopping-bag"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${cartItemCount}">
                             0
@@ -280,7 +263,6 @@
         </div>
     </div>
 </nav>
-
 
 
 <div class="container my-4">

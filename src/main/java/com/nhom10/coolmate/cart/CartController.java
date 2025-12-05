@@ -2,6 +2,7 @@ package com.nhom10.coolmate.cart;
 
 import com.nhom10.coolmate.cart.Cart;
 import com.nhom10.coolmate.cart.CartService;
+import com.nhom10.coolmate.category.CategoryRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class CartController {
 
     private final CartService cartService;
+    private final CategoryRepository categoryRepository;
 
     // --- 1. Xem giỏ hàng ---
     @GetMapping
@@ -32,6 +34,8 @@ public class CartController {
                     .sum();
         }
         model.addAttribute("grandTotal", grandTotal);
+        model.addAttribute("categories", categoryRepository.findAll());
+        model.addAttribute("cartItemCount", cartService.countItemsInCart(request, response));
 
         return "user/cart"; // Trả về template: templates/user/cart.html
     }

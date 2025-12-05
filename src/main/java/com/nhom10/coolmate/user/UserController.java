@@ -2,6 +2,8 @@ package com.nhom10.coolmate.user;
 
 import com.nhom10.coolmate.address.Address;
 import com.nhom10.coolmate.address.AddressRepository;
+import com.nhom10.coolmate.cart.CartService;
+import com.nhom10.coolmate.category.CategoryRepository;
 import com.nhom10.coolmate.exception.AppException;
 
 import com.nhom10.coolmate.order.OrderDTO;
@@ -25,6 +27,9 @@ public class UserController {
     private final UserService userService;
     private final AddressRepository addressRepository;
     private final OrderService orderService;
+    private final CategoryRepository categoryRepository;
+    private final CartService cartService;
+
 
     // --- HIỂN THỊ FORM ĐĂNG KÝ ---
     @GetMapping("/register")
@@ -218,7 +223,7 @@ public class UserController {
 
     // --- THÊM: HIỂN THỊ LỊCH SỬ ĐƠN HÀNG ---
     @GetMapping("/user/my_orders")
-    public String myOrders(Model model, Principal principal) {
+    public String myOrders(Model model, Principal principal ) {
         if (principal == null) {
             return "redirect:/login";
         }
@@ -228,6 +233,7 @@ public class UserController {
 
         model.addAttribute("orders", myOrders);
         model.addAttribute("activeTab", "order"); // Để highlight sidebar menu
+
 
         return "user/my_orders"; // Trả về file html
     }
