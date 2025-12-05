@@ -65,11 +65,13 @@ public class CartService {
 
             // Nếu chưa có cookie token -> Tạo mới
             if (sessionToken == null) {
-                return createGuestCart(response);
+                // SỬA: Truyền request vào createGuestCart
+                return createGuestCart(request, response);
             } else {
                 // Nếu có token -> Tìm giỏ hàng, nếu không thấy (VD DB bị xóa) -> Tạo mới
+                // SỬA: Truyền request vào createGuestCart
                 return cartRepository.findBySessionToken(sessionToken)
-                        .orElseGet(() -> createGuestCart(response));
+                        .orElseGet(() -> createGuestCart(request, response));
             }
         }
     }
@@ -80,6 +82,7 @@ public class CartService {
                           HttpServletRequest request, HttpServletResponse response) {
 
         // Bước 1: Lấy giỏ hàng hiện tại (Guest hoặc User)
+        // Lưu ý: getCart() sẽ tự động tạo Session/Cookie nếu chưa có
         Cart cart = getCart(request, response);
 
         // Bước 2: Validate dữ liệu đầu vào
@@ -177,8 +180,13 @@ public class CartService {
 
     // ================= HELPER METHODS =================
 
-    private Cart createGuestCart(HttpServletResponse response) {
+    // SỬA: Thêm HttpServletRequest để tạo Session trước khi thêm Cookie
+    private Cart createGuestCart(HttpServletRequest request, HttpServletResponse response) {
         String token = UUID.randomUUID().toString();
+
+        // QUAN TRỌNG: Tạo Session để Spring Security có thể lưu CSRF token trước
+        // khi Response Header được commit bởi việc thêm Cookie.
+        request.getSession(true);
 
         // Tạo Cookie gửi về client
         Cookie cookie = new Cookie(CART_COOKIE_NAME, token);
@@ -221,5 +229,17 @@ public class CartService {
             return price.multiply(factor);
         }
         return price;
+    }
+    // --- 6. XÓA SẠCH GIỎ HÀNG (Dùng sau khi Checkout) ---
+    @Transactional
+    public void clearCart(HttpServletRequest request, HttpServletResponse response) {
+        Cart cart = getCart(request, response);
+        if (cart != null && !cart.getCartItems().isEmpty()) {
+            // Xóa tất cả item trong DB
+            cartItemRepository.deleteAll(cart.getCartItems());
+            // Xóa list trong memory để tránh lỗi nếu dùng tiếp object này
+            cart.getCartItems().clear();
+            cartRepository.save(cart);
+        }
     }
 }

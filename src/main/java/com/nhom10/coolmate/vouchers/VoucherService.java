@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZoneId;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,10 +24,12 @@ public class VoucherService {
                 .code(voucher.getCode())
                 .description(voucher.getDescription())
                 .discountType(voucher.getDiscountType())
-                .discountValue(voucher.getDiscountValue())
+
+                // MAP: Entity.discountAmount -> DTO.discountValue
+                .discountValue(voucher.getDiscountAmount())
+
                 .minOrderAmount(voucher.getMinOrder())
-                // Chuyển đổi java.sql.Date sang LocalDate
-                .startDate(voucher.getStartDate() != null ? voucher.getStartDate().toLocalDate() : null)
+                .startDate(voucher.getStartDate())
                 .endDate(voucher.getEndDate())
                 .usageLimit(voucher.getUsageLimit())
                 .usedCount(voucher.getUsedCount())
@@ -39,20 +43,22 @@ public class VoucherService {
                 .code(dto.getCode().toUpperCase())
                 .description(dto.getDescription())
                 .discountType(dto.getDiscountType())
-                .discountValue(dto.getDiscountValue())
+
+                // MAP: DTO.discountValue -> Entity.discountAmount
+                .discountAmount(dto.getDiscountValue())
+
                 .minOrder(dto.getMinOrderAmount())
-                // Chuyển đổi LocalDate sang java.sql.Date
-                .startDate(dto.getStartDate() != null ? java.sql.Date.valueOf(dto.getStartDate()) : null)
+                .quantity(dto.getUsageLimit() != null ? dto.getUsageLimit() : 100) // Mặc định quantity
+                .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
                 .usageLimit(dto.getUsageLimit())
                 .usedCount(dto.getUsedCount())
                 .status(dto.getStatus())
                 .build();
 
-        // Đảm bảo các trường mặc định khi tạo mới
         if (voucher.getId() == null) {
             voucher.setUsedCount(0);
-            if (voucher.getUsageLimit() == null) voucher.setUsageLimit(100);
+            if (voucher.getQuantity() == null) voucher.setQuantity(100);
             if (voucher.getStatus() == null) voucher.setStatus(1);
         }
         return voucher;
@@ -79,24 +85,22 @@ public class VoucherService {
     public VoucherDTO saveVoucher(VoucherDTO dto) {
         dto.setCode(dto.getCode().toUpperCase());
 
-        // Kiểm tra trùng CODE (trừ chính nó)
-        if (voucherRepository.existsByCodeIgnoreCase(dto.getCode())) {
-            if (dto.getId() == null || !voucherRepository.findById(dto.getId()).orElse(new Voucher()).getCode().equalsIgnoreCase(dto.getCode())) {
+        // Kiểm tra trùng CODE (không phân biệt hoa thường khi kiểm tra)
+        voucherRepository.findByCodeIgnoreCase(dto.getCode()).ifPresent(existing -> {
+            if (dto.getId() == null || !existing.getId().equals(dto.getId())) {
                 throw new AppException("Mã Voucher đã tồn tại: " + dto.getCode());
             }
-        }
+        });
 
-        // Kiểm tra logic ngày tháng (mặc dù đã có JS/DTO validation)
+        // Kiểm tra logic ngày tháng (Dùng isBefore cho LocalDate)
         if (dto.getStartDate() != null && dto.getEndDate() != null && dto.getEndDate().isBefore(dto.getStartDate())) {
             throw new AppException("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
         }
 
         Voucher voucherToSave;
         if (dto.getId() == null) {
-            // CREATE
             voucherToSave = mapToEntity(dto);
         } else {
-            // UPDATE: Giữ lại usedCount và các giá trị mặc định khác
             Voucher existing = voucherRepository.findById(dto.getId())
                     .orElseThrow(() -> new AppException("Voucher không tìm thấy để cập nhật: " + dto.getId()));
 
@@ -108,13 +112,77 @@ public class VoucherService {
         return mapToDTO(savedVoucher);
     }
 
-    // 4. DELETE: Xóa Voucher (Có thể là soft delete - đổi status, nhưng ta dùng hard delete)
+    // 4. DELETE: Xóa Voucher
     @Transactional
     public void deleteVoucher(Integer id) {
         if (!voucherRepository.existsById(id)) {
             throw new AppException("Voucher không tìm thấy để xóa.");
         }
-        // TODO: Nên có logic kiểm tra voucher này đã được sử dụng trong Order nào chưa.
         voucherRepository.deleteById(id);
+    }
+
+    // 5. Lấy danh sách voucher (Cho User chọn)
+    public List<Voucher> getAvailableVouchers() {
+        // Hàm findAllActiveVouchers cần được khai báo trong Repository
+        return voucherRepository.findAllActiveVouchers();
+    }
+
+    // 6. Logic kiểm tra mã Voucher (Cho Checkout)
+    public Voucher validateVoucher(String code, BigDecimal orderTotal) {
+        // SỬA: Dùng findByCodeIgnoreCase để không phân biệt hoa thường
+        Voucher voucher = voucherRepository.findByCodeIgnoreCase(code)
+                .orElseThrow(() -> new AppException("Mã giảm giá không tồn tại."));
+
+        // Kiểm tra trạng thái và số lượng
+        if (voucher.getStatus() == 0 || voucher.getQuantity() <= 0) {
+            throw new AppException("Mã giảm giá đã hết lượt sử dụng hoặc ngừng hoạt động.");
+        }
+
+        // SỬA: Dùng LocalDate.now() và isBefore/isAfter
+        LocalDate now = LocalDate.now();
+
+        if (voucher.getStartDate() != null && voucher.getStartDate().isAfter(now)) {
+            throw new AppException("Mã giảm giá chưa đến đợt sử dụng.");
+        }
+
+        if (voucher.getEndDate() != null && voucher.getEndDate().isBefore(now)) {
+            throw new AppException("Mã giảm giá đã hết hạn.");
+        }
+
+        // Kiểm tra giá trị đơn hàng tối thiểu
+        if (voucher.getMinOrder() != null && orderTotal.compareTo(voucher.getMinOrder()) < 0) {
+            throw new AppException("Đơn hàng chưa đạt giá trị tối thiểu ("
+                    + voucher.getMinOrder() + ") để áp dụng mã này.");
+        }
+
+        return voucher;
+    }
+
+    // 7. Hàm TÍNH TOÁN SỐ TIỀN GIẢM THỰC TẾ (MỚI)
+    /**
+     * Tính số tiền giảm giá thực tế dựa trên Voucher và tổng đơn hàng.
+     * Hàm này được gọi trong CheckoutController (API check) và OrderService (createOrder).
+     * @param voucher Voucher Entity
+     * @param orderTotal Tổng tiền đơn hàng chưa giảm
+     * @return Số tiền giảm giá BigDecimal
+     */
+    public BigDecimal calculateDiscount(Voucher voucher, BigDecimal orderTotal) {
+        if (voucher.getDiscountType() == DiscountType.PERCENT) {
+            // Tính số tiền giảm theo %: total * (discountAmount / 100)
+            BigDecimal percent = voucher.getDiscountAmount().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            return orderTotal.multiply(percent).setScale(0, RoundingMode.HALF_UP); // Làm tròn về số nguyên
+        } else if (voucher.getDiscountType() == DiscountType.AMOUNT) {
+            // Giảm theo số tiền cố định, không được giảm quá tổng tiền
+            return voucher.getDiscountAmount().min(orderTotal).setScale(0, RoundingMode.HALF_UP);
+        }
+        return BigDecimal.ZERO;
+    }
+
+    // 8. Tăng số lần sử dụng Voucher
+    @Transactional
+    public void increaseVoucherUsedCount(Voucher voucher) {
+        voucher.setUsedCount(voucher.getUsedCount() + 1);
+        voucher.setQuantity(voucher.getQuantity() - 1); // Giảm số lượng còn lại
+        voucherRepository.save(voucher);
     }
 }

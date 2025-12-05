@@ -80,13 +80,8 @@ public class HomeController {
     @GetMapping("/user/contact")
     public String contact() { return "user/contact"; }
 
-    @GetMapping("/user/profile")
-    public String profile() { return "/user/profile"; }
 
-    @GetMapping("/user/my_orders")
-    public String myOrders(Model model) {
-        return "/user/my_orders";
-    }
+
 
     @GetMapping("/product/{id}")
     public String viewProductDetail(@PathVariable Integer id, Model model) {

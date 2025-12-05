@@ -67,7 +67,38 @@ public class CartController {
         return "redirect:" + (referer != null ? referer : "/user/product");
     }
 
-    // --- 3. Xóa sản phẩm khỏi giỏ ---
+    // --- 3. THÊM VÀ CHUYỂN HƯỚNG ĐẾN CHECKOUT (Xử lý MUA NGAY) ---
+    @PostMapping("/add-and-checkout")
+    public String addAndCheckout(@RequestParam Integer productId,
+                                 @RequestParam Integer quantity,
+                                 @RequestParam String size,
+                                 @RequestParam String color,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response,
+                                 RedirectAttributes redirectAttributes) {
+
+        try {
+            // 1. Gọi service xử lý logic thêm sản phẩm
+            // Sử dụng lại hàm addToCart để thêm sản phẩm vào giỏ hàng/cookie/session
+            cartService.addToCart(productId, quantity, size, color, request, response);
+
+            // 2. CHUYỂN HƯỚNG THẲNG ĐẾN TRANG THANH TOÁN
+            // Đây là điểm khác biệt cốt lõi của chức năng MUA NGAY
+            return "redirect:/user/checkout";
+
+        } catch (Exception e) {
+            // Nếu có lỗi (ví dụ: hết hàng), chuyển hướng về trang chi tiết sản phẩm
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+
+            // Lấy URL của trang trước đó (product_detail) để quay lại đúng chỗ
+            String referer = request.getHeader("Referer");
+            return "redirect:" + (referer != null ? referer : "/user/product");
+        }
+    }
+
+
+    // --- 4. Xóa sản phẩm khỏi giỏ ---
     @GetMapping("/remove/{id}")
     public String removeFromCart(@PathVariable Integer id,
                                  HttpServletRequest request,

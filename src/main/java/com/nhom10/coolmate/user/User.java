@@ -55,6 +55,9 @@ public class User implements UserDetails { // <<--- PHẢI IMPLEMENT USERDETAILS
     @Column(name = "render", nullable = false, columnDefinition = "ENUM('Nam','Nu') DEFAULT 'Nam'")
     private Gender gender;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     // Ánh xạ quan hệ 1-n (Giữ nguyên)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses;

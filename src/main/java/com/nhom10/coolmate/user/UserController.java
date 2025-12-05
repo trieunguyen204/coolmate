@@ -1,7 +1,11 @@
 package com.nhom10.coolmate.user;
 
+import com.nhom10.coolmate.address.Address;
+import com.nhom10.coolmate.address.AddressRepository;
 import com.nhom10.coolmate.exception.AppException;
 
+import com.nhom10.coolmate.order.OrderDTO;
+import com.nhom10.coolmate.order.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -18,6 +23,8 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final AddressRepository addressRepository;
+    private final OrderService orderService;
 
     // --- HIỂN THỊ FORM ĐĂNG KÝ ---
     @GetMapping("/register")
@@ -174,4 +181,57 @@ public class UserController {
         model.addAttribute("message", "Bạn không có quyền truy cập vào trang này.");
         return "/error/access-denied";
     }
+
+
+    // --- TRANG HỒ SƠ CÁ NHÂN ---
+    @GetMapping("/user/profile")
+    public String showProfile(Model model, Principal principal) {
+        String email = principal.getName();
+        User user = userService.getUserEntityByEmail(email); // Viết thêm hàm này trong Service trả về Entity
+
+        // Load dữ liệu ra form
+        ProfileUpdateDTO profileDTO = userService.getCurrentUserProfile(email);
+
+        // Load danh sách địa chỉ để hiển thị vào Dropdown
+        List<Address> addresses = addressRepository.findByUser(user);
+
+        model.addAttribute("profileDTO", profileDTO);
+        model.addAttribute("addresses", addresses);
+        model.addAttribute("userEmail", email); // Email disable
+        model.addAttribute("activeTab", "profile"); // Để highlight menu
+
+        return "user/profile";
+    }
+
+    @PostMapping("/user/profile/update")
+    public String updateProfile(@ModelAttribute("profileDTO") ProfileUpdateDTO dto,
+                                Principal principal,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            userService.updateProfile(principal.getName(), dto);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật hồ sơ thành công!");
+        } catch (AppException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/user/profile";
+    }
+
+    // --- THÊM: HIỂN THỊ LỊCH SỬ ĐƠN HÀNG ---
+    @GetMapping("/user/my_orders")
+    public String myOrders(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        // Lấy danh sách đơn hàng của user hiện tại
+        List<OrderDTO> myOrders = orderService.getMyOrders(principal.getName());
+
+        model.addAttribute("orders", myOrders);
+        model.addAttribute("activeTab", "order"); // Để highlight sidebar menu
+
+        return "user/my_orders"; // Trả về file html
+    }
+
+
+
 }

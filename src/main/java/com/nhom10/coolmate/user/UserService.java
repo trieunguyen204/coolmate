@@ -1,5 +1,7 @@
 package com.nhom10.coolmate.user;
 
+import com.nhom10.coolmate.address.Address;
+import com.nhom10.coolmate.address.AddressRepository;
 import com.nhom10.coolmate.exception.AppException;
 
 import lombok.RequiredArgsConstructor;
@@ -9,9 +11,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,7 +28,109 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AddressRepository addressRepository; // Inject thêm cái này
 
+    // --- LOGIC PROFILE ---
+
+
+    // Hàm này trả về Entity User để dùng trong AddressController và UserController
+    public User getUserEntityByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException("Không tìm thấy người dùng với email: " + email));
+    }
+
+    // 1. Lấy thông tin hiển thị lên form
+    public ProfileUpdateDTO getCurrentUserProfile(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException("User not found"));
+
+        // Tìm địa chỉ mặc định (isDefault = 1)
+        Optional<Address> defaultAddr = addressRepository.findByUserAndIsDefault(user, 1);
+
+        ProfileUpdateDTO dto = new ProfileUpdateDTO();
+        dto.setFullName(user.getFullName());
+        dto.setPhone(user.getPhone());
+        dto.setGender(user.getGender());
+        dto.setAvatarUrl(user.getAvatarUrl()); // Lấy avatar hiện tại
+
+        if (defaultAddr.isPresent()) {
+            dto.setDefaultAddressId(defaultAddr.get().getId());
+        }
+        return dto;
+    }
+
+    @Transactional
+    public void updateProfile(String email, ProfileUpdateDTO dto) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException("User not found"));
+
+        user.setFullName(dto.getFullName());
+        user.setPhone(dto.getPhone());
+        user.setGender(dto.getGender());
+
+        // --- 1. XỬ LÝ UPLOAD ẢNH ---
+        if (dto.getAvatarFile() != null && !dto.getAvatarFile().isEmpty()) {
+            try {
+                String fileName = saveFile(dto.getAvatarFile());
+                user.setAvatarUrl("/uploads/" + fileName); // Lưu đường dẫn vào DB
+            } catch (Exception e) {
+                throw new AppException("Lỗi khi lưu ảnh: " + e.getMessage());
+            }
+        }
+
+        // --- 2. XỬ LÝ ĐỔI MẬT KHẨU (Giữ nguyên logic cũ) ---
+        if (dto.getCurrentPassword() != null && !dto.getCurrentPassword().isEmpty()) {
+            if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+                throw new AppException("Mật khẩu hiện tại không đúng.");
+            }
+            if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+                throw new AppException("Mật khẩu xác nhận không khớp.");
+            }
+            user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        }
+
+        // --- 3. XỬ LÝ ĐỊA CHỈ MẶC ĐỊNH ---
+        if (dto.getDefaultAddressId() != null) {
+            // Reset tất cả về 0
+            List<Address> addresses = addressRepository.findByUser(user);
+            for (Address addr : addresses) {
+                addr.setIsDefault(0); // Dùng 0 thay vì false
+            }
+            // Set cái mới thành 1
+            Address newDefault = addressRepository.findById(dto.getDefaultAddressId())
+                    .orElseThrow(() -> new AppException("Địa chỉ không tồn tại"));
+
+            if(!newDefault.getUser().getId().equals(user.getId())) {
+                throw new AppException("Không có quyền truy cập địa chỉ này");
+            }
+
+            newDefault.setIsDefault(1); // Dùng 1 thay vì true
+            addressRepository.saveAll(addresses);
+        }
+
+        userRepository.save(user);
+    }
+
+    // --- HÀM HỖ TRỢ LƯU FILE ---
+    private String saveFile(MultipartFile file) throws Exception {
+        // Đường dẫn lưu file: src/main/resources/static/uploads
+        // Lưu ý: Khi chạy thực tế có thể cần cấu hình external path để không mất ảnh khi restart
+        String uploadDir = "src/main/resources/static/uploads";
+
+        Path uploadPath = Paths.get(uploadDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String newFileName = UUID.randomUUID().toString() + extension; // Tạo tên file ngẫu nhiên để tránh trùng
+
+        Path filePath = uploadPath.resolve(newFileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return newFileName;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

@@ -1,6 +1,5 @@
 package com.nhom10.coolmate.config;
 
-
 import com.nhom10.coolmate.user.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,27 +44,28 @@ public class SecurityConfig {
                                 "/register",
                                 "/css/**", "/js/**", "/webjars/**", "/uploads/**",
                                 "/",
+                                "/error/**",
                                 "/user/product",
                                 "/user/contact",
-                                "/user/about"
-                                ,"/user/home"
-                                ,"/user/product_detail"
-                                ,"/product/{id}"
-                                ,"/user/cart"
-                                ,"/products/by-category/{id}"
-                                ,"/user/cart/add"
-                                ,"/user/cart/remove/**"
-                                ,"/error/access-denied"
-
-
-
+                                "/user/about",
+                                "/user/home",
+                                "/user/product_detail",
+                                "/product/**",
+                                "/user/cart",
+                                "/products/by-category/*",
+                                "/user/cart/add",
+                                "/user/cart/remove/**",
+                                "/error/access-denied",
+                                "/user/checkout",
+                                "/user/order_success/**",
+                                "/place-order"
 
                         ).permitAll()
 
                         // 2. PHÂN QUYỀN ADMIN: Chỉ ROLE_ADMIN truy cập /admin/**
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // 4. BẤT KỲ CÁI CÒN LẠI: Yêu cầu xác thực (thường là không cần nếu đã bao phủ hết)
+                        // 3. BẤT KỲ CÁI CÒN LẠI: Yêu cầu xác thực
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

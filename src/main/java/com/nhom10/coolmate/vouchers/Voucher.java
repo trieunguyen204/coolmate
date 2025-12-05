@@ -6,10 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,22 +28,22 @@ public class Voucher {
     @Column(name = "description", length = 255)
     private String description;
 
-
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "discount_type", columnDefinition = "ENUM('PERCENT','AMOUNT') DEFAULT 'AMOUNT'")
     private DiscountType discountType;
 
-    @Column(name = "discount_value", nullable = false, precision = 10, scale = 2)
-    private BigDecimal discountValue;
+    // SỬA: Đổi tên từ discountValue -> discountAmount để khớp với logic tính toán
+    @Column(name = "discount_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal discountAmount;
 
     @Column(name = "min_order", columnDefinition = "DECIMAL(10,2) DEFAULT 0")
     private BigDecimal minOrder;
 
-    @CreationTimestamp
     @Column(name = "start_date")
-    private Date startDate;
-
+    private LocalDate startDate;
 
     @Column(name = "end_date")
     private LocalDate endDate;
@@ -57,11 +55,9 @@ public class Voucher {
     private Integer usedCount;
 
     @Column(name = "status", columnDefinition = "TINYINT DEFAULT 1")
-    private Integer status;
+    private Integer status; // 1: Active, 0: Inactive
 
     // Ánh xạ quan hệ 1-n
     @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
-
-
 }
