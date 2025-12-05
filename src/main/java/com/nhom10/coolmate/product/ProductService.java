@@ -2,6 +2,7 @@ package com.nhom10.coolmate.product;
 
 import com.nhom10.coolmate.category.Category;
 import com.nhom10.coolmate.category.CategoryRepository;
+import com.nhom10.coolmate.comment.CommentService; // THÊM: Import CommentService
 import com.nhom10.coolmate.sizes.Sizes;
 import com.nhom10.coolmate.sizes.SizesRepository;
 import com.nhom10.coolmate.util.FileUploadHelper;
@@ -30,6 +31,7 @@ public class ProductService {
     private final ProductImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
     private final SizesRepository sizesRepository;
+    private final CommentService commentService; // THÊM: Inject CommentService
 
     // --- Mapper & Calculation ---
 
@@ -71,6 +73,10 @@ public class ProductService {
                         .build())
                 .collect(Collectors.toList());
 
+        // THÊM: Lấy điểm đánh giá trung bình
+        Double averageRating = commentService.getAverageRatingByProductId(product.getId());
+
+
         return ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -86,6 +92,7 @@ public class ProductService {
                 .imageUrl(mainImageUrl)
                 .productVariants(variantsDto)
                 .existingImages(product.getImages())
+                .averageRating(averageRating) // Gán giá trị đánh giá
                 .build();
     }
 
@@ -125,7 +132,6 @@ public class ProductService {
         }
 
         // 2. Gọi Repository với logic phức tạp (Filter, Sắp xếp)
-        // LỖI ĐÃ XẢY RA Ở ĐÂY: THIẾU THAM SỐ sortOrder
         List<Product> products = productRepository.findByKeywordAndPriceRange(keyword, minPrice, maxPrice, sortOrder);
 
 

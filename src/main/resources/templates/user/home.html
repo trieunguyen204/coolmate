@@ -422,12 +422,14 @@
                             <h3 class="product-title" th:text="${product.name}">Áo Polo Dry-Ex Coolmate</h3>
                         </a>
                         <div class="product-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <span>(4.0)</span>
+                            <span th:with="rating=${T(java.lang.Math).round(product.averageRating * 2.0) / 2.0}">
+                                <i th:each="i : ${#numbers.sequence(1, 5)}"
+                                   th:classappend="${rating >= i} ? 'fas fa-star' : (${rating > i-1} ? 'fas fa-star-half-alt' : 'far fa-star')"
+                                   class="fa-star text-warning"></i>
+                                <span class="ms-1" th:text="'(' + ${product.averageRating} + ')'">
+                                    (4.5)
+                                </span>
+                            </span>
                         </div>
                         <div>
                             <span class="product-price" th:text="${#numbers.formatDecimal(product.currentPrice, 0, 'POINT', 0, 'COMMA')} + ' đ'">249.000 đ</span>

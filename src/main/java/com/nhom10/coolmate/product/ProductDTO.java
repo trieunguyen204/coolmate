@@ -38,31 +38,32 @@ public class ProductDTO {
     @NotNull(message = "Danh mục không được để trống")
     private Integer categoryId;
 
-    // --- SỬA LỖI HTML: Thêm tên danh mục để hiển thị trong bảng ---
     private String categoryName;
 
-    // --- DỮ LIỆU BỔ SUNG CHO GIAO DIỆN KHÁCH HÀNG ---
-    private String imageUrl; // URL ảnh đại diện (ảnh đầu tiên)
-    private BigDecimal currentPrice; // Giá bán hiện tại (sau chiết khấu)
-    private BigDecimal oldPrice; // Giá gốc (chỉ hiển thị nếu có chiết khấu)
+    // --- CÁC TRƯỜNG QUAN TRỌNG ĐỂ HIỂN THỊ GIÁ VÀ SAO ---
+    private BigDecimal currentPrice; // Giá bán thực tế (đã trừ KM)
+    private BigDecimal oldPrice;     // Giá cũ (để gạch ngang)
+    private Double averageRating;    // Điểm đánh giá trung bình
+    private String imageUrl;         // Ảnh đại diện chính
+    // -----------------------------------------------------
 
-    // --- Dữ liệu Biến thể MỚI (Admin) ---
+    // --- Dữ liệu Biến thể (Admin Form) ---
     private List<VariantInputDTO> variantInputs = new ArrayList<>();
 
-    // --- Xử lý File Upload (Admin) ---
+    // --- Xử lý File Upload (Admin Form) ---
     private List<MultipartFile> newImages = new ArrayList<>();
 
-    // --- Dữ liệu hiện tại (Chỉ dùng để hiển thị trong modal Admin) ---
+    // --- Dữ liệu hiện tại (Admin Modal) ---
     private List<ProductImage> existingImages = new ArrayList<>();
 
-    // --- Dữ liệu tổng hợp (Chỉ dùng để hiển thị trong bảng list Admin) ---
-    private BigDecimal discountPrice;
+    // --- Dữ liệu tổng hợp (Admin List) ---
+    private BigDecimal discountPrice; // Tương đương currentPrice, giữ lại để tương thích code cũ
 
     // List các biến thể (dùng cho việc hiển thị bảng list/tải dữ liệu)
     private List<ProductSizeColorStockDTO> productVariants = new ArrayList<>();
 
 
-    // --- NESTED DTO CHO MỖI DÒNG INPUT (FORM): VariantInputDTO ---
+    // --- NESTED DTO ---
     @Data
     @Builder
     @NoArgsConstructor
@@ -77,7 +78,6 @@ public class ProductDTO {
         private Integer stock;
     }
 
-    // Nested DTO cho hiển thị tồn kho trong bảng
     @Data
     @Builder
     @NoArgsConstructor
