@@ -60,6 +60,7 @@ public class SecurityConfig {
                                 "/user/order_success/**",
                                 "/place-order"
                                 ,"/user/cart/add-and-checkout"
+                                , "/user/cart/update-quantity"
 
                         ).permitAll()
 

@@ -26,18 +26,28 @@ public class CartController {
         Cart cart = cartService.getCart(request, response);
         model.addAttribute("cart", cart);
 
-        // Tính tổng tiền
+        // Tính tổng tiền và TỔNG SỐ LƯỢNG SẢN PHẨM
         double grandTotal = 0;
+        int totalQuantity = 0; // <<< KHAI BÁO BIẾN MỚI
+
         if (cart != null && cart.getCartItems() != null) {
             grandTotal = cart.getCartItems().stream()
                     .mapToDouble(item -> item.getPriceAtTime().doubleValue() * item.getQuantity())
                     .sum();
+
+
+            totalQuantity = cart.getCartItems().stream()
+                    .mapToInt(item -> item.getQuantity())
+                    .sum();
         }
+
+
         model.addAttribute("grandTotal", grandTotal);
+        model.addAttribute("totalQuantity", totalQuantity);
         model.addAttribute("categories", categoryRepository.findAll());
         model.addAttribute("cartItemCount", cartService.countItemsInCart(request, response));
 
-        return "user/cart"; // Trả về template: templates/user/cart.html
+        return "user/cart";
     }
 
     // --- 2. Thêm vào giỏ hàng (Xử lý POST từ form) ---
@@ -112,6 +122,27 @@ public class CartController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa sản phẩm: " + e.getMessage());
         }
+
+        return "redirect:/user/cart";
+    }
+
+    // --- 5. CẬP NHẬT SỐ LƯỢNG (Mới) ---
+    @PostMapping("/update-quantity")
+    public String updateQuantity(@RequestParam Integer cartItemId,
+                                 @RequestParam Integer newQuantity,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response,
+                                 RedirectAttributes redirectAttributes) {
+
+        try {
+
+            cartService.updateQuantity(cartItemId, newQuantity, request, response);
+            // Không cần flash message thành công vì trang sẽ tự reload, người dùng thấy ngay thay đổi
+        } catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể cập nhật số lượng: " + e.getMessage());
+        }
+
 
         return "redirect:/user/cart";
     }
