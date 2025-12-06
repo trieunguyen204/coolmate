@@ -71,15 +71,20 @@ public class UserProductController {
     public String listUserProducts(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "priceRanges", required = false) List<String> priceRanges,
-            @RequestParam(value = "sort", required = false) String sort,
+            @RequestParam(value = "minPriceInput", required = false) String minPriceInput, // <<<< THÊM
+            @RequestParam(value = "maxPriceInput", required = false) String maxPriceInput, // <<<< THÊM
+            @RequestParam(value = "sortOrder", required = false, defaultValue = "createdAt_desc") String sortOrder, // <<<< ĐỔI TÊN THAM SỐ
             Model model) {
 
-        List<ProductDTO> products = productService.getFilteredProducts(keyword, priceRanges, sort);
+        List<ProductDTO> products = productService.getFilteredProducts(keyword, priceRanges, minPriceInput, maxPriceInput, sortOrder);
 
         model.addAttribute("products", products);
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedPriceRanges", priceRanges);
-        model.addAttribute("sort", sort);
+        model.addAttribute("minPriceInput", minPriceInput); // <<<< GÁN VÀO MODEL
+        model.addAttribute("maxPriceInput", maxPriceInput); // <<<< GÁN VÀO MODEL
+        model.addAttribute("sortOrder", sortOrder); // <<<< GÁN VÀO MODEL
+
         model.addAttribute("pageTitle", "Danh sách Sản phẩm");
 
         return "user/product";

@@ -62,15 +62,19 @@ public class CartService {
 
         // B. Trường hợp: Khách vãng lai (Guest) - Dùng Cookie
         else {
+            // [QUAN TRỌNG - FIX LỖI]
+            // Tạo Session ngay lập tức để Spring Security có chỗ lưu CSRF token.
+            // Điều này ngăn lỗi "Cannot create a session after the response has been committed"
+            // khi Controller thực hiện redirect sau đó.
+            request.getSession(true);
+
             String sessionToken = getSessionTokenFromCookie(request);
 
             // Nếu chưa có cookie token -> Tạo mới
             if (sessionToken == null) {
-                // SỬA: Truyền request vào createGuestCart
                 return createGuestCart(request, response);
             } else {
                 // Nếu có token -> Tìm giỏ hàng, nếu không thấy (VD DB bị xóa) -> Tạo mới
-                // SỬA: Truyền request vào createGuestCart
                 return cartRepository.findBySessionToken(sessionToken)
                         .orElseGet(() -> createGuestCart(request, response));
             }
@@ -181,13 +185,8 @@ public class CartService {
 
     // ================= HELPER METHODS =================
 
-    // SỬA: Thêm HttpServletRequest để tạo Session trước khi thêm Cookie
     private Cart createGuestCart(HttpServletRequest request, HttpServletResponse response) {
         String token = UUID.randomUUID().toString();
-
-        // QUAN TRỌNG: Tạo Session để Spring Security có thể lưu CSRF token trước
-        // khi Response Header được commit bởi việc thêm Cookie.
-        request.getSession(true);
 
         // Tạo Cookie gửi về client
         Cookie cookie = new Cookie(CART_COOKIE_NAME, token);

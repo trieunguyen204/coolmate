@@ -2,7 +2,7 @@ package com.nhom10.coolmate.product;
 
 import com.nhom10.coolmate.category.Category;
 import com.nhom10.coolmate.category.CategoryRepository;
-import com.nhom10.coolmate.comment.CommentService; // THÊM: Import CommentService
+import com.nhom10.coolmate.comment.CommentService;
 import com.nhom10.coolmate.sizes.Sizes;
 import com.nhom10.coolmate.sizes.SizesRepository;
 import com.nhom10.coolmate.util.FileUploadHelper;
@@ -31,7 +31,7 @@ public class ProductService {
     private final ProductImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
     private final SizesRepository sizesRepository;
-    private final CommentService commentService; // THÊM: Inject CommentService
+    private final CommentService commentService;
 
     // --- Mapper & Calculation ---
 
@@ -40,7 +40,7 @@ public class ProductService {
             return price;
         }
         BigDecimal discountFactor = BigDecimal.valueOf(100 - discountPercent.doubleValue()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        return price.multiply(discountFactor).setScale(0, RoundingMode.HALF_UP); // Set Scale 0 để làm tròn giá bán
+        return price.multiply(discountFactor).setScale(0, RoundingMode.HALF_UP);
     }
 
     private ProductDTO mapToDTO(Product product) {
@@ -73,9 +73,7 @@ public class ProductService {
                         .build())
                 .collect(Collectors.toList());
 
-        // THÊM: Lấy điểm đánh giá trung bình
         Double averageRating = commentService.getAverageRatingByProductId(product.getId());
-
 
         return ProductDTO.builder()
                 .id(product.getId())
@@ -92,24 +90,17 @@ public class ProductService {
                 .imageUrl(mainImageUrl)
                 .productVariants(variantsDto)
                 .existingImages(product.getImages())
-                .averageRating(averageRating) // Gán giá trị đánh giá
+                .averageRating(averageRating)
                 .build();
     }
 
     // ==========================================================
-    // CLIENT: getFilteredProducts (CHỨC NĂNG LỌC VÀ SẮP XẾP)
+    // CLIENT: getFilteredProducts (LỌC VÀ SẮP XẾP)
     // ==========================================================
-    /**
-     * Lọc và sắp xếp sản phẩm dựa trên keyword, khoảng giá và thứ tự sắp xếp.
-     * @param keyword Từ khóa tìm kiếm
-     * @param priceRanges Danh sách các chuỗi khoảng giá (ví dụ: ["0-200000"])
-     * @param sortOrder Thứ tự sắp xếp (ví dụ: "price_asc", "createdAt_desc")
-     * @return List<ProductDTO>
-     */
-    public List<ProductDTO> getFilteredProducts(String keyword, List<String> priceRanges, String sortOrder) {
-        // 1. Phân tích khoảng giá (Giữ nguyên logic từ bước trước)
-        BigDecimal minPrice = null;
-        BigDecimal maxPrice = null;
+    public List<ProductDTO> getFilteredProducts(String keyword, List<String> priceRanges, String minPriceInput, String maxPriceInput, String sortOrder) {
+        // 1. Phân tích khoảng giá từ Checkbox
+        BigDecimal minPriceFromRanges = null;
+        BigDecimal maxPriceFromRanges = null;
 
         if (priceRanges != null && !priceRanges.isEmpty()) {
             for (String range : priceRanges) {
@@ -117,27 +108,64 @@ public class ProductService {
 
                 if (!parts[0].isEmpty()) {
                     BigDecimal currentMin = new BigDecimal(parts[0]);
-                    if (minPrice == null || currentMin.compareTo(minPrice) < 0) {
-                        minPrice = currentMin;
+                    if (minPriceFromRanges == null || currentMin.compareTo(minPriceFromRanges) < 0) {
+                        minPriceFromRanges = currentMin;
                     }
                 }
 
                 if (parts.length > 1 && !parts[1].isEmpty()) {
                     BigDecimal currentMax = new BigDecimal(parts[1]);
-                    if (maxPrice == null || currentMax.compareTo(maxPrice) > 0) {
-                        maxPrice = currentMax;
+                    if (maxPriceFromRanges == null || currentMax.compareTo(maxPriceFromRanges) > 0) {
+                        maxPriceFromRanges = currentMax;
                     }
                 }
             }
         }
 
-        // 2. Gọi Repository với logic phức tạp (Filter, Sắp xếp)
-        List<Product> products = productRepository.findByKeywordAndPriceRange(keyword, minPrice, maxPrice, sortOrder);
+        // 2. Phân tích khoảng giá từ Input nhập tay
+        BigDecimal minPriceFromInput = null;
+        BigDecimal maxPriceFromInput = null;
 
+        try {
+            if (minPriceInput != null && !minPriceInput.trim().isEmpty()) {
+                minPriceFromInput = new BigDecimal(minPriceInput);
+            }
+            if (maxPriceInput != null && !maxPriceInput.trim().isEmpty()) {
+                maxPriceFromInput = new BigDecimal(maxPriceInput);
+            }
+        } catch (NumberFormatException e) {
+            // Bỏ qua lỗi nhập liệu
+        }
+
+        // 3. Kết hợp các khoảng giá
+        BigDecimal finalMinPrice = combineMinPrices(minPriceFromRanges, minPriceFromInput);
+        BigDecimal finalMaxPrice = combineMaxPrices(maxPriceFromRanges, maxPriceFromInput);
+
+        // 4. Gọi Repository
+        List<Product> products = productRepository.findByKeywordAndPriceRange(keyword, finalMinPrice, finalMaxPrice, sortOrder);
 
         return products.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    private BigDecimal combineMinPrices(BigDecimal rangeMin, BigDecimal inputMin) {
+        if (rangeMin == null && inputMin == null) return null;
+        if (rangeMin == null) return inputMin;
+        if (inputMin == null) return rangeMin;
+
+        // Lấy cận dưới lớn nhất (strict hơn)
+        return rangeMin.compareTo(inputMin) > 0 ? rangeMin : inputMin;
+    }
+
+    private BigDecimal combineMaxPrices(BigDecimal rangeMax, BigDecimal inputMax) {
+        if (rangeMax == null && inputMax == null) return null;
+        if (rangeMax == null) return inputMax;
+        if (inputMax == null) return rangeMax;
+
+        // Lấy cận trên nhỏ nhất (strict hơn)
+        // ĐÃ SỬA LỖI Ở DÒNG DƯỚI ĐÂY:
+        return rangeMax.compareTo(inputMax) < 0 ? rangeMax : inputMax;
     }
 
     // ==========================================================
@@ -152,9 +180,8 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-
     // ==========================================================
-    // READ: getAllProducts (ADMIN)
+    // ADMIN: getAllProducts
     // ==========================================================
     public List<ProductDTO> getAllProducts(String keyword) {
         List<Product> products;
@@ -170,7 +197,7 @@ public class ProductService {
     }
 
     // ==========================================================
-    // READ: getProductById (ADMIN)
+    // ADMIN: getProductById
     // ==========================================================
     public ProductDTO getProductById(Integer id) {
         Product product = productRepository.findById(id)
@@ -179,12 +206,10 @@ public class ProductService {
         return mapToDTO(product);
     }
 
-
     // --- CRUD Logic (ADMIN) ---
 
     @Transactional
     public void saveProduct(@Valid ProductDTO dto) {
-        // ... (Logic save product giữ nguyên) ...
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new AppException("Danh mục không tồn tại."));
 
@@ -208,14 +233,12 @@ public class ProductService {
         Product savedProduct = productRepository.save(product);
 
         if (dto.getVariantInputs() != null && !dto.getVariantInputs().isEmpty()) {
-
             java.util.Set<String> uniqueVariants = new java.util.HashSet<>();
 
             for (ProductDTO.VariantInputDTO input : dto.getVariantInputs()) {
-
                 String uniqueKey = input.getSizeId() + "_" + input.getColor().trim().toLowerCase();
                 if (!uniqueVariants.add(uniqueKey)) {
-                    throw new AppException("Biến thể trùng lặp được phát hiện trong dữ liệu nhập: Size ID " + input.getSizeId() + " và Màu " + input.getColor());
+                    throw new AppException("Biến thể trùng lặp: Size ID " + input.getSizeId() + " và Màu " + input.getColor());
                 }
 
                 Sizes size = sizesRepository.findById(input.getSizeId())
@@ -230,7 +253,6 @@ public class ProductService {
                 }
 
                 ProductVariant variant = existingVariant.orElseGet(ProductVariant::new);
-
                 variant.setProduct(savedProduct);
                 variant.setSize(size);
                 variant.setColor(input.getColor().trim());
@@ -268,11 +290,8 @@ public class ProductService {
 
     public List<ProductDTO> findByCategoryId(Integer categoryId) {
         List<Product> products = productRepository.findByCategoryId(categoryId);
-
         return products.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
-
-
 }
