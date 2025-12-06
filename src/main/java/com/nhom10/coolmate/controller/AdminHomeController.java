@@ -22,21 +22,26 @@ public class AdminHomeController {
 
     @GetMapping("/home")
     public String showHomePage(Model model) {
-        // 1. Lấy dữ liệu thống kê
+        // 1. Thống kê tổng quan
         BigDecimal totalRevenue = orderService.getTotalRevenue();
         long totalOrders = orderRepository.count();
-        // Giả sử có 1 số lượng nhỏ đơn hàng chờ xử lý
         long pendingOrders = orderRepository.findByStatus(OrderStatus.PENDING).size();
 
-        // 2. Lấy Top sản phẩm bán chạy (chỉ lấy 10 sản phẩm đầu)
+        // 2. [CẬP NHẬT] Lấy Top sản phẩm bán chạy (Top 10)
         List<OrderService.ProductSaleDTO> topSellingProducts = orderService.getTopSellingProducts();
 
-        // 3. Add to Model
+        // 3. [MỚI] Lấy dữ liệu biểu đồ doanh thu 6 tháng
+        List<OrderService.RevenueChartDTO> revenueData = orderService.getRevenueLast6Months();
+
+        // 4. Add to Model
         model.addAttribute("pageTitle", "Trang Chủ Quản Trị");
         model.addAttribute("totalRevenue", totalRevenue);
         model.addAttribute("totalOrders", totalOrders);
         model.addAttribute("pendingOrders", pendingOrders);
+
+        // Truyền dữ liệu xuống JavaScript
         model.addAttribute("topSellingProducts", topSellingProducts);
+        model.addAttribute("revenueData", revenueData);
 
         return "admin/home";
     }

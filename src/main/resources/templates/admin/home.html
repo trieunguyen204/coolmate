@@ -326,21 +326,25 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Hàm hiển thị thông báo (Notification)
-    function showNotification(message, type) {
-        // ... (Giữ nguyên hàm showNotification)
-    }
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Nhận dữ liệu Top Sản Phẩm từ Model
+    window.topSellingProducts = [[${topSellingProducts}]];
+
+    // Nhận dữ liệu Doanh Thu từ Model
+    window.revenueData = [[${revenueData}]];
+    /*]]>*/
+</script>
+
+<script>
     // --- Logic Sidebar ---
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
         const toggleIcon = document.getElementById('toggleIcon');
-
         sidebar.classList.toggle('collapsed');
         mainContent.classList.toggle('expanded');
-
         if (sidebar.classList.contains('collapsed')) {
             toggleIcon.classList.remove('fa-chevron-left');
             toggleIcon.classList.add('fa-chevron-right');
@@ -353,18 +357,26 @@
         document.getElementById('sidebar').classList.toggle('show');
     }
 
-
-    // Logic Chart.js
+    // --- Logic Chart.js ---
     document.addEventListener('DOMContentLoaded', function() {
-        // 1. BIỂU ĐỒ DOANH THU (Dữ liệu mẫu)
+
+        // ===========================================
+        // 1. VẼ BIỂU ĐỒ DOANH THU (REAL DATA)
+        // ===========================================
+        const revenueDataRaw = window.revenueData || [];
+
+        // Tách nhãn (tháng) và dữ liệu (tiền) từ list DTO
+        const revenueLabels = revenueDataRaw.map(item => item.label);
+        const revenueValues = revenueDataRaw.map(item => item.value);
+
         const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
         const revenueChart = new Chart(ctxRevenue, {
-            type: 'bar',
+            type: 'bar', // Hoặc 'line'
             data: {
-                labels: ['Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                labels: revenueLabels,
                 datasets: [{
                     label: 'Doanh thu (VNĐ)',
-                    data: [75000000, 82000000, 95000000, 105000000, 90000000, 110000000],
+                    data: revenueValues,
                     backgroundColor: '#1c3144',
                     borderColor: '#1c3144',
                     borderWidth: 1,
@@ -379,75 +391,80 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return (value / 1000000).toFixed(0) + ' Tr';
+                                // Format số tiền rút gọn (VD: 1,000,000 -> 1 Tr)
+                                if (value >= 1000000) return (value / 1000000).toFixed(1) + ' Tr';
+                                return value.toLocaleString('vi-VN');
                             }
                         }
                     }
                 },
                 plugins: {
                     legend: { display: false },
-                    title: { display: false }
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
                 }
             }
         });
 
+        // ===========================================
+        // 2. VẼ BIỂU ĐỒ TOP SẢN PHẨM (REAL DATA)
+        // ===========================================
+        const productsData = window.topSellingProducts || [];
 
-        // 2. BIỂU ĐỒ SẢN PHẨM BÁN CHẠY (Dữ liệu thực tế từ DB)
-        const productsData = window.topSellingProducts;
-
-        // Xử lý dữ liệu cho Chart.js
-        const labels = productsData.map(p => p.productName + ' (' + p.sizeName + ')');
-        const quantities = productsData.map(p => p.quantitySold);
+        const productLabels = productsData.map(p => p.productName + ' (' + p.sizeName + ')');
+        const productQuantities = productsData.map(p => p.quantitySold);
 
         const ctxProducts = document.getElementById('topProductsChart').getContext('2d');
         const topProductsChart = new Chart(ctxProducts, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: productLabels,
                 datasets: [{
                     label: 'Số lượng bán',
-                    data: quantities,
-                    backgroundColor: '#3e5a77', // Màu xanh Coolmate nhạt hơn
+                    data: productQuantities,
+                    backgroundColor: '#3e5a77',
                     borderColor: '#3e5a77',
                     borderWidth: 1,
                     borderRadius: 5
                 }]
             },
             options: {
-                indexAxis: 'y', // Đổi sang biểu đồ ngang
+                indexAxis: 'y', // Biểu đồ ngang
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
                     x: {
                         beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Số lượng'
-                        }
+                        ticks: { stepSize: 1 } // Chỉ hiện số nguyên
                     },
                     y: {
-                        // Cắt nhãn nếu quá dài (tùy chọn)
                         ticks: {
-                            maxRotation: 0,
-                            minRotation: 0,
                             autoSkip: false,
-                            callback: function(value, index, values) {
+                            callback: function(value) {
                                 const label = this.getLabelForValue(value);
-                                return label.length > 30 ? label.substring(0, 30) + '...' : label;
+                                return label.length > 25 ? label.substring(0, 25) + '...' : label;
                             }
                         }
                     }
                 },
                 plugins: {
-                    legend: { display: false },
-                    title: {
-                        display: false
-                    }
+                    legend: { display: false }
                 }
             }
         });
     });
-
 </script>
 </body>
 </html>
