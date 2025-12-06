@@ -157,6 +157,11 @@
                                 <span th:text="${order.orderItems != null ? order.orderItems.size() : 0}">2</span> sản phẩm
                             </span>
 
+                            <div th:if="${order.orderItems != null and order.orderItems.size() > 0}" class="small text-muted mb-2">
+                                <span th:text="${order.orderItems[0].product.name}">Áo thun</span>
+                                <span th:if="${order.orderItems[0].size != null and order.orderItems[0].size.sizeName != 'N/A'}" th:text="'(Size: ' + ${order.orderItems[0].size.sizeName} + ')'"></span>
+                                <span th:if="${order.orderItems[0].color != null and order.orderItems[0].color != 'N/A'}" th:text="' - Màu: ' + ${order.orderItems[0].color}"></span> </div>
+
                             <a th:href="@{/user/order_success/{id}(id=${order.id})}" class="btn btn-sm btn-outline-primary px-3">
                                 Xem chi tiết <i class="fas fa-arrow-right ms-1"></i>
                             </a>

@@ -274,12 +274,14 @@ public class OrderService {
                 .map(item -> {
                     String productName = "Sản phẩm";
                     String sizeName = "N/A";
+                    String color = "N/A"; // <<<< KHAI BÁO VÀ GÁN DEFAULT CHO MÀU SẮC
                     List<OrderDTO.ImageInfoDTO> images = new ArrayList<>();
 
                     try {
                         if (item.getProductVariant() != null) {
                             productName = item.getProductVariant().getProduct().getName();
                             sizeName = item.getProductVariant().getSize().getSizeName();
+                            color = item.getProductVariant().getColor(); // <<<< LẤY GIÁ TRỊ MÀU SẮC
                             images = item.getProductVariant().getProduct().getImages().stream()
                                     .map(img -> OrderDTO.ImageInfoDTO.builder().imageUrl(img.getImageUrl()).build())
                                     .collect(Collectors.toList());
@@ -298,6 +300,7 @@ public class OrderService {
                                     .images(images)
                                     .build())
                             .size(OrderDTO.SizeInfoDTO.builder().sizeName(sizeName).build())
+                            .color(color) // <<<< GÁN GIÁ TRỊ MÀU SẮC VÀO DTO
                             .build();
                 })
                 .collect(Collectors.toList());

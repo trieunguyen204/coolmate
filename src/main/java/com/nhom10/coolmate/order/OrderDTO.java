@@ -53,6 +53,7 @@ public class OrderDTO {
 
         private ProductInfoDTO product;
         private SizeInfoDTO size;
+        private String color; // <<<< ĐÃ THÊM TRƯỜNG NÀY
     }
 
     @Data

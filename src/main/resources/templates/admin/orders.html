@@ -293,7 +293,7 @@
                                     <tr>
                                         <th class="ps-3">Sản phẩm</th>
                                         <th>Size</th>
-                                        <th class="text-center">SL</th>
+                                        <th>Màu</th> <th class="text-center">SL</th>
                                         <th class="text-end pe-3">Thành tiền</th>
                                     </tr>
                                     </thead>
@@ -311,7 +311,7 @@
                                             </div>
                                         </td>
                                         <td><span class="badge bg-light text-dark border">[[${item.size.sizeName}]]</span></td>
-                                        <td class="text-center">x[[${item.quantity}]]</td>
+                                        <td><span class="badge bg-light text-dark border">[[${item.color}]]</span></td> <td class="text-center">x[[${item.quantity}]]</td>
                                         <td class="text-end pe-3 fw-bold">[[${#numbers.formatDecimal(item.price * item.quantity, 0, 'POINT', 0, 'POINT')}]] đ</td>
                                     </tr>
                                     </tbody>
