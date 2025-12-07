@@ -11,4 +11,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findAllByProductIdOrderByCreatedAtDesc(Integer productId);
 
 
+    List<Comment> findByProductIdAndParentIsNullOrderByCreatedAtDesc(Integer productId);
+
+    List<Comment> findAllByOrderByCreatedAtDesc();
 }

@@ -55,4 +55,32 @@ public class CommentController {
 
         return "redirect:/product/" + productId;
     }
+
+    // Endpoint để User trả lời bình luận (Đặt trong CommentController)
+    @PostMapping("/reply")
+    public String replyComment(
+            @RequestParam("parentId") Integer parentId,
+            @RequestParam("content") String content,
+            @RequestParam("productId") Integer productId,
+            @AuthenticationPrincipal User principal,
+            RedirectAttributes ra) {
+
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        if (content.trim().isEmpty()) {
+            ra.addFlashAttribute("errorMessage", "Nội dung không được để trống.");
+            return "redirect:/product/" + productId;
+        }
+
+        try {
+            commentService.userReplyToComment(parentId, principal.getId(), content);
+            ra.addFlashAttribute("successMessage", "Đã gửi câu trả lời!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/product/" + productId;
+    }
 }

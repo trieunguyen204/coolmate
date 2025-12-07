@@ -527,21 +527,62 @@
 
         <div th:if="${productComments != null && !productComments.isEmpty()}">
             <div th:each="comment : ${productComments}" class="comment-item">
+
                 <div class="comment-header">
-                    <div class="comment-avatar" th:text="${#strings.substring(comment.user.username, 0, 1).toUpperCase()}">U</div>
-                    <div class="comment-user-info">
-                        <strong th:text="${comment.user.username}">Anonymous User</strong>
-                        <div class="comment-rating">
-                            <th:block th:with="ratingVal=${comment.rate != null ? comment.rate : 0}">
-                                <i th:each="i : ${#numbers.sequence(1, 5)}"
-                                   th:class="${i <= ratingVal ? 'fas fa-star' : 'far fa-star'}">
-                                </i>
-                            </th:block>
+                </div>
+                <p class="mb-1" th:text="${comment.content}">Nội dung</p>
+
+                <div sec:authorize="isAuthenticated()" class="mt-2">
+                    <button class="btn btn-sm btn-link text-decoration-none p-0" type="button"
+                            data-bs-toggle="collapse"
+                            th:data-bs-target="'#replyForm-' + ${comment.id}">
+                        <i class="fas fa-reply"></i> Trả lời
+                    </button>
+
+                    <div class="collapse mt-2 ps-3" th:id="'replyForm-' + ${comment.id}">
+                        <form th:action="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/comments/reply} : @{/user/comments/reply}"
+                              method="post">
+                            <input type="hidden" name="parentId" th:value="${comment.id}">
+                            <input type="hidden" name="productId" th:value="${product.id}">
+                            <div class="input-group">
+                                <input type="text" name="content" class="form-control form-control-sm"
+                                       placeholder="Viết câu trả lời..." required>
+                                <button class="btn btn-sm btn-primary" type="submit">Gửi</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div th:if="${not #lists.isEmpty(comment.replies)}" class="ms-5 mt-3 ps-3 border-start border-3 border-light bg-light rounded p-2">
+                    <div th:each="reply : ${comment.replies}" class="mb-3"> <div class="d-flex align-items-center mb-1">
+                        <span th:if="${reply.isAdminReply}" class="badge bg-primary me-2">QTV Coolmate</span>
+                        <strong th:unless="${reply.isAdminReply}" th:text="${reply.user.username}" class="me-2">User</strong>
+                        <small class="text-muted" th:text="${#dates.format(reply.createdAt, 'dd/MM/yyyy HH:mm')}"></small>
+                    </div>
+                        <p class="mb-1 small" th:text="${reply.content}"></p>
+
+                        <div sec:authorize="isAuthenticated()">
+                            <small>
+                                <a href="#" class="text-decoration-none text-muted"
+                                   data-bs-toggle="collapse"
+                                   th:data-bs-target="'#replySubForm-' + ${reply.id}">
+                                    Trả lời
+                                </a>
+                            </small>
+                            <div class="collapse mt-1" th:id="'replySubForm-' + ${reply.id}">
+                                <form th:action="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/comments/reply} : @{/user/comments/reply}"
+                                      method="post">
+                                    <input type="hidden" name="parentId" th:value="${reply.id}">
+                                    <input type="hidden" name="productId" th:value="${product.id}">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" name="content" class="form-control" placeholder="Phản hồi..." required>
+                                        <button class="btn btn-secondary" type="submit">Gửi</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <p class="mb-1" th:text="${comment.content}">Nội dung bình luận</p>
-                <small class="text-muted" th:text="${#dates.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}">20/12/2025 10:30</small>
             </div>
         </div>
 
